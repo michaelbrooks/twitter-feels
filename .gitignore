@@ -2,3 +2,25 @@
 *.pot
 *.pyc
 local_settings.py
+
+# Build dir
+/out
+
+# Static files dir
+/twitter_feels/static/
+/twitter_feels/media/
+
+# Virtual environments
+/venv
+
+# SQLite3 database files:
+*.db
+*.db-journal
+
+# IntelliJ IDEA project files
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/dataSources.xml
+/.idea/sqlDataSources.xml
+/.idea/dynamic.xml
+/.idea/dataSources.ids

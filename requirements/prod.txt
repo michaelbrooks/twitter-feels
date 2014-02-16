@@ -1,0 +1,6 @@
+# requirements/prod.txt
+
+-r common.txt
+
+mysql-python==1.2.5
+django-rq=0.6.1

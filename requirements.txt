@@ -1,0 +1,3 @@
+# requirements.txt for production
+# This file is helpful for deploying to Heroku-like systems.
+-r requirements/prod.txt
