@@ -182,6 +182,18 @@ class QueueStreamListener(JsonStreamListener):
         return len(batch) / diff
 
 
+def get_credentials(credentials_name):
+    if credentials_name:
+        credentials = TwitterAPICredentials.objects.get(name=credentials_name)
+    else:
+        credentials = TwitterAPICredentials.objects.first()
+
+    if not credentials:
+        raise ObjectDoesNotExist("Unknown credentials %s" % credentials_name)
+
+    return credentials
+
+
 class Command(BaseCommand):
     """
     Calculates time frames for
@@ -221,13 +233,7 @@ class Command(BaseCommand):
         )
 
         try:
-            if credentials_name:
-                credentials = TwitterAPICredentials.objects.get(name=credentials_name)
-            else:
-                credentials = TwitterAPICredentials.objects.get()
-
-            if not credentials:
-                raise ObjectDoesNotExist("Unknown credentials %s" % credentials_name)
+            credentials = get_credentials(credentials_name)
 
             logger.info("Using credentials for %s", credentials.name)
             stream_process.credentials = credentials

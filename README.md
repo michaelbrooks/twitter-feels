@@ -20,3 +20,10 @@ Running an RQ worker on Windows:
 ```bash
 $ manage.py rqworker --worker-class rq_win.WindowsWorker
 ```
+
+Run the RQ scheduler process (this manages periodic analysis tasks).
+This causes it to check for scheduled tasks every 20 seconds:
+
+```bash
+$ manage.py rqscheduler -i 20
+```

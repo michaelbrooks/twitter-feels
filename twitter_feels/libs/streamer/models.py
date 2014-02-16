@@ -1,5 +1,4 @@
 from django.db import models
-
 from datetime import datetime
 from email.utils import parsedate
 from django.utils import timezone
@@ -29,6 +28,8 @@ class TwitterAPICredentials(models.Model):
     access_token = models.CharField(max_length=250)
     access_token_secret = models.CharField(max_length=250)
 
+    def __unicode__(self):
+        return self.name
 
 class StreamProcess(models.Model):
 
@@ -171,6 +172,13 @@ class Tweet(models.Model):
             in_reply_to_status_id=raw.get('in_reply_to_status_id'),
             retweeted_status_id=retweeted_status['id']
         )
+
+    @classmethod
+    def get_created_in_range(cls, start, end):
+        """
+        Returns all the tweets between start and end.
+        """
+        return cls.objects.filter(created_at__range=[start, end])
 
 
 class FilterTerm(models.Model):

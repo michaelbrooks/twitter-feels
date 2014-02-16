@@ -29,7 +29,7 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': '',
-        }
+    }
 }
 ########## END DATABASE CONFIGURATION
 
@@ -40,8 +40,8 @@ RQ_QUEUES = {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
-        },
-    }
+    },
+}
 ######### END RQ CONFIGURATION
 
 
@@ -50,7 +50,7 @@ RQ_QUEUES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
+    }
 }
 ########## END CACHE CONFIGURATION
 
@@ -71,7 +71,7 @@ MIDDLEWARE_CLASSES += (
 
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
-    }
+}
 ########## END TOOLBAR CONFIGURATION
 
 
@@ -92,11 +92,11 @@ LOGGING = {
         }
     },
     "formatters": {
-        "rq_console": {
+        "time_console": {
             "format": "%(asctime)s %(message)s",
             "datefmt": "%H:%M:%S",
-            },
         },
+    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
@@ -105,26 +105,31 @@ LOGGING = {
         },
         'console': {
             'level': 'DEBUG',
-            'class': 'logging.StreamHandler'
+            'class': 'logging.StreamHandler',
+            'formatter': 'time_console'
         },
         "rq_console": {
             "level": "DEBUG",
             "class": "rq.utils.ColorizingStreamHandler",
-            "formatter": "rq_console",
+            "formatter": "time_console",
             "exclude": ["%(asctime)s"],
-            },
         },
+    },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins', 'console'],
             'level': 'DEBUG',
             'propagate': True,
-            },
+        },
         "rq.worker": {
             "handlers": ["rq_console"],
-            "level": "DEBUG"
+            "level": "INFO"
         },
         "streamer": {
+            "handlers": ['console'],
+            "level": "DEBUG"
+        },
+        "thermometer": {
             "handlers": ['console'],
             "level": "DEBUG"
         }

@@ -60,11 +60,7 @@ DATABASES = {
 
 ########## Redis Queue (RQ) CONFIGURATION
 RQ_QUEUES = {
-    'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-    }
+    'default': {},
 }
 # Warning: Overrides the admin template!
 RQ_SHOW_ADMIN_LINK = True

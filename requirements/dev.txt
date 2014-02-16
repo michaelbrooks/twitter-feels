@@ -3,6 +3,7 @@
 -r common.txt
 
 django-debug-toolbar==1.0.1
+rq-dashboard==0.3.3
 
 # Install django-rq from my fork for now because it supports custom worker classes
 # This is needed for windows-based RQ development
