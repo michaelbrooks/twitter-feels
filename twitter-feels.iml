@@ -22,6 +22,33 @@
   <component name="PyDocumentationSettings">
     <option name="myDocStringFormat" value="Plain" />
   </component>
+  <component name="TemplatesService">
+    <option name="TEMPLATE_CONFIGURATION" value="Django" />
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/gis/templates/gis" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/gis/templates/gis/admin" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/gis/templates/gis/google" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/auth/tests/templates/registration" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/auth/tests/templates/context_processors" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/admin/templates/admin" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/admin/templates/admin/auth/user" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/admin/templates/admin/includes" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/admin/templates/admin/edit_inline" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/admin/templates/registration" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/comments/templates/comments" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/admindocs/templates/admin_doc" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/flatpages/tests/templates" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/flatpages/tests/templates/flatpages" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/flatpages/tests/templates/registration" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/formtools/tests/wizard/wizardtests/templates" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/formtools/tests/templates" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/formtools/tests/templates/forms" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/formtools/templates/formtools" />
+        <option value="$MODULE_DIR$/venv/Lib/site-packages/django/contrib/formtools/templates/formtools/wizard" />
+      </list>
+    </option>
+  </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="Unittests" />
     <option name="PROJECT_TEST_RUNNER" value="Unittests" />

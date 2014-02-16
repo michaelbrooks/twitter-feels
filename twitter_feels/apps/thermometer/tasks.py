@@ -23,6 +23,13 @@ def _insert_and_queue(time_frames):
 
 
 def schedule_create_tasks():
+    """
+    Schedule a periodic analysis job.
+    """
+
+    # First cancel any old jobs
+    cancel_create_tasks()
+
     now = datetime.now()
     duration = settings.TIME_FRAME_DURATION
 
@@ -32,20 +39,43 @@ def schedule_create_tasks():
         func=create_tasks,
         interval=duration.total_seconds(),
     )
+    job.meta['thermometer.create_tasks'] = True
+    job.save()
 
-    logger.info('Scheduled job %s', str(job.id))
+    logger.info('Scheduled analysis job %s', str(job.id))
+    return True
 
-
-def cancel_create_tasks():
+def scheduler_status():
+    """
+    Returns true if there is an analysis job scheduled.
+    """
     scheduler = django_rq.get_scheduler()
     jobs = scheduler.get_jobs()
 
     for job in jobs:
-        scheduler.cancel(job)
-        logger.info("Cancelled job %s", str(job.id))
-    if not len(jobs):
-        logger.info("No jobs to cancel")
+        if job.meta.get('thermometer.create_tasks'):
+            return True
 
+    return False
+
+def cancel_create_tasks():
+    """
+    Cancels any scheduled analysis jobs.
+    """
+    scheduler = django_rq.get_scheduler()
+    jobs = scheduler.get_jobs()
+
+    cancelled = 0
+    for job in jobs:
+        if job.meta.get('thermometer.create_tasks'):
+            scheduler.cancel(job)
+            logger.info("Cancelled analysis job %s", str(job.id))
+            cancelled += 1
+
+    if not cancelled:
+        logger.info("No analysis jobs to cancel")
+
+    return cancelled
 
 def create_tasks():
     """
@@ -206,6 +236,13 @@ def cleanup():
         .filter(word=None, tweet_count__isnull=False)
 
     # Delete the tweets in each of these frames
+    tweets_cleaned = 0
+    frames_cleaned = 0
     for frame in frames:
         tweets = Tweet.get_created_in_range(frame.start_time, frame.end_time)
-        tweets.delete()
+        if len(tweets):
+            tweets_cleaned += len(tweets)
+            frames_cleaned += 1
+            tweets.delete()
+
+    logger.info("Cleaned %d tweets for %d frames.", tweets_cleaned, frames_cleaned)

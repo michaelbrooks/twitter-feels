@@ -6,7 +6,7 @@ from logging.config import dictConfig
 import time
 import Queue
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.core.management.base import BaseCommand
 import tweepy
 from twitter_monitor import JsonStreamListener, DynamicTwitterStream, TermChecker
@@ -97,20 +97,26 @@ class FeelsTermChecker(TermChecker):
     object will actually also insert the tweets into the database.
     """
 
-    def __init__(self, queue_listener, stream_process):
+    def __init__(self, queue_listener, stream_process, scheduler=None):
         super(FeelsTermChecker, self).__init__()
 
         # A queue for tweets that need to be written to the database
         self.listener = queue_listener
         self.error_count = 0
         self.process = stream_process
+        # If provided, will periodically enqueue scheduled tasks
+        self.scheduler = scheduler
 
     def update_tracking_terms(self):
-        # Process the tweet queue first -- this is more important
+        # Process the tweet queue -- this is more important
         # to do regularly than updating the tracking terms
         # Update the process status in the database
         self.process.tweet_rate = self.listener.process_tweet_queue()
         self.process.error_count = self.error_count
+
+        # Check for scheduled jobs
+        if self.scheduler:
+            self.scheduler.enqueue_jobs()
 
         # Check for new tracking terms
         filter_terms = FilterTerm.objects.filter(enabled=True)
@@ -194,12 +200,25 @@ def get_credentials(credentials_name):
     return credentials
 
 
+try:
+    from django_rq import get_scheduler
+except ImportError:
+    def get_scheduler(*args, **kwargs):
+        raise ImproperlyConfigured('django_rq not installed')
+
+
+
 class Command(BaseCommand):
     """
-    Calculates time frames for
+    Starts a process that streams data from Twitter.
+
+    If --scheduler-queue is provided, manages scheduled
+    RQ jobs on the given queue at the same rate as polling.
 
     Example usage:
     python manage.py stream
+    python manage.py stream --poll-interval 25
+    python manage.py stream --poll-interval 25 --scheduler-queue default
     """
 
     option_list = BaseCommand.option_list + (
@@ -210,14 +229,22 @@ class Command(BaseCommand):
             default=10,
             help='Seconds between term updates and tweet inserts.'
         ),
+        make_option(
+            '--scheduler-queue',
+            action='store',
+            dest='scheduler_queue',
+            default=None,
+            help='Schedule RQ tasks on this queue.'
+        )
     )
     args = '<credentials_name>'
-    help = "Starts a streaming connection to Twitter"
+    help = "Starts a streaming connection to Twitter, optionally schedules RQ jobs"
 
     def handle(self, credentials_name=None, *args, **options):
 
         # The suggested time between hearbeats
         poll_interval = options.get('poll_interval', 10)
+        scheduler_queue = options.get('scheduler_queue', None)
 
         # First expire any old stream process records that have failed
         # to report in for a while
@@ -235,6 +262,15 @@ class Command(BaseCommand):
         try:
             credentials = get_credentials(credentials_name)
 
+            if scheduler_queue:
+                scheduler = get_scheduler(name=scheduler_queue, interval=poll_interval)
+                if not scheduler:
+                    logger.error("Unable to initialize scheduler %s", scheduler_queue)
+                else:
+                    logger.info("Managing scheduled tasks on %s", scheduler_queue)
+            else:
+                scheduler = None
+
             logger.info("Using credentials for %s", credentials.name)
             stream_process.credentials = credentials
             stream_process.save()
@@ -244,7 +280,8 @@ class Command(BaseCommand):
 
             listener = QueueStreamListener()
             checker = FeelsTermChecker(queue_listener=listener,
-                                       stream_process=stream_process)
+                                       stream_process=stream_process,
+                                       scheduler=scheduler)
 
             # Start and maintain the streaming connection...
             stream = DynamicTwitterStream(auth, listener, checker)

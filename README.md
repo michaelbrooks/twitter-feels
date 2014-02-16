@@ -27,3 +27,11 @@ This causes it to check for scheduled tasks every 20 seconds:
 ```bash
 $ manage.py rqscheduler -i 20
 ```
+
+Run the streamer with the `--scheduler-queue` option
+to manage the RQ scheduler as part of the Twitter streaming process
+(less processes to start and stop):
+
+```bash
+$ manage.py stream <credentials_name> --interval 20 --scheduler-queue default
+```
