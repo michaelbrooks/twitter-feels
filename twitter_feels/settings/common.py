@@ -143,6 +143,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+
+    # Adds a 'site' variable to every template
+    'twitter_feels.context_processors.sites.current_site'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -208,6 +211,9 @@ THIRD_PARTY_APPS = (
 
     # Django and RQ integration
     'django_rq',
+
+    # Hierarchical navigation template tags
+    'lineage',
 )
 
 LOCAL_APPS = (

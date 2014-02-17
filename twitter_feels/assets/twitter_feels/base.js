@@ -1,5 +1,5 @@
 (function() {
 
-    alert("howdy");
+    console.log("twitter_feels loaded")
 
 })();

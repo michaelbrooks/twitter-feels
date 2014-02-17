@@ -1,8 +1,6 @@
-from datetime import time
 from django.db import models
 import re
 
-# Create your models here.
 
 class FeelingGroup(models.Model):
     """
@@ -12,6 +10,7 @@ class FeelingGroup(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class FeelingPrefix(models.Model):
     """
@@ -50,6 +49,7 @@ class FeelingPrefix(models.Model):
 
         return None
 
+
 class FeelingWord(models.Model):
     """
     A feeling word such as "fine" or "better" or "angry".
@@ -65,6 +65,7 @@ class FeelingWord(models.Model):
 
     def __unicode__(self):
         return self.word
+
 
 class TimeFrame(models.Model):
     """

@@ -1,15 +1,27 @@
 from django.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.utils import parsedate
 from django.utils import timezone
+import os
+import socket
 import settings
 
 current_timezone = timezone.get_current_timezone()
+
+
 def parse_datetime(string):
     if settings.USE_TZ:
         return datetime(*(parsedate(string)[:6]), tzinfo=current_timezone)
     else:
         return datetime(*(parsedate(string)[:6]))
+
+
+def get_streamer_status():
+    processes = StreamProcess.get_current_stream_processes()
+    return {
+        "running": len(processes) > 0,
+        "processes": processes,
+    }
 
 
 class TwitterAPICredentials(models.Model):
@@ -31,9 +43,11 @@ class TwitterAPICredentials(models.Model):
     def __unicode__(self):
         return self.name
 
-class StreamProcess(models.Model):
 
+class StreamProcess(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    timeout_seconds = models.PositiveIntegerField()
+    expires_at = models.DateTimeField()
     last_heartbeat = models.DateTimeField()
 
     credentials = models.ForeignKey(TwitterAPICredentials, null=True)
@@ -44,21 +58,58 @@ class StreamProcess(models.Model):
     STREAM_STATUS_WAITING = "WAITING"  # No terms currently being tracked
     STREAM_STATUS_STOPPED = "STOPPED"
     status = models.CharField(max_length=10,
-                                     choices=(
-                                         (STREAM_STATUS_RUNNING, "Running"),
-                                         (STREAM_STATUS_WAITING, "Waiting"),
-                                         (STREAM_STATUS_STOPPED, "Stopped")
-                                     ),
-                                     default=STREAM_STATUS_WAITING)
+                              choices=(
+                                  (STREAM_STATUS_RUNNING, "Running"),
+                                  (STREAM_STATUS_WAITING, "Waiting"),
+                                  (STREAM_STATUS_STOPPED, "Stopped")
+                              ),
+                              default=STREAM_STATUS_WAITING)
 
     tweet_rate = models.FloatField(default=0)
     error_count = models.PositiveSmallIntegerField(default=0)
+
+    def heartbeat(self, save=True):
+        self.status = StreamProcess.STREAM_STATUS_RUNNING
+        self.last_heartbeat = timezone.now()
+        self.expires_at = self.last_heartbeat + timedelta(seconds=self.timeout_seconds)
+        if save:
+            self.save()
 
     def lifetime(self):
         return self.last_heartbeat - self.created_at
 
     def __unicode__(self):
         return "%s:%d %s (%s)" % (self.hostname, self.process_id, self.status, self.lifetime())
+
+    @classmethod
+    def create(cls, timeout_seconds):
+        now = timezone.now()
+        expires_at = now + timedelta(seconds=timeout_seconds)
+        return StreamProcess(
+            process_id=os.getpid(),
+            hostname=socket.gethostname(),
+            last_heartbeat=now,
+            expires_at=expires_at,
+            timeout_seconds=timeout_seconds
+        )
+
+    @classmethod
+    def get_current_stream_processes(cls, minutes_ago=10):
+
+        # some maintenance
+        cls.expire_timed_out()
+
+        minutes_ago_dt = timezone.now() - timedelta(minutes=minutes_ago)
+        return StreamProcess.objects \
+            .filter(last_heartbeat__gt=minutes_ago_dt) \
+            .order_by('-last_heartbeat')
+
+
+    @classmethod
+    def expire_timed_out(cls):
+        StreamProcess.objects \
+            .filter(expires_at__lt=timezone.now()) \
+            .update(status=StreamProcess.STREAM_STATUS_STOPPED)
 
 
 class Tweet(models.Model):

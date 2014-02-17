@@ -1,25 +1,24 @@
 # For tasks that can be run as background jobs.
 import django_rq
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import timedelta, datetime
 from django.utils import timezone
 from models import TimeFrame, FeelingPrefix, FeelingWord
 from twitter_feels.libs.streamer.models import Tweet
+import django_rq
+from datetime import datetime
 import settings
-
 import logging
 
 logger = logging.getLogger('thermometer')
 
 
-def _insert_and_queue(time_frames):
-    """
-    Inserts the given TimeFrames into the database
-    and creates a job to calculate each one.
-    """
-    for frame in time_frames:
-        frame.save()
-        aggregate.delay(frame_id=frame.pk)
+def get_thermometer_status():
+    running = scheduler_status()
+    data = {
+        "running": running,
+        "message": "Running" if running else "Stopped"
+    }
+    return data
 
 
 def schedule_create_tasks():
@@ -45,6 +44,7 @@ def schedule_create_tasks():
     logger.info('Scheduled analysis job %s', str(job.id))
     return True
 
+
 def scheduler_status():
     """
     Returns true if there is an analysis job scheduled.
@@ -57,6 +57,7 @@ def scheduler_status():
             return True
 
     return False
+
 
 def cancel_create_tasks():
     """
@@ -76,6 +77,17 @@ def cancel_create_tasks():
         logger.info("No analysis jobs to cancel")
 
     return cancelled
+
+
+def _insert_and_queue(time_frames):
+    """
+    Inserts the given TimeFrames into the database
+    and creates a job to calculate each one.
+    """
+    for frame in time_frames:
+        frame.save()
+        aggregate.delay(frame_id=frame.pk)
+
 
 def create_tasks():
     """

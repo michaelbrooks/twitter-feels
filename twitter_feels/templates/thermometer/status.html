@@ -1,0 +1,5 @@
+<span id='thermometer-status'
+      class="label {% if running %}label-success{% else %}label-warning{% endif %}"
+      data-status-url="{% url 'thermometer_status' %}">
+    {{ message }}
+</span>

@@ -1,0 +1,40 @@
+{% load humanize %}
+{% if processes %}
+    Active Twitter streams:
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Process</th>
+            <th>Started</th>
+            <th>API Credentials</th>
+            <th>Last Heartbeat</th>
+            <th>Status</th>
+            <th>Tweet Rate (t/s)</th>
+            <th>Errors</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stream in processes %}
+            <tr class="
+            {% if stream.status != stream.STREAM_STATUS_RUNNING %}text-muted{% endif %}
+            {% if stream.error_count > 0 %}text-danger{% endif %}
+            ">
+
+                <td>{{ stream.hostname }}:{{ stream.process_id }}</td>
+                <td>{{ stream.created_at|naturaltime }}</td>
+                <td>{{ stream.credentials }}</td>
+                <td>{{ stream.last_heartbeat|naturaltime }}</td>
+                <td>{{ stream.get_status_display }}</td>
+                <td>{{ stream.tweet_rate|floatformat }}</td>
+            {% if stream.error_count > 0 %}
+                <td><b>{{ stream.error_count }}</b></td>
+            {% else %}
+                <td>{{ stream.error_count }}</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No Twitter stream running</p>
+{% endif %}

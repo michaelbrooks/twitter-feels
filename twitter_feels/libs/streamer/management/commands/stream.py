@@ -1,6 +1,4 @@
 import logging
-import os
-import socket
 from optparse import make_option
 from logging.config import dictConfig
 import time
@@ -126,8 +124,7 @@ class FeelsTermChecker(TermChecker):
         else:
             self.process.status = StreamProcess.STREAM_STATUS_WAITING
 
-        self.process.last_heartbeat = timezone.now()
-        self.process.save()
+        self.process.heartbeat()
 
         return set([t.term for t in filter_terms])
 
@@ -248,15 +245,11 @@ class Command(BaseCommand):
 
         # First expire any old stream process records that have failed
         # to report in for a while
-        expire_time = timezone.now() - timedelta(seconds=3 * poll_interval)
-        StreamProcess.objects \
-            .filter(last_heartbeat__lt=expire_time) \
-            .update(status=StreamProcess.STREAM_STATUS_STOPPED)
+        timeout_seconds = 3 * poll_interval
+        StreamProcess.expire_timed_out()
 
-        stream_process = StreamProcess(
-            process_id=os.getpid(),
-            hostname=socket.gethostname(),
-            last_heartbeat=timezone.now()
+        stream_process = StreamProcess.create(
+            timeout_seconds=3 * poll_interval
         )
 
         try:
@@ -294,8 +287,7 @@ class Command(BaseCommand):
 
             logger.error("Stopping because term checker not ok")
             stream_process.status = StreamProcess.STREAM_STATUS_STOPPED
-            stream_process.last_heartbeat = timezone.now()
-            stream_process.save()
+            stream_process.heartbeat()
 
         except KeyboardInterrupt:
             pass
@@ -305,5 +297,4 @@ class Command(BaseCommand):
 
         finally:
             stream_process.status = StreamProcess.STREAM_STATUS_STOPPED
-            stream_process.last_heartbeat = timezone.now()
-            stream_process.save()
+            stream_process.heartbeat()

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Status{% endblock %}
+{% block header %}Status <button class="btn" title="Reload" id="refresh-status"><span class="glyphicon glyphicon-refresh"></span></button>{% endblock %}
+
+{% block content %}
+    {# Save the status url here for json requests #}
+    <span id='#urls' class="hidden" data-status-url="{% url 'status' %}"></span>
+
+    <h2>Thermometer</h2>
+
+    <p>Periodic analysis task scheduler: {% include 'thermometer/status.html' with running=thermometer.running message=thermometer.message %}</p>
+
+    {% if request.user.is_staff %}
+        {# Show a switch for controlling turning on and off the thermometer analysis system #}
+        <p>
+            <strong>Admin:</strong> Turn the analysis task scheduler on or off:
+            <input type="checkbox" id="thermometer-toggle"
+                   data-on-color="success" data-off-color="warning"
+                   data-animate="false" data-size="small"
+                   data-stop-url="{% url 'thermometer_stop' %}"
+                   data-start-url="{% url 'thermometer_start' %}"
+                   {% if thermometer.running %}checked="checked"{% endif %}/>
+        </p>
+    {% endif %}
+
+    <h2>Twitter Streaming</h2>
+
+    <div id="streamer-status">
+        {% include 'twitter_feels/../streamer/status.html' with processes=streamer.processes %}
+    </div>
+
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" type=text/css"
+          href="{% static 'libs/bootstrap-switch/build/css/bootstrap3/bootstrap-switch.css' %}"/>
+    <link rel="stylesheet" type=text/css"
+          href="{% static 'twitter_feels/status/status.css' %}"/>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'libs/bootstrap-switch/build/js/bootstrap-switch.js' %}" type="text/javascript"></script>
+    <script src="{% static 'twitter_feels/status/status.js' %}"
+            type="text/javascript"></script>
+{% endblock %}
