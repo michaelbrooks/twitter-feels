@@ -8,14 +8,12 @@
     {# Save the status url here for json requests #}
     <span id='#urls' class="hidden" data-status-url="{% url 'status' %}"></span>
 
-    <h2>Thermometer</h2>
-
-    <p>Periodic analysis task scheduler: {% include 'thermometer/status.html' with running=thermometer.running message=thermometer.message %}</p>
+    <h2>Thermometer Analysis {% include 'thermometer/status.html' with running=thermometer.running message=thermometer.message %}</h2>
 
     {% if request.user.is_staff %}
         {# Show a switch for controlling turning on and off the thermometer analysis system #}
         <p>
-            <strong>Admin:</strong> Turn the analysis task scheduler on or off:
+            <strong>Admin Only:</strong> Start/stop the analysis task scheduler:
             <input type="checkbox" id="thermometer-toggle"
                    data-on-color="success" data-off-color="warning"
                    data-animate="false" data-size="small"
@@ -25,10 +23,8 @@
         </p>
     {% endif %}
 
-    <h2>Twitter Streaming</h2>
-
     <div id="streamer-status">
-        {% include 'twitter_feels/../streamer/status.html' with processes=streamer.processes %}
+        {% include 'twitter_feels/../streamer/status.html' with running=thermometer.running message=thermometer.message processes=streamer.processes %}
     </div>
 
 {% endblock %}

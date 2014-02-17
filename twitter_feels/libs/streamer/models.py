@@ -18,8 +18,15 @@ def parse_datetime(string):
 
 def get_streamer_status():
     processes = StreamProcess.get_current_stream_processes()
+    running = False
+    for p in processes:
+        if p.status == StreamProcess.STREAM_STATUS_RUNNING:
+            running = True
+            break
+
     return {
-        "running": len(processes) > 0,
+        "running": running,
+        "message": "Running" if running else "Stopped",
         "processes": processes,
     }
 

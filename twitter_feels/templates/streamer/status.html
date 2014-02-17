@@ -1,4 +1,9 @@
 {% load humanize %}
+<h2>Twitter Streaming
+    <span class="label {% if running %}label-success{% else %}label-warning{% endif %}">
+    {{ message }}
+    </span>
+</h2>
 {% if processes %}
     Active Twitter streams:
     <table class="table">
@@ -26,11 +31,11 @@
                 <td>{{ stream.last_heartbeat|naturaltime }}</td>
                 <td>{{ stream.get_status_display }}</td>
                 <td>{{ stream.tweet_rate|floatformat }}</td>
-            {% if stream.error_count > 0 %}
-                <td><b>{{ stream.error_count }}</b></td>
-            {% else %}
-                <td>{{ stream.error_count }}</td>
-            {% endif %}
+                {% if stream.error_count > 0 %}
+                    <td><b>{{ stream.error_count }}</b></td>
+                {% else %}
+                    <td>{{ stream.error_count }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
