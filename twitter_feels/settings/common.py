@@ -145,7 +145,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 
     # Adds a 'site' variable to every template
-    'twitter_feels.context_processors.sites.current_site'
+    'twitter_feels.context_processors.current_site',
+    'twitter_feels.context_processors.debug_mode',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -222,6 +223,9 @@ LOCAL_APPS = (
 
     # A thermometer visualization
     'twitter_feels.apps.thermometer',
+
+    # A status monitoring app
+    'twitter_feels.apps.status',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -311,3 +315,14 @@ WSGI_APPLICATION = 'wsgi.application'
 BOOTSTRAP3 = {
 }
 ########## END BOOTSTRAP SETTINGS
+
+
+########## SCHEDULED TASKS SETTINGS
+STATUS_SCHEDULED_TASKS = {
+    "thermometer": {
+        "name": "Thermometer Analysis",
+        "path": "twitter_feels.apps.thermometer.tasks.create_tasks",
+        "interval": 30
+    },
+}
+########## END SCHEDULED TASKS SETTINGS

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load staticfiles humanize %}
+
+{% block title %}Status{% endblock %}
+{% block header %}
+    Status
+    <button class="btn" title="Reload" id="refresh-status"
+            data-status-url="{% url 'get_status' %}">
+        <span class="glyphicon glyphicon-refresh"></span>
+    </button>{% endblock %}
+
+{% block content %}
+
+    <h2>Scheduled Tasks</h2>
+    {% if redis %}
+        <table class="table tasks">
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th>Task Name</th>
+                <th>Last Scheduled</th>
+                {% if request.user.is_staff %}
+                    <th>Turn on or off</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for name, task in status.items %}
+                <tr class="task-row"
+                    data-task-key="{{ task.key }}"
+                    data-task-status-url="{% url 'get_task_status' task.key %}">
+                    <td class="badge-cell">{% include 'status/badge.html' with status=task %}</td>
+                    <td class="name-cell">{{ task.name }}</td>
+                    <td class="enqueued-at-cell">{{ task.enqueued_at|naturaltime }}</td>
+                    {% if request.user.is_staff %}
+                        <td class="switch-cell invisible">{% include 'status/switch.html' with status=task %}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-danger">Redis server not available!</div>
+    {% endif %}
+
+    <div id="streamer-status">
+        {#        {% include 'streamer/status.html' with running=thermometer.running message=thermometer.message processes=streamer.processes %}#}
+    </div>
+
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" type=text/css"
+          href="{% static 'libs/bootstrap-switch/build/css/bootstrap3/bootstrap-switch.css' %}"/>
+    <link rel="stylesheet" type=text/css" href="{% static 'status/status.css' %}"/>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script src="{% static 'libs/bootstrap-switch/build/js/bootstrap-switch.js' %}" type="text/javascript"></script>
+    <script src="{% static 'status/task_view.js' %}" type="text/javascript"></script>
+    <script src="{% static 'status/status.js' %}" type="text/javascript"></script>
+{% endblock %}

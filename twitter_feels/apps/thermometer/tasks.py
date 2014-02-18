@@ -1,82 +1,13 @@
 # For tasks that can be run as background jobs.
-import django_rq
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from models import TimeFrame, FeelingPrefix, FeelingWord
 from twitter_feels.libs.streamer.models import Tweet
 import django_rq
-from datetime import datetime
 import settings
 import logging
 
 logger = logging.getLogger('thermometer')
-
-
-def get_thermometer_status():
-    running = scheduler_status()
-    data = {
-        "running": running,
-        "message": "Running" if running else "Stopped"
-    }
-    return data
-
-
-def schedule_create_tasks():
-    """
-    Schedule a periodic analysis job.
-    """
-
-    # First cancel any old jobs
-    cancel_create_tasks()
-
-    now = datetime.now()
-    duration = settings.TIME_FRAME_DURATION
-
-    scheduler = django_rq.get_scheduler()
-    job = scheduler.schedule(
-        scheduled_time=now,
-        func=create_tasks,
-        interval=duration.total_seconds(),
-    )
-    job.meta['thermometer.create_tasks'] = True
-    job.save()
-
-    logger.info('Scheduled analysis job %s', str(job.id))
-    return True
-
-
-def scheduler_status():
-    """
-    Returns true if there is an analysis job scheduled.
-    """
-    scheduler = django_rq.get_scheduler()
-    jobs = scheduler.get_jobs()
-
-    for job in jobs:
-        if job.meta.get('thermometer.create_tasks'):
-            return True
-
-    return False
-
-
-def cancel_create_tasks():
-    """
-    Cancels any scheduled analysis jobs.
-    """
-    scheduler = django_rq.get_scheduler()
-    jobs = scheduler.get_jobs()
-
-    cancelled = 0
-    for job in jobs:
-        if job.meta.get('thermometer.create_tasks'):
-            scheduler.cancel(job)
-            logger.info("Cancelled analysis job %s", str(job.id))
-            cancelled += 1
-
-    if not cancelled:
-        logger.info("No analysis jobs to cancel")
-
-    return cancelled
 
 
 def _insert_and_queue(time_frames):

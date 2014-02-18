@@ -97,8 +97,16 @@
     </script>
     {% block js %}
         <script src="{% static 'libs/console.log-wrapper/consolelog.js' %}" type="text/javascript"></script>
+        <script src="{% static 'libs/js-logger/src/logger.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/jquery-cookie/jquery.cookie.js' %}" type="text/javascript"></script>
         <script src="{% static 'twitter_feels/base.js' %}" type="text/javascript"></script>
+        <script type="text/javascript">
+            {% if debug_mode %}
+                window.apps.configureLogger(Logger.DEBUG);
+            {% else %}
+                window.apps.configureLogger(Logger.WARN);
+            {% endif %}
+        </script>
     {% endblock %}
 {% endcompress %}
 

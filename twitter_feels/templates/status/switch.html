@@ -1,0 +1,9 @@
+<input type="checkbox"
+       data-on-color="success"
+       data-off-color="warning"
+       data-animate="false"
+       data-size="small"
+       data-stop-url="{% url 'stop_task' status.key %}"
+       data-start-url="{% url 'start_task' status.key %}"
+       {% if status.running %}checked="checked"{% endif %}
+        />
