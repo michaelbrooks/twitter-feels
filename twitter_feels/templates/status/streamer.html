@@ -1,35 +1,47 @@
 {% load humanize %}
-<h2>Twitter Streaming
-    <span class="label {% if running %}label-success{% else %}label-warning{% endif %}">
-    {{ message }}
+<h2>Twitter Streaming</h2>
+
+<p>The Twitter stream is
+    <span class="label {% if streamer.running %}label-success{% else %}label-warning{% endif %}">
+        {% if streamer.running %}Running{% else %}Stopped{% endif %}
     </span>
-</h2>
-{% if processes %}
-    Active Twitter streams:
+</p>
+
+<p>Current filter terms:
+    {% for term in streamer.terms %}
+        <code>{{ term }}</code>
+    {% endfor %}
+</p>
+
+{% if streamer.processes %}
+    <p>Recent Twitter streaming processes:</p>
     <table class="table">
         <thead>
         <tr>
-            <th>Process</th>
-            <th>Started</th>
-            <th>API Credentials</th>
-            <th>Last Heartbeat</th>
             <th>Status</th>
+            <th>Process</th>
+            <th>API Credentials</th>
+            <th>Started</th>
+            <th>Last Heartbeat</th>
             <th>Tweet Rate (t/s)</th>
             <th>Errors</th>
         </tr>
         </thead>
         <tbody>
-        {% for stream in processes %}
+        {% for stream in streamer.processes %}
             <tr class="
             {% if stream.status != stream.STREAM_STATUS_RUNNING %}text-muted{% endif %}
             {% if stream.error_count > 0 %}text-danger{% endif %}
             ">
-
+                <td>
+                <span class="label {% if stream.status != stream.STREAM_STATUS_RUNNING %}label-default{% else %}label-success{% endif %}">
+                    {{ stream.get_status_display }}
+                </span>
+                </td>
                 <td>{{ stream.hostname }}:{{ stream.process_id }}</td>
-                <td>{{ stream.created_at|naturaltime }}</td>
                 <td>{{ stream.credentials }}</td>
+                <td>{{ stream.created_at|naturaltime }}</td>
                 <td>{{ stream.last_heartbeat|naturaltime }}</td>
-                <td>{{ stream.get_status_display }}</td>
                 <td>{{ stream.tweet_rate|floatformat }}</td>
                 {% if stream.error_count > 0 %}
                     <td><b>{{ stream.error_count }}</b></td>
@@ -41,5 +53,6 @@
         </tbody>
     </table>
 {% else %}
-    <p>No Twitter stream running</p>
+    <p>No recent Twitter streaming processes.</p>
 {% endif %}
+

@@ -1,0 +1,44 @@
+{% load humanize %}
+<h3>Workers</h3>
+
+<p>Your task queue is
+    <span class="label {% if workers.running %}label-success{% else %}label-warning{% endif %}">
+        {% if workers.running %}Running{% else %}Stopped{% endif %}
+    </span>
+</p>
+
+{% if workers.workers %}
+    <p>Workers:</p>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>State</th>
+            <th>Name</th>
+            <th>Queues</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for worker in workers.workers %}
+            <tr class="{% if worker.state != 'busy' %}text-muted{% endif %}">
+                <td>
+                <span class="label
+                        {% if worker.state == 'idle' %}label-warning
+                        {% elif worker.state == 'busy' %}label-success
+                        {% endif %}">
+                    {{ worker.state.capitalize }}
+                </span>
+                </td>
+                <td>{{ worker.name }}</td>
+                <td>
+                    {% for q in worker.queues %}
+                        <code>{{ q }}</code>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No workers running.</p>
+{% endif %}
+

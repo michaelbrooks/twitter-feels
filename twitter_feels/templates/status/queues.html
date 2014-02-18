@@ -1,0 +1,38 @@
+{% load humanize %}
+<h3>Queued Work</h3>
+
+{% if queues %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Queue</th>
+            <th>Jobs</th>
+            <th>Oldest Unfinished Job</th>
+            <th>Job States</th>
+            <th>Job Types</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for name, queue in queues.items %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ queue.count }}</td>
+                <td>{{ queue.oldest|naturaltime }}</td>
+                <td>
+                    {% for s, count in queue.state_count.items %}
+                        <code>{{ s }}</code> ({{ count }} jobs)<br/>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for t, count in queue.func_count.items %}
+                        <code>{{ t }}</code> ({{ count }} jobs)<br/>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Your queues are empty.</p>
+{% endif %}
+

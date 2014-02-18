@@ -11,6 +11,10 @@
 
 {% block content %}
 
+    <div id="general-status">
+        {% include 'status/general.html' %}
+    </div>
+
     <h2>Scheduled Tasks</h2>
     {% if redis %}
         <table class="table tasks">
@@ -25,11 +29,11 @@
             </tr>
             </thead>
             <tbody>
-            {% for name, task in status.items %}
+            {% for name, task in tasks.items %}
                 <tr class="task-row"
                     data-task-key="{{ task.key }}"
                     data-task-status-url="{% url 'get_task_status' task.key %}">
-                    <td class="badge-cell">{% include 'status/badge.html' with status=task %}</td>
+                    <td class="badge-cell">{% include 'status/badge.html' with running=task.running %}</td>
                     <td class="name-cell">{{ task.name }}</td>
                     <td class="enqueued-at-cell">{{ task.enqueued_at|naturaltime }}</td>
                     {% if request.user.is_staff %}
@@ -44,7 +48,17 @@
     {% endif %}
 
     <div id="streamer-status">
-        {#        {% include 'streamer/status.html' with running=thermometer.running message=thermometer.message processes=streamer.processes %}#}
+        {% include 'status/streamer.html' with streamer=streamer %}
+    </div>
+
+    <h2>RQ Status</h2>
+
+    <div id="workers-status">
+        {% include 'status/workers.html' with workers=workers %}
+    </div>
+
+    <div id="queues-status">
+        {% include 'status/queues.html' with queues=queues %}
     </div>
 
 {% endblock %}

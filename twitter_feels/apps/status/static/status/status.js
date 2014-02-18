@@ -9,7 +9,11 @@
 
         this.ui = {
             refresh_button: $('#refresh-status'),
-            task_table: $('table.tasks')
+            task_table: $('table.tasks'),
+            streamer_status: $('#streamer-status'),
+            workers_status: $('#workers-status'),
+            queues_status: $('#queues-status'),
+            general_status: $('#general-status')
         };
 
         if (this.ui.refresh_button) {
@@ -20,9 +24,10 @@
         this.init_task_views();
     };
 
-    StatusApp.prototype.start = function() {
+    StatusApp.prototype.start = function () {
         if (this.status_url) {
             logger.info("polling every " + (POLLING_INTERVAL / 1000) + " seconds");
+
             //Start polling for status
             this.schedule_next_poll();
         }
@@ -33,7 +38,7 @@
     /**
      * Listen for refresh button clicks.
      */
-    StatusApp.prototype.init_refresh = function() {
+    StatusApp.prototype.init_refresh = function () {
         var self = this;
         this.status_url = this.ui.refresh_button.data('status-url');
 
@@ -66,15 +71,22 @@
         $.get(self.status_url)
             .done(function (response) {
 
-                $.each(response, function (key, status) {
-                    self.display_status(key, status);
+                $.each(response.tasks, function (key, status) {
+                    self.display_task_status(key, status);
                 });
-                //display_streamer_status(response.streamer);
+
+                self.display_status_block(self.ui.streamer_status, response.streamer);
+                self.display_status_block(self.ui.queues_status, response.queues);
+                self.display_status_block(self.ui.workers_status, response.workers);
+                self.display_status_block(self.ui.general_status, response.general);
             })
             .fail(function (err) {
                 logger.error("Failed to obtain status.", err);
-                self.display_status();
-//                display_streamer_status(undefined);
+                self.display_task_status();
+                self.display_status_block(self.ui.streamer_status, undefined);
+                self.display_status_block(self.ui.queues_status, undefined);
+                self.display_status_block(self.ui.workers_status, undefined);
+                self.display_status_block(self.ui.general_status, undefined);
             })
             .always(function () {
                 self.schedule_next_poll();
@@ -90,7 +102,7 @@
      * @param [key]
      * @param [status]
      */
-    StatusApp.prototype.display_status = function (key, status) {
+    StatusApp.prototype.display_task_status = function (key, status) {
         if (key) {
             var task_view = this.task_views[key];
             task_view.display_status(status);
@@ -102,6 +114,17 @@
     };
 
     /**
+     * Display updated status for a block replace html element
+     *
+     * @param [streamerStatus]
+     */
+    StatusApp.prototype.display_status_block = function (element, newHtml) {
+        if (newHtml) {
+            element.html(newHtml);
+        }
+    };
+
+    /**
      * Set a timeout for the next status update.
      */
     StatusApp.prototype.schedule_next_poll = function () {
@@ -109,23 +132,6 @@
         setTimeout(function () {
             self.update_status()
         }, POLLING_INTERVAL);
-    };
-
-
-    var get_streamer_status = function () {
-        return $('#streamer-status')
-    };
-
-    /**
-     * Display updated streamer status.
-     *
-     * @param [streamerStatus]
-     */
-    var display_streamer_status = function (streamerStatus) {
-        if (streamerStatus) {
-            var indicator = get_streamer_status();
-            indicator.html(streamerStatus.html);
-        }
     };
 
     //Get started

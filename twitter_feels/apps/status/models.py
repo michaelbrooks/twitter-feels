@@ -1,9 +1,14 @@
 from datetime import datetime, timedelta
 import logging
 import redis
+from collections import defaultdict
+from django.utils import timezone
+
 import django_rq
+import rq
 
 import settings
+from twitter_feels.libs.streamer.models import Tweet, StreamProcess, FilterTerm
 
 
 logger = logging.getLogger('status')
@@ -141,3 +146,82 @@ def redis_running():
         return True
     except redis.ConnectionError:
         return False
+
+
+def scheduler_status():
+    if scheduler.connection.exists(scheduler.scheduler_key) and \
+            not scheduler.connection.hexists(scheduler.scheduler_key, 'death'):
+        return True
+    else:
+        return False
+
+
+def queues_status():
+    queues = rq.Queue.all(connection=django_rq.get_connection())
+    result = {}
+    for q in queues:
+        jobs = q.get_jobs()
+
+        oldest = None
+        state_count = defaultdict(int)
+        func_count = defaultdict(int)
+
+        for j in jobs:
+            if j.status != 'finished' and (not oldest or j.created_at < oldest):
+                oldest = j.created_at
+
+            func_count[j.func_name] += 1
+            state_count[j.status] += 1
+
+        #TODO: Fix this nasty hack -- rq doesn't use UTC
+        if oldest:
+            oldest = timezone.make_aware(oldest, timezone.get_default_timezone())
+
+        result[q.name] = {
+            'name': q.name,
+            'count': q.count,
+            'oldest': oldest,
+            'state_count': dict(state_count),
+            'func_count': dict(func_count)
+        }
+    return result
+
+
+def worker_status():
+    workers = rq.Worker.all(connection=django_rq.get_connection())
+    worker_data = []
+    running = False
+    for w in workers:
+        if not w.stopped:
+            running = True
+
+        worker_data.append({
+            'name': w.name,
+            'state': w.state,
+            'stopped': w.stopped,
+            'queues': w.queue_names(),
+        })
+
+    result = {
+        "workers": worker_data,
+        "running": running
+    }
+
+    return result
+
+
+def stream_status():
+    terms = FilterTerm.objects.filter(enabled=True)
+    processes = StreamProcess.get_current_stream_processes()
+    running = False
+    for p in processes:
+        if p.status == StreamProcess.STREAM_STATUS_RUNNING:
+            running = True
+            break
+
+    return {
+        'running': running,
+        'terms': [t.term for t in terms],
+        'processes': processes,
+        'tweet_count': Tweet.objects.count()
+    }

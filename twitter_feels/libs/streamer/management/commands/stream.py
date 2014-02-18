@@ -6,6 +6,7 @@ import Queue
 
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.core.management.base import BaseCommand
+import signal
 import tweepy
 from twitter_monitor import JsonStreamListener, DynamicTwitterStream, TermChecker
 from datetime import timedelta
@@ -204,7 +205,6 @@ except ImportError:
         raise ImproperlyConfigured('django_rq not installed')
 
 
-
 class Command(BaseCommand):
     """
     Starts a process that streams data from Twitter.
@@ -252,6 +252,32 @@ class Command(BaseCommand):
             timeout_seconds=3 * poll_interval
         )
 
+
+        def stop(signum, frame):
+            """
+            Register scheduler's death and exit.
+            """
+            logger.debug("Stopping because of signal")
+            if scheduler:
+                scheduler.register_death()
+
+            if stream_process:
+                stream_process.status = StreamProcess.STREAM_STATUS_STOPPED
+                stream_process.heartbeat()
+
+            raise SystemExit()
+
+        def install_signal_handlers():
+            """
+            Installs signal handlers for handling SIGINT and SIGTERM
+            gracefully.
+            """
+
+            signal.signal(signal.SIGINT, stop)
+            signal.signal(signal.SIGTERM, stop)
+
+        install_signal_handlers()
+
         try:
             credentials = get_credentials(credentials_name)
 
@@ -261,8 +287,7 @@ class Command(BaseCommand):
                     logger.error("Unable to initialize scheduler %s", scheduler_queue)
                 else:
                     logger.info("Managing scheduled tasks on %s", scheduler_queue)
-            else:
-                scheduler = None
+                    scheduler.register_birth()
 
             logger.info("Using credentials for %s", credentials.name)
             stream_process.credentials = credentials
@@ -278,6 +303,7 @@ class Command(BaseCommand):
 
             # Start and maintain the streaming connection...
             stream = DynamicTwitterStream(auth, listener, checker)
+
             while checker.ok():
                 try:
                     stream.start(poll_interval)
@@ -289,12 +315,8 @@ class Command(BaseCommand):
             stream_process.status = StreamProcess.STREAM_STATUS_STOPPED
             stream_process.heartbeat()
 
-        except KeyboardInterrupt:
-            pass
-
         except Exception as e:
             logger.error(e)
 
         finally:
-            stream_process.status = StreamProcess.STREAM_STATUS_STOPPED
-            stream_process.heartbeat()
+            stop(None, None)
