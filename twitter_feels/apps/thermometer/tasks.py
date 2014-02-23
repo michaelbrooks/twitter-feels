@@ -1,7 +1,8 @@
 # For tasks that can be run as background jobs.
+from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from models import TimeFrame, FeelingPrefix, FeelingWord
+from models import TimeFrame, FeelingIndicator, FeelingWord
 from twitter_feels.libs.streamer.models import Tweet
 import django_rq
 import settings
@@ -106,59 +107,76 @@ def aggregate(frame_id, cleanup_when_done=False):
     globalframe = TimeFrame.objects.get(pk=frame_id)
 
     # Get all the words we are currently interested in tracking
-    # words = FeelingWord.objects.filter(enabled=True)
-    # prefixes = FeelingPrefix.objects.filter(enabled=True)
-    #
-    # # Create a ton of empty frames -- one for each word
-    # all_new_frames = []
-    # frames_by_word = {}
-    # for word in words:
-    #     frame = globalframe.create_subframe(word=word, tweet_count=0)
-    #     all_new_frames.append(frame)
-    #     frames_by_word[word.word] = frame
-    #
-    # # And... one for each prefix
-    # frames_by_prefix = {}
-    # # And one for each (prefix, word)
-    # frames_by_word_by_prefix = {}
-    # for prefix in prefixes:
-    #     frame = globalframe.create_subframe(prefix=prefix, tweet_count=0)
-    #     all_new_frames.append(frame)
-    #     frames_by_prefix[prefix.prefix] = frame
-    #
-    #     frames_by_word_by_prefix[prefix.prefix] = {}
-    #     for word in words:
-    #         frame = globalframe.create_subframe(prefix=prefix, word=word, tweet_count=0)
-    #         all_new_frames.append(frame)
-    #         frames_by_word_by_prefix[prefix.prefix][word.word] = frame
-    #
-    # # Go through all the tweets in the interval
-    tweets = Tweet.get_created_in_range(globalframe.start_time, globalframe.end_time)
-    # for tweet in tweets:
-    #
-    #     # find out which prefix matches and get the next word
-    #     for prefix in prefixes:
-    #
-    #         next_word = prefix.get_next_word(tweet.text)
-    #         if next_word:
-    #             next_word = next_word.lower()
-    #
-    #             # Update the frame for this prefix
-    #             frames_by_prefix[prefix.prefix].tweet_count += 1
-    #
-    #             # Check if the following word is in our set
-    #             if next_word in frames_by_word:
-    #                 # update the frame for this word
-    #                 frames_by_word[next_word].tweet_count += 1
-    #
-    #                 # update the frame for this (prefix, word)
-    #                 frames_by_word_by_prefix[prefix.prefix][word.word].tweet_count += 1
-    #
-    # # Save all the new frames
-    # TimeFrame.objects.bulk_create(all_new_frames)
+    indicators = FeelingIndicator.objects.filter(enabled=True)
+    feelings = FeelingWord.get_tracked_list()
+    feelings_dict = dict((f.word, f) for f in feelings)
+
+    # Create a matrix for holding the counts -- these will be initialized to 0 as needed
+    # Index into this with by indicator then words
+    # For example: sparse_matrix['i feel']['fine'] += 1
+    sparse_matrix = defaultdict(lambda: defaultdict(int))
+
+    # Go through all the tweets in the interval
+    tweets = Tweet.get_created_in_range(globalframe.start_time, globalframe.end_time)\
+        .filter(retweeted_status_id=None)
+
+    indicator_matches = 0
+    for tweet in tweets:
+        # find out if an indicator matches
+        for indicator in indicators:
+
+            try:
+
+                indicator_phrase, feeling_word = indicator.extract_feeling(tweet.text, feelings_dict)
+
+                if feeling_word:
+                    # we have a valid feeling for this indicator
+                    sparse_matrix[indicator_phrase][feeling_word] += 1
+
+                    break  # only one indicator per tweet, please
+
+                elif indicator_phrase:
+                    # we have a match on the indicator but no detectable feeling
+                    indicator_matches += 1
+
+            except Exception as e:
+                logger.error("Error parsing tweet: %s", e.message)
+
+    # Create a bunch of new data frames
+    all_new_frames = []
+    now = timezone.now()
+    for idx, indicator in enumerate(indicators):
+
+        for feeling in feelings:
+
+            all_new_frames.append(globalframe.create_subframe(
+                feeling=feeling,
+                indicator=indicator,
+                tweet_count=sparse_matrix[indicator.phrase][feeling.word],
+                calculated_at=now
+            ))
+
+            # if idx == 0:
+            #     # create a null-indicator entry for this feeling
+            #     all_new_frames.append(globalframe.create_subframe(
+            #         feeling=feeling,
+            #         indicator=None,
+            #         tweet_count=sparse_matrix[None][feeling.word]
+            #     ))
+
+        # # create a null-feeling entry for this indicator
+        # all_new_frames.append(globalframe.create_subframe(
+        #     feeling=None,
+        #     indicator=indicator,
+        #     tweet_count=sparse_matrix[indicator.phrase][None]
+        # ))
+
+    # Save all the new frames
+    TimeFrame.objects.bulk_create(all_new_frames)
 
     # This global frame is now done
-    globalframe.tweet_count = len(tweets)
+    globalframe.tweet_count = indicator_matches
+    globalframe.calculated_at = now
     globalframe.save()
 
     logger.info('Processed %d tweets for frame %s', len(tweets), str(frame_id))

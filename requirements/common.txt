@@ -20,3 +20,5 @@ tweepy==2.2
 -e git+https://github.com/michaelbrooks/twitter-monitor.git@simpler-threading#egg=twitter-monitor
 
 django-bootstrap3==2.5.6
+
+nltk==2.0.4

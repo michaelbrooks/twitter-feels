@@ -6,6 +6,25 @@
 
 {% block content %}
 
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for frame in frames %}
+
+            <tr>
+                <td>{{ frame.time }}</td>
+                <td>{{ frame.total }}</td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+
 {% endblock %}
 
 {% block css %}
