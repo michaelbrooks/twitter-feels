@@ -158,21 +158,19 @@ class TimeFrame(models.Model):
         )
 
     @classmethod
-    def get_latest(cls, *args):
+    def get_latest(cls):
         """
         Returns the latest timeframe for the given word.
         """
         return cls.objects \
-            .filter(*args) \
             .latest(field_name='start_time')
 
     @classmethod
-    def get_earliest(cls, *args):
+    def get_earliest(cls):
         """
         Returns the earliest timeframe for the given word.
         """
         return cls.objects \
-            .filter(*args) \
             .earliest(field_name='start_time')
 
     @classmethod
