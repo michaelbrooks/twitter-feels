@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from models import TimeFrame, FeelingIndicator, FeelingWord
 from twitter_feels.libs.streamer.models import Tweet
+from datetime import timedelta
 import django_rq
 import settings
 import logging
@@ -109,74 +110,74 @@ def aggregate(frame_id, cleanup_when_done=False):
     # Get all the words we are currently interested in tracking
     indicators = FeelingIndicator.objects.filter(enabled=True)
     feelings = FeelingWord.get_tracked_list()
-    feelings_dict = dict((f.word, f) for f in feelings)
+    feelings_set = set(f.word for f in feelings)
 
-    # Create a matrix for holding the counts -- these will be initialized to 0 as needed
-    # Index into this with by indicator then words
-    # For example: sparse_matrix['i feel']['fine'] += 1
-    sparse_matrix = defaultdict(lambda: defaultdict(int))
+    # Create a dict for holding the counts -- these will be initialized to 0 as needed
+    # Index into this with feeling words
+    # For example: tweet_counts_by_feeling['fine'] += 1
+    tweet_counts_by_feeling = defaultdict(int)
 
     # Go through all the tweets in the interval
     tweets = Tweet.get_created_in_range(globalframe.start_time, globalframe.end_time)\
-        .filter(retweeted_status_id=None)
+        .filter(retweeted_status_id=None)\
+        .order_by('created_at')
 
+    # The number of tweets that matched an indicator but did NOT contain a recognized feeling.
     indicator_matches = 0
+    largest_gap = timedelta(seconds=0)
+    last_tweet_time = None
     for tweet in tweets:
+
+        # Detecting gaps in the data
+        if last_tweet_time:
+            gap = tweet.created_at - last_tweet_time
+            if gap > largest_gap:
+                largest_gap = gap
+
+        last_tweet_time = tweet.created_at
+
         # find out if an indicator matches
         for indicator in indicators:
 
             try:
-
-                indicator_phrase, feeling_word = indicator.extract_feeling(tweet.text, feelings_dict)
+                indicator_phrase, feeling_word = indicator.extract_feeling(tweet.text, feelings_set)
 
                 if feeling_word:
                     # we have a valid feeling for this indicator
-                    sparse_matrix[indicator_phrase][feeling_word] += 1
+                    tweet_counts_by_feeling[feeling_word] += 1
 
                     break  # only one indicator per tweet, please
 
                 elif indicator_phrase:
+
                     # we have a match on the indicator but no detectable feeling
                     indicator_matches += 1
 
             except Exception as e:
                 logger.error("Error parsing tweet: %s", e.message)
 
+    # If more than 20% of the frame was a gap, then consider it incomplete
+    incomplete = len(tweets) == 0 or largest_gap.total_seconds() > globalframe.duration_seconds * 0.2
+
     # Create a bunch of new data frames
     all_new_frames = []
-    now = timezone.now()
-    for idx, indicator in enumerate(indicators):
 
-        for feeling in feelings:
+    for feeling in feelings:
 
-            all_new_frames.append(globalframe.create_subframe(
-                feeling=feeling,
-                indicator=indicator,
-                tweet_count=sparse_matrix[indicator.phrase][feeling.word],
-                calculated_at=now
-            ))
-
-            # if idx == 0:
-            #     # create a null-indicator entry for this feeling
-            #     all_new_frames.append(globalframe.create_subframe(
-            #         feeling=feeling,
-            #         indicator=None,
-            #         tweet_count=sparse_matrix[None][feeling.word]
-            #     ))
-
-        # # create a null-feeling entry for this indicator
-        # all_new_frames.append(globalframe.create_subframe(
-        #     feeling=None,
-        #     indicator=indicator,
-        #     tweet_count=sparse_matrix[indicator.phrase][None]
-        # ))
+        all_new_frames.append(globalframe.create_subframe(
+            feeling=feeling,
+            tweet_count=tweet_counts_by_feeling[feeling.word],
+            calculated=True,
+            incomplete=incomplete
+        ))
 
     # Save all the new frames
     TimeFrame.objects.bulk_create(all_new_frames)
 
     # This global frame is now done
     globalframe.tweet_count = indicator_matches
-    globalframe.calculated_at = now
+    globalframe.calculated = True
+    globalframe.incomplete = incomplete
     globalframe.save()
 
     logger.info('Processed %d tweets for frame %s', len(tweets), str(frame_id))

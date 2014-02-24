@@ -1,30 +1,64 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
+{% load staticfiles humanize %}
 
 {% block title %}Thermometer{% endblock %}
 {% block header %}Thermometer{% endblock %}
 
 {% block content %}
+    <table class="table">
+        <thead>
+        <th></th>
+        <th style="background-color: #000; color: #FFF">OTHER</th>
+        {% for feeling in data.feelings %}
+            <th style="background-color: #{{ feeling.color }}">{{ feeling.word }}</th>
+        {% endfor %}
+        </thead>
+        <tbody>
+        <tr>
+            <td>Normal:</td>
+            {% for c in data.normal.feeling_counts %}
+                <td>{{ c|floatformat }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td>Last 24hrs:</td>
+            {% for c in data.historical.feeling_counts %}
+                <td>{{ c|floatformat }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td>Now:</td>
+            {% with data.frames.data|last as lastframe %}
+                {% for c in lastframe.feeling_counts %}
+                    <td>{{ c|floatformat }}</td>
+                {% endfor %}
+            {% endwith %}
+        </tr>
+        </tbody>
+    </table>
 
     <table class="table">
         <thead>
         <tr>
-            <th>Time</th>
-            <th>Total</th>
+            <th></th>
+            {% for frame in data.frames.data %}
+                <th style="font-size: 0.5em">{{ frame.start_time }}</th>
+            {% endfor %}
         </tr>
         </thead>
         <tbody>
-        {% for frame in frames %}
-
+        {% for feeling in data.feelings %}
             <tr>
-                <td>{{ frame.time }}</td>
-                <td>{{ frame.total }}</td>
+            <td>{{ feeling.word }}</td>
             </tr>
-
         {% endfor %}
         </tbody>
     </table>
-
+    <script>
+        (function () {
+            window.thermometer_data = {{ json_data|safe }};
+        })();
+    </script>
 {% endblock %}
 
 {% block css %}

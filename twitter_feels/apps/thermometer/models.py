@@ -11,6 +11,7 @@ INDICATOR_REG_TEMPLATE = (r"([^\w]|^)"   # something that is not wordy
 # The number of match groups contained in the regex
 INDICATOR_REG_GROUP_COUNT = 2
 
+
 class FeelingIndicator(models.Model):
     """
     A feeling indicator such as "I feel" or "I am feeling".
@@ -27,7 +28,7 @@ class FeelingIndicator(models.Model):
         super(FeelingIndicator, self).__init__(*args, **kwargs)
         self._reg = None
 
-    def extract_feeling(self, text, feelings_dict):
+    def extract_feeling(self, text, feelings_set):
         """
         Given the text of a tweet and a set of all valid FeelingWords,
         returns a tuple of strings: (indicator phrase, valid feeling).
@@ -58,14 +59,14 @@ class FeelingIndicator(models.Model):
             # search afterwards then backwards before
             before_tokens.reverse()
             for token in after_tokens + before_tokens:
-                if token in feelings_dict:
+                if token in feelings_set:
                     return self.phrase, token
 
             # The indicator matched but no feeling found
             return self.phrase, None
 
         elif len(segments) > 1:
-            raise Exception("Unexpected result from split: %s" %(str(segments)))
+            raise Exception("Unexpected result from split: %s" % (str(segments)))
 
         # The indicator didn't match
         return None, None
@@ -99,54 +100,61 @@ class FeelingWord(models.Model):
 
 class TimeFrame(models.Model):
     """
-    Tweet count for a specific indicator and feeling word in a specific time window.
+    Tweet count for feeling word in a specific time window.
 
-    If indicator and feeling are both None,
-    then the TimeFrame is a "global frame", and the
+    If the feeling is None, then the TimeFrame is a "global frame", and the
     tweet_count represents the total number of tweets that matched any indicator,
-    even if no particular feeling was detected.
+    but where NO particular feeling was detected.
     """
 
+    class Meta:
+        index_together = [
+            ["incomplete", "feeling"],
+            ["calculated", "end_time", "feeling"]
+        ]
+
     # Some slightly redundant timing info for convenience
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = models.DateTimeField(db_index=True)
+    end_time = models.DateTimeField(db_index=True)
     duration_seconds = models.PositiveIntegerField()
 
-    # The indicator and word whose frequency we are counting, or none for the total tweet count
-    indicator = models.ForeignKey(FeelingIndicator, null=True, default=None, blank=True)
+    # The word whose frequency we are counting, or none for the total tweet count
     feeling = models.ForeignKey(FeelingWord, null=True, default=None, blank=True)
 
     # The number of tweets
     tweet_count = models.PositiveIntegerField(null=True, blank=True, default=None)
-    calculated_at = models.DateTimeField(null=True, blank=True, default=None)
+    calculated = models.BooleanField(default=False)
+
+    # True if we think the data for this frame is incomplete
+    incomplete = models.BooleanField(default=True)
 
     @classmethod
     def create_global(cls, start_time, time_delta):
         """
-        Creates a TimeFrame without a indicator/feeling assigned.
+        Creates a TimeFrame without a feeling assigned.
         """
         return cls(
             start_time=start_time,
             end_time=start_time + time_delta,
             duration_seconds=time_delta.total_seconds(),
             feeling=None,
-            indicator=None,
             tweet_count=None,
-            calculated_at=None
+            calculated=False,
+            incomplete=True
         )
 
-    def create_subframe(self, feeling=None, indicator=None, tweet_count=None, calculated_at=None):
+    def create_subframe(self, feeling=None, tweet_count=None, calculated=False, incomplete=False):
         """
-        Make a duplicate of this frame but with the word and/or indicator set.
+        Make a duplicate of this frame but with the feeling set.
         """
         return TimeFrame(
             start_time=self.start_time,
             end_time=self.end_time,
             duration_seconds=self.duration_seconds,
             feeling=feeling,
-            indicator=indicator,
             tweet_count=tweet_count,
-            calculated_at=calculated_at
+            calculated=calculated,
+            incomplete=incomplete
         )
 
     @classmethod
@@ -168,17 +176,40 @@ class TimeFrame(models.Model):
             .earliest(field_name='start_time')
 
     @classmethod
-    def get_global_frames(cls, start=None, end=None):
+    def get_average_rates(cls, start=None, end=None):
         """
-        Gets all of the global frames covering a time range
+        Gets the average tweet count for each feeling, and globally.
         """
-        result = cls.objects
-        if end:
-            result = result.filter(start_time__lt=end)
-        if start:
-            result = result.filter(end_time__gt=start)
+        query = cls.objects \
+            .filter(incomplete=False)
 
-        return result.filter(tweet_count__isnull=False, indicator=None, feeling=None)
+        if end:
+            query = query.filter(start_time__lt=end)
+        if start:
+            query = query.filter(end_time__gt=start)
+
+        query = query.values('feeling').annotate(models.Avg('tweet_count')) \
+            .order_by('feeling')
+
+        result = [row['tweet_count__avg'] for row in query]
+
+        return result
+
+    @classmethod
+    def get_frames(cls, start=None, end=None):
+        """
+        Gets the count of each feeling at time frames over an interval.
+        """
+        query = cls.objects.filter(calculated=True)
+
+        if end:
+            query = query.filter(start_time__lt=end)
+        if start:
+            query = query.filter(end_time__gt=start)
+
+        query = query.order_by('end_time', 'feeling')
+
+        return query
 
     def __unicode__(self):
-        return "[%s, %s] %s %s (%d tweets)" % (self.start_time, self.end_time, self.indicator, self.feeling, self.tweet_count or 0)
+        return "[%s, %s] %s (%d tweets)" % (self.start_time, self.end_time, self.feeling, self.tweet_count or 0)
