@@ -1,7 +1,8 @@
 (function() {
 
     window.apps = {
-        status: {}
+        status: {},
+        thermometer: {}
     };
 
     //Configure a logger

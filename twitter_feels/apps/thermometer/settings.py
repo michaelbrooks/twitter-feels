@@ -7,5 +7,5 @@ TIME_FRAME_DURATION = getattr(settings, 'TIME_FRAME_DURATION', timedelta(seconds
 WINDOW_AFTER = getattr(settings, 'WINDOW_AFTER', 5)
 WINDOW_BEFORE = getattr(settings, 'WINDOW_BEFORE', 2)
 
-HISTORICAL_INTERVAL = getattr(settings, 'HISTORICAL_INTERVAL', timedelta(hours=24))
+HISTORICAL_INTERVAL = getattr(settings, 'HISTORICAL_INTERVAL', timedelta(hours=6))
 DISPLAY_INTERVAL = getattr(settings, 'DISPLAY_INTERVAL', timedelta(minutes=60))

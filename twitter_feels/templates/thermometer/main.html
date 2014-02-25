@@ -21,7 +21,7 @@
             {% endfor %}
         </tr>
         <tr>
-            <td>Last 24hrs:</td>
+            <td>Last 12hrs:</td>
             {% for c in data.historical.feeling_counts %}
                 <td>{{ c|floatformat }}</td>
             {% endfor %}
@@ -36,24 +36,8 @@
         </tr>
         </tbody>
     </table>
+    <table class="table timeline"></table>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th></th>
-            {% for frame in data.frames.data %}
-                <th style="font-size: 0.5em">{{ frame.start_time }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for feeling in data.feelings %}
-            <tr>
-            <td>{{ feeling.word }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
     <script>
         (function () {
             window.thermometer_data = {{ json_data|safe }};
@@ -63,10 +47,10 @@
 
 {% block css %}
     {{ block.super }}
-
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/thermometer.css' %}"/>
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
-
+    <script type="text/javascript" src="{% static 'thermometer/thermometer.js' %}"></script>
 {% endblock %}

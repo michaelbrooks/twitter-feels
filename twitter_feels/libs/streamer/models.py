@@ -5,9 +5,9 @@ from django.utils import timezone
 import os
 import socket
 import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 current_timezone = timezone.get_current_timezone()
-
 
 def parse_datetime(string):
     if settings.USE_TZ:
@@ -50,6 +50,17 @@ class TwitterAPICredentials(models.Model):
     def __unicode__(self):
         return self.name
 
+    @classmethod
+    def get_credentials(cls, credentials_name):
+        if credentials_name:
+            credentials = TwitterAPICredentials.objects.get(name=credentials_name)
+        else:
+            credentials = TwitterAPICredentials.objects.first()
+
+        if not credentials:
+            raise ObjectDoesNotExist("Unknown credentials %s" % credentials_name)
+
+        return credentials
 
 class StreamProcess(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

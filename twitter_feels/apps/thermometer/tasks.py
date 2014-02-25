@@ -49,8 +49,11 @@ def create_tasks():
         latest = latest.replace(second=0, microsecond=0)  # chop off the small bits
 
     # Get the current time
-    now = timezone.now()
-    latest_allowable_start = now - duration
+    try:
+        latest_allowable_start = Tweet.objects.latest(field_name='created_at').created_at - duration
+    except ObjectDoesNotExist:
+        logger.info("No tweets to analyze")
+        return
 
     # Add any time frames that fit between the most recent time frame and now
     frame_start = latest

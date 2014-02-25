@@ -7,7 +7,7 @@ rq-dashboard==0.3.3
 
 # Install django-rq from my fork for now because it supports custom worker classes
 # This is needed for windows-based RQ development
--e git+https://github.com/michaelbrooks/django-rq.git@workerclass#egg=django-rq
+-e git+https://github.com/michaelbrooks/django-rq.git#egg=django-rq
 -e git+https://github.com/michaelbrooks/rq-win.git#egg=rq-win
 
 # Use my fork of rq-scheduler because it works on Windows
