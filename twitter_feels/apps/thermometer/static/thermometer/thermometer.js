@@ -6,28 +6,62 @@
     };
 
     ThermometerApp.prototype.start = function() {
+
         var data = window.thermometer_data;
+
+        //Apply successive moving averages
+        var window_sizes = [7, 5, 3];
+//        var window_sizes = [5];
+
         var table = $('.timeline.table');
         var header = $('<thead>').appendTo(table);
 
         var headerRow = $('<tr>').appendTo(header);
         headerRow.append('<th>');
         data.frames.data.forEach(function(frame, i) {
-            headerRow.append('<th>' + i + '</th>');
+            if (i > window_sizes[0]) {
+                headerRow.append('<th>' + i + '</th>');
+            }
         });
 
         var body = $('<tbody>').appendTo(table);
         data.feelings.forEach(function(feeling, i) {
 
-            var normal = data.normal.feeling_counts[i];
+            var normal = data.normal.feeling_tweets[i];
 
             var row = $('<tr>').appendTo(body);
             row.append('<td>' + feeling.word + '</td>');
 
+            window_sizes.forEach(function(window_size) {
+                var queue = [];
+                var current_sum = undefined;
+
+                data.frames.data.forEach(function(frame, j) {
+                    var percent = frame.feeling_tweets[i]
+                    if (current_sum === undefined) {
+                        current_sum = percent;
+                    }
+
+                    queue.push(percent);
+                    current_sum += percent;
+
+                    if (queue.length > window_size) {
+                        var first = queue.shift();
+                        current_sum -= first;
+                    }
+
+                    if (j > window_size) {
+                        frame.feeling_tweets[i] = current_sum / queue.length;
+                    }
+                });
+            });
+
             data.frames.data.forEach(function(frame, j) {
-                var count = frame.feeling_counts[i];
-                var diff = (count - normal) / normal
-                row.append('<td>' + 100 * diff + '</td>');
+                if (j > window_sizes[0]) {
+                    var diff = (frame.feeling_tweets[i] - normal) / normal;
+                    diff = (100 * diff).toFixed(1);
+                    row.append('<td>' + diff + '%</td>');
+                }
             });
 
         });

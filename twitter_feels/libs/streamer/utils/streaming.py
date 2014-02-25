@@ -30,6 +30,7 @@ class FeelsTermChecker(twitter_monitor.TermChecker):
         self.scheduler = scheduler
 
     def update_tracking_terms(self):
+
         # Process the tweet queue -- this is more important
         # to do regularly than updating the tracking terms
         # Update the process status in the database

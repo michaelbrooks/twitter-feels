@@ -45,11 +45,13 @@ class FakeTwitterStream(tweet_processor.TweetProcessor):
         self.tracking_terms = []
         self.polling = False
         self.stream = None
+        self.last_created_at = 0
 
         self.polling_interrupt = threading.Event()
 
     def process(self, tweet, raw_tweet):
         self.listener.on_status(tweet)
+        self.last_created_at = tweet['created_at']
 
     def start(self, interval):
         """
@@ -63,6 +65,8 @@ class FakeTwitterStream(tweet_processor.TweetProcessor):
 
         logger.info("Starting polling for changes to the track list")
         while self.polling:
+            if self.last_created_at:
+                logger.info('Inserted tweets up to %s', str(self.last_created_at))
 
             # Check if the tracking list has changed
             if self.term_checker.check():
@@ -116,7 +120,7 @@ class Command(BaseCommand):
             '--rate-limit',
             action='store',
             dest='rate_limit',
-            default=50,
+            default=None,
             type=float,
             help='Rate to read in tweets.'
         ),
@@ -174,6 +178,8 @@ class Command(BaseCommand):
         try:
 
             logger.info("Streaming from %s", tweets_file)
+            if rate_limit:
+                logger.limit("Rate limit: %f", rate_limit)
 
             listener = streaming.QueueStreamListener()
             checker = streaming.FeelsTermChecker(queue_listener=listener,

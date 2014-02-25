@@ -26,37 +26,48 @@ def create_tasks():
     """
     Determines what aggregation buckets need to be calculated.
 
-    First it searches forward, looking for new tweets that haven't been
-    processed yet.
+    First, it checks the time on the newest tweet and the newest frame.
+    If there is room for new frames, it adds these.
 
-    Then it searches backwards, looking for old tweets that haven't
-    been processed yet.
+    Then it searches backwards, looking if there are
+    tweets before the earliest frame.
     """
+
+    if Tweet.objects.count() == 0:
+        logger.info("No tweets to analyze")
+        return
 
     duration = settings.TIME_FRAME_DURATION
 
     new_time_frames = []
 
-    # Get the most recent global time frame (no associated word)
+    # Get the most recent global time frame.
+    # We'll start analyzing after this.
     try:
-        latest = TimeFrame.get_latest().end_time
+        latest_analyzed = TimeFrame.get_latest().end_time
     except ObjectDoesNotExist:
         try:
-            latest = Tweet.objects.earliest(field_name='created_at').created_at
+            # There are no frames, so we will start with the first tweet.
+            latest_analyzed = Tweet.objects.earliest(field_name='created_at').created_at
+            latest_analyzed = latest_analyzed.replace(second=0, microsecond=0)  # chop off the small bits
         except ObjectDoesNotExist:
-            latest = timezone.now()
+            logger.info("No tweets to analyze")
+            return
 
-        latest = latest.replace(second=0, microsecond=0)  # chop off the small bits
-
-    # Get the current time
+    # Get the latest tweet. We'll stop analyzing here.
     try:
-        latest_allowable_start = Tweet.objects.latest(field_name='created_at').created_at - duration
+        latest_allowable_start = Tweet.objects.latest(field_name='created_at').created_at
+        # but the frame can stop no later than this time so subtract the duration of the frame
+        latest_allowable_start -= duration
     except ObjectDoesNotExist:
         logger.info("No tweets to analyze")
         return
 
     # Add any time frames that fit between the most recent time frame and now
-    frame_start = latest
+    frame_start = latest_analyzed
+
+    if frame_start < latest_allowable_start:
+        logger.info("Analyzing from %s to %s", frame_start, latest_allowable_start)
     while frame_start < latest_allowable_start:
         # Create a new global (no word) time frame
         new_time_frames.append(TimeFrame.create_global(
@@ -72,30 +83,36 @@ def create_tasks():
     # Done looking forwards, now look backwards
     new_time_frames = []
 
-    if Tweet.objects.count():
-        # Get the oldest tweet
-        first_tweet = Tweet.objects.earliest(field_name='created_at')
+    # Get the oldest tweet
+    # We'll start analysis here
+    try:
+        earliest_allowable_start = Tweet.objects.earliest(field_name='created_at').created_at - duration
+    except ObjectDoesNotExist:
+        logger.info("No tweets to analyze")
+        return
 
-        earliest_allowable_start = first_tweet.created_at - duration
+    # Get the oldest time frame
+    # We'll stop analysis here
+    try:
+        earliest = TimeFrame.get_earliest().start_time
+    except ObjectDoesNotExist:
+        logger.info("No backfilling necessary.")
+        return
 
-        # Get the oldest time frame
-        try:
-            earliest = TimeFrame.get_earliest().start_time
-        except ObjectDoesNotExist:
-            earliest = timezone.now().replace(second=0)  # chop off the seconds portion
+    # Add any time frames that fit between the oldest tweet and the oldest time frame
+    frame_start = earliest - duration
+    if frame_start > earliest_allowable_start:
+        logger.info("Analyzing from %s to %s", earliest_allowable_start, frame_start)
+    while frame_start > earliest_allowable_start:
+        # go until we've overshot the tweet
 
-        # Add any time frames that fit between the oldest tweet and the oldest time frame
-        frame_start = earliest - duration
-        while frame_start > earliest_allowable_start:
-            # go until we've overshot the tweet
+        # Create a new global (no word) time frame
+        new_time_frames.append(TimeFrame.create_global(
+            start_time=frame_start,
+            time_delta=duration
+        ))
 
-            # Create a new global (no word) time frame
-            new_time_frames.append(TimeFrame.create_global(
-                start_time=frame_start,
-                time_delta=duration
-            ))
-
-            frame_start -= duration
+        frame_start -= duration
 
     _insert_and_queue(new_time_frames)
     logger.info("Created %d backward time frames", len(new_time_frames))
@@ -118,7 +135,7 @@ def aggregate(frame_id, cleanup_when_done=False):
     # Create a dict for holding the counts -- these will be initialized to 0 as needed
     # Index into this with feeling words
     # For example: tweet_counts_by_feeling['fine'] += 1
-    tweet_counts_by_feeling = defaultdict(int)
+    tweet_counts_by_feeling = defaultdict(float)
 
     # Go through all the tweets in the interval
     tweets = Tweet.get_created_in_range(globalframe.start_time, globalframe.end_time)\
@@ -148,6 +165,7 @@ def aggregate(frame_id, cleanup_when_done=False):
                 if feeling_word:
                     # we have a valid feeling for this indicator
                     tweet_counts_by_feeling[feeling_word] += 1
+                    indicator_matches += 1
 
                     break  # only one indicator per tweet, please
 
@@ -166,10 +184,14 @@ def aggregate(frame_id, cleanup_when_done=False):
     all_new_frames = []
 
     for feeling in feelings:
+        if indicator_matches > 0:
+            percent = tweet_counts_by_feeling[feeling.word] / indicator_matches
+        else:
+            percent = 0
 
         all_new_frames.append(globalframe.create_subframe(
             feeling=feeling,
-            tweet_count=tweet_counts_by_feeling[feeling.word],
+            tweets=percent,
             calculated=True,
             incomplete=incomplete
         ))
@@ -178,7 +200,7 @@ def aggregate(frame_id, cleanup_when_done=False):
     TimeFrame.objects.bulk_create(all_new_frames)
 
     # This global frame is now done
-    globalframe.tweet_count = indicator_matches
+    globalframe.tweets = indicator_matches
     globalframe.calculated = True
     globalframe.incomplete = incomplete
     globalframe.save()
@@ -198,7 +220,7 @@ def cleanup():
 
     # Get every global frame that has already been processed
     frames = TimeFrame.objects \
-        .filter(word=None, tweet_count__isnull=False)
+        .filter(word=None, calculated=True)
 
     # Delete the tweets in each of these frames
     tweets_cleaned = 0

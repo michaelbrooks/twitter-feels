@@ -100,10 +100,10 @@ class FeelingWord(models.Model):
 
 class TimeFrame(models.Model):
     """
-    Tweet count for feeling word in a specific time window.
+    Tweet percent for feeling word in a specific time window.
 
     If the feeling is None, then the TimeFrame is a "global frame", and the
-    tweet_count represents the total number of tweets that matched any indicator,
+    tweets field represents the total number of tweets that matched any indicator,
     but where NO particular feeling was detected.
     """
 
@@ -121,8 +121,11 @@ class TimeFrame(models.Model):
     # The word whose frequency we are counting, or none for the total tweet count
     feeling = models.ForeignKey(FeelingWord, null=True, default=None, blank=True)
 
-    # The number of tweets
-    tweet_count = models.PositiveIntegerField(null=True, blank=True, default=None)
+    # The percent of tweets with this feeling
+    # If it is a global frame, this holds the ABSOLUTE NUMBER of tweets in the frame
+    tweets = models.FloatField(null=True, blank=True, default=None)
+
+    # True if this frame has been calculated
     calculated = models.BooleanField(default=False)
 
     # True if we think the data for this frame is incomplete
@@ -138,12 +141,12 @@ class TimeFrame(models.Model):
             end_time=start_time + time_delta,
             duration_seconds=time_delta.total_seconds(),
             feeling=None,
-            tweet_count=None,
+            tweets=None,
             calculated=False,
             incomplete=True
         )
 
-    def create_subframe(self, feeling=None, tweet_count=None, calculated=False, incomplete=False):
+    def create_subframe(self, feeling=None, tweets=None, calculated=False, incomplete=False):
         """
         Make a duplicate of this frame but with the feeling set.
         """
@@ -152,7 +155,7 @@ class TimeFrame(models.Model):
             end_time=self.end_time,
             duration_seconds=self.duration_seconds,
             feeling=feeling,
-            tweet_count=tweet_count,
+            tweets=tweets,
             calculated=calculated,
             incomplete=incomplete
         )
@@ -176,20 +179,21 @@ class TimeFrame(models.Model):
     @classmethod
     def get_average_rates(cls, start=None, end=None):
         """
-        Gets the average tweet count for each feeling, and globally.
+        Gets the average percentage for each feeling.
         """
         query = cls.objects \
-            .filter(incomplete=False)
+            .filter(incomplete=False, feeling__isnull=False)
 
         if end:
             query = query.filter(start_time__lt=end)
         if start:
             query = query.filter(end_time__gt=start)
 
-        query = query.values('feeling').annotate(models.Avg('tweet_count')) \
+        query = query.values('feeling')\
+            .annotate(models.Avg('tweets')) \
             .order_by('feeling')
 
-        result = [row['tweet_count__avg'] for row in query]
+        result = [row['tweets__avg'] for row in query]
 
         return result
 
@@ -210,4 +214,4 @@ class TimeFrame(models.Model):
         return query
 
     def __unicode__(self):
-        return "[%s, %s] %s (%d tweets)" % (self.start_time, self.end_time, self.feeling, self.tweet_count or 0)
+        return "[%s, %s] %s (%d tweets)" % (self.start_time, self.end_time, self.feeling, self.tweets or 0)

@@ -8,7 +8,6 @@
     <table class="table">
         <thead>
         <th></th>
-        <th style="background-color: #000; color: #FFF">OTHER</th>
         {% for feeling in data.feelings %}
             <th style="background-color: #{{ feeling.color }}">{{ feeling.word }}</th>
         {% endfor %}
@@ -16,21 +15,21 @@
         <tbody>
         <tr>
             <td>Normal:</td>
-            {% for c in data.normal.feeling_counts %}
-                <td>{{ c|floatformat }}</td>
+            {% for c in data.normal.feeling_tweets %}
+                <td>{{ c|floatformat:3 }}</td>
             {% endfor %}
         </tr>
         <tr>
             <td>Last 12hrs:</td>
-            {% for c in data.historical.feeling_counts %}
-                <td>{{ c|floatformat }}</td>
+            {% for c in data.historical.feeling_tweets %}
+                <td>{{ c|floatformat:3 }}</td>
             {% endfor %}
         </tr>
         <tr>
             <td>Now:</td>
             {% with data.frames.data|last as lastframe %}
-                {% for c in lastframe.feeling_counts %}
-                    <td>{{ c|floatformat }}</td>
+                {% for c in lastframe.feeling_tweets %}
+                    <td>{{ c|floatformat:3 }}</td>
                 {% endfor %}
             {% endwith %}
         </tr>
