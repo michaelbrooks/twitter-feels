@@ -1,16 +1,12 @@
 import datetime
-
+import time
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
-
-class BaseTimeFrame(models.Model):
+class TimedIntervalMixin(models.Model):
     """
-    Describes a frame of analysis, a fixed interval of time.
-    It has a start and a duration.
-
-    Any properties added on subclasses should have default
-    values set!
+    Provides several convenient methods for working with models that have
+    a start_time field and a DURATION property.
     """
 
     # Tells Django not to make a table for this abstract class.
@@ -23,13 +19,6 @@ class BaseTimeFrame(models.Model):
 
     # The time when this time frame starts.
     start_time = models.DateTimeField(db_index=True)
-
-    # True if this frame has been calculated
-    calculated = models.BooleanField(default=False)
-
-    # True if we think the data for this frame is missing data
-    missing_data = models.BooleanField(default=True)
-
 
     #######
     # Object properties - for convenience.
@@ -55,39 +44,6 @@ class BaseTimeFrame(models.Model):
         The end time for this time frame.
         """
         return self.start_time + self.duration
-
-
-    #######
-    # Instance methods
-    #######
-
-    def calculate(self, tweets):
-        """
-        Perform the analysis procedure that results in
-        'calculated' being set to true.
-
-        Should be overridden in derived classes.
-        The implementation should set 'calculated'
-        and save the model.
-
-        The 'tweets' parameter is a query set (iterable) over
-        all of the tweets enclosed in this time frame.
-        """
-        self.calculated = True
-        self.save()
-
-    def mark_done(self, missing_data=False):
-        """
-        Marks the time frame as calculated.
-        missing_data can also be set.
-        """
-        self.calculated = True
-        self.missing_data = missing_data
-        self.save()
-
-    def __unicode__(self):
-        """Printing for Django admin / debugging"""
-        return "[%s, %s]"
 
 
     #######
@@ -138,7 +94,7 @@ class BaseTimeFrame(models.Model):
         return result['earliest_start_time']
 
     @classmethod
-    def get_frames(cls, start=None, end=None, calculated=None):
+    def get_in_range(cls, start=None, end=None, calculated=None):
         """
         Returns a queryset that provides all of the frames.
 
@@ -162,3 +118,93 @@ class BaseTimeFrame(models.Model):
             query = query.filter(start_time__gt=start - cls.DURATION)
 
         return query
+
+
+class BaseTimeFrame(TimedIntervalMixin, models.Model):
+    """
+    Describes a frame of analysis, a fixed interval of time.
+    It has a start and a duration.
+
+    Any properties added on subclasses should have default
+    values set!
+    """
+
+    # Tells Django not to make a table for this abstract class.
+    class Meta:
+        abstract = True
+
+    # True if this frame has been calculated
+    calculated = models.BooleanField(default=False)
+
+    # True if we think the data for this frame is missing data
+    missing_data = models.BooleanField(default=True)
+
+    # The time in seconds taken by analysis. Before calculated=True, this is analysis start time.
+    analysis_time = models.FloatField(default=None, null=True, blank=True)
+
+
+    #######
+    # Instance methods
+    #######
+
+    def calculate(self, tweets):
+        """
+        Perform the analysis procedure that results in
+        'calculated' being set to true.
+
+        Should be overridden in derived classes.
+        The implementation should call mark_done(tweets)
+        with all of the tweets that you wouldn't mind
+        being deleted.
+
+        The 'tweets' parameter is a query set (iterable) over
+        all of the tweets enclosed in this time frame.
+        This includes RTs and everything.
+        """
+        self.mark_done(tweets)
+
+    def mark_started(self):
+        """Saves the current time, indicating analysis is beginning."""
+        self.analysis_time = time.time()
+        self.save()
+
+    def mark_done(self, tweets, missing_data=False):
+        """
+        Marks the time frame as calculated.
+        Marks the tweets and analyzed.
+
+        The missing_data field can also be set to indicate
+        if the time frame had complete data.
+        """
+
+        self.calculated = True
+        self.missing_data = missing_data
+
+        # Calculate the time taken for analysis
+        if self.analysis_time:
+            self.analysis_time = time.time() - self.analysis_time
+
+        self.save()
+
+        # Increase the analyzed_by count on the tweets
+        tweets.update(analyzed_by=models.F('analyzed_by') + 1)
+
+
+    def __unicode__(self):
+        """Printing for Django admin / debugging"""
+        return "[%s, %s]"
+
+    @classmethod
+    def get_average_analysis_time(cls, start=None, end=None):
+        """Returns the average time taken to analyze these time frames."""
+
+        query = cls.get_in_range(start=start, end=end, calculated=True)
+
+        result = query.aggregate(average_analysis_time=models.Avg('analysis_time'))
+        return result['average_analysis_time']
+
+    @classmethod
+    def count_completed(cls):
+        """Counts the number of completed frames of this type."""
+        query = cls.get_in_range(calculated=True)
+        return query.count()

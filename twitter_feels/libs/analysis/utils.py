@@ -47,6 +47,7 @@ class AnalysisTask(object):
     A class for representing, validating, and scheduling analysis tasks.
     """
     TASK_KEY_REGEX = re.compile('\w+')
+    _tasks_config = {}
 
     def __init__(self, key, taskdef):
         self.key = key
@@ -129,35 +130,51 @@ class AnalysisTask(object):
     @classmethod
     def get(cls, key=None):
         if key:
-            return _tasks_config[key]
+            return cls._tasks_config[key]
         else:
-            return _tasks_config.values()
+            return cls._tasks_config.values()
 
+    @classmethod
+    def initialize(cls):
+        """
+        Sets up the analysis tasks from the config settings.
+        """
+        if len(cls._tasks_config):
+            raise Exception("AnalysisTasks already initialized")
 
-_tasks_config = {}
-# Load the tasks from settings
-for key in settings.TIME_FRAME_TASKS:
-    _tasks_config[key] = AnalysisTask(key, settings.TIME_FRAME_TASKS[key])
-    _tasks_config[key].validate()
+        for key in settings.TIME_FRAME_TASKS:
+            cls._tasks_config[key] = AnalysisTask(key, settings.TIME_FRAME_TASKS[key])
+            cls._tasks_config[key].validate()
+
+AnalysisTask.initialize()
 
 
 ########################
 # Functions for doing analysis
 ########################
 
+
+def _insert_and_queue(task_key, time_frames):
+    """
+    Inserts the given TimeFrames into the database
+    and creates a job to calculate each one.
+    """
+    for frame in time_frames:
+        frame.save()
+        analyze_frame.delay(task_key=task_key, frame_id=frame.pk)
+    if time_frames:
+        logger.info("Created %d time frames", len(time_frames))
+
+
 def create_frames(task_key):
     """
-    Creates any new time frames that are needed.
+    Creates new time frames that are needed to analyze new tweets.
     Takes as input a task key from the ANALYSIS_TIME_FRAME_TASKS dict.
 
-    First, it checks the time on the newest tweet and the newest frame.
+    It checks the time on the newest tweet and the newest frame.
     If there is room for new frames, it adds these.
 
-    Then it searches backwards, looking if there are
-    tweets before the earliest frame.
-    If there is room, it adds these as well.
-
-    For every new frame, a job is created to analyze it.
+    For every new frame, an RQ job is created to analyze it.
     """
 
     if Tweet.objects.count() == 0:
@@ -206,6 +223,23 @@ def create_frames(task_key):
 
     _insert_and_queue(task_key, new_time_frames)
 
+
+def backfill_tasks(task_key):
+    """
+    Fills in any missing tasks for tweets that are older than the oldest
+    time frame for this task.
+    """
+
+    if Tweet.objects.count() == 0:
+        logger.info("No tweets to analyze")
+        return
+
+    task = AnalysisTask.get(key=task_key)
+    frame_class = task.frame_class
+    duration = frame_class.DURATION
+
+    logger.info("Backfilling frames for %s", task.name)
+
     # Done looking forwards, now look backwards
     new_time_frames = []
 
@@ -238,18 +272,6 @@ def create_frames(task_key):
     _insert_and_queue(task_key, new_time_frames)
 
 
-def _insert_and_queue(task_key, time_frames):
-    """
-    Inserts the given TimeFrames into the database
-    and creates a job to calculate each one.
-    """
-    for frame in time_frames:
-        frame.save()
-        analyze_frame.delay(task_key=task_key, frame_id=frame.pk)
-    if time_frames:
-        logger.info("Created %d time frames", len(time_frames))
-
-
 @django_rq.job
 def analyze_frame(task_key, frame_id):
     """
@@ -264,9 +286,10 @@ def analyze_frame(task_key, frame_id):
 
     # Get the tweets for this time frame
     tweets = Tweet.get_created_in_range(frame.start_time, frame.end_time) \
-        .filter(retweeted_status_id=None) \
         .order_by('created_at')
 
+
+    frame.mark_started()
     frame.calculate(tweets)
 
     logger.info('Processed %d tweets for %s #%s', len(tweets), frame_class.__name__, str(frame_id))
@@ -277,7 +300,21 @@ def cleanup():
     """
     Removes any tweets which have already been analyzed by all tasks.
     """
-    num_analyses = len(settings.TIME_FRAME_TASKS)
-    deleted = Tweet.delete_analyzed(analyzed_by=num_analyses)
-    logger.info("Cleaned %d tweets already covered by %d analyses.", deleted, num_analyses)
 
+    num_analyses = len(settings.TIME_FRAME_TASKS)
+    analyzed = get_analyzed_tweets()
+
+    deleted = analyzed.count()
+    analyzed.delete()
+
+    logger.info("Cleaned %d tweets already covered by %d analyses.", deleted, num_analyses)
+    return deleted
+
+
+def get_analyzed_tweets():
+    """
+    Deletes all tweets with analysis counts at least this high.
+    """
+    num_analyses = len(settings.TIME_FRAME_TASKS)
+    analyzed = Tweet.objects.filter(analyzed_by__gte=num_analyses)
+    return analyzed

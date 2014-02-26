@@ -7,19 +7,19 @@ from django.core.management.base import BaseCommand
 # Setup logging if not already configured
 from ...utils import cleanup
 
-logger = logging.getLogger('thermometer')
+logger = logging.getLogger('analysis')
 if not logger.handlers:
     dictConfig({
         "version": 1,
         "disable_existing_loggers": False,
         "handlers": {
-            "thermometer": {
+            "analysis": {
                 "level": "DEBUG",
                 "class": "logging.StreamHandler",
             },
         },
-        "thermometer": {
-            "handlers": ["thermometer"],
+        "analysis": {
+            "handlers": ["analysis"],
             "level": "DEBUG"
         }
     })

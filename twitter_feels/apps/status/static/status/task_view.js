@@ -15,6 +15,8 @@
             name_cell: task_row.find('td.name-cell'),
             badge_cell: task_row.find('td.badge-cell'),
             enqueued_at_cell: task_row.find('td.enqueued-at-cell'),
+            avg_time_cell: task_row.find('td.avg-time-cell'),
+            frame_count_cell: task_row.find('td.frame-count-cell'),
             switch_cell: task_row.find('td.switch-cell')
         };
         this.ui.badge = this.ui.badge_cell.find('.status-badge');
@@ -54,7 +56,7 @@
         this.ui.switch.bootstrapSwitch('disabled', state === undefined);
 
         if (state !== undefined) {
-            this.ui.switch.bootstrapSwitch('state', status.running)
+            this.ui.switch.bootstrapSwitch('state', state.running)
         }
     };
 
@@ -64,10 +66,40 @@
      * @param status
      */
     TaskView.prototype.update_enqueued_at = function(status) {
+        if (!this.ui.enqueued_at_cell) {
+            return;
+        }
+
         if (status) {
             this.ui.enqueued_at_cell.text(status.enqueued_at || "None");
         } else {
             this.ui.enqueued_at_cell.text('?');
+        }
+    };
+
+    /**
+     * Update the total frame count.
+     *
+     * @param status
+     */
+    TaskView.prototype.update_frame_count = function(status) {
+        if (status) {
+            this.ui.frame_count_cell.text(status.frame_count);
+        } else {
+            this.ui.frame_count_cell.text('?');
+        }
+    };
+
+    /**
+     * Update the average time for this task.
+     *
+     * @param status
+     */
+    TaskView.prototype.update_avg_time = function(status) {
+        if (status && status.avg_time) {
+            this.ui.avg_time_cell.text(status.avg_time.toFixed(2));
+        } else {
+            this.ui.avg_time_cell.text('?');
         }
     };
 
@@ -90,6 +122,8 @@
 
             this.update_switch(status);
             this.update_enqueued_at(status);
+            this.update_avg_time(status);
+            this.update_frame_count(status);
         } else {
 
             logger.debug("Status is " + status
@@ -100,6 +134,8 @@
             this.ui.badge.addClass('label-danger');
             this.update_switch(undefined);
             this.update_enqueued_at(undefined);
+            this.update_avg_time(undefined);
+            this.update_frame_count(undefined);
         }
     };
 

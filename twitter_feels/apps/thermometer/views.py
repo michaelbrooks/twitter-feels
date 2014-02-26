@@ -1,6 +1,5 @@
 from django.views import generic
-from django.core.exceptions import ObjectDoesNotExist
-from models import TimeFrame, FeelingWord
+from models import TimeFrame, FeelingWord, FeelingPercent
 from django.utils import timezone
 from jsonview.decorators import json_view
 import json
@@ -22,71 +21,72 @@ def get_thermometer_data():
 
     # normal number of tweets per minute over all time
     effective_now = timezone.now()
-    normal_start = TimeFrame.get_earliest_start_time()
-    normal_end = TimeFrame.get_latest_end_time()
+    normal_start = FeelingPercent.get_earliest_start_time()
+    normal_end = FeelingPercent.get_latest_end_time()
     if normal_end:
         effective_now = normal_end
 
-    normal_counts = TimeFrame.get_average_rates()
+    normal_percents = FeelingPercent.get_average_rates()
 
     # number of tweets per minute in the past historical interval
     history_end = effective_now.replace(second=0, microsecond=0)
     history_start = history_end - settings.HISTORICAL_INTERVAL
-    historical_counts = TimeFrame.get_average_rates(start=history_start)
+    history_percents = FeelingPercent.get_average_rates(start=history_start)
 
     # number of tweets per minute for the past display interval
     display_end = history_end
     # add a little extra data to assist with smoothing
     display_start = display_end - (settings.DISPLAY_INTERVAL + settings.TIME_FRAME_DURATION * 10)
 
-    frames = TimeFrame.get_frames(start=display_start)
-    frame_data = []
-    for start_time, frame_group in groupby(frames, lambda fr: fr.start_time):
+    feeling_percents = FeelingPercent.get_in_range(start=display_start)
+    feeling_data = []
+    for start_time, time_group in groupby(feeling_percents, lambda fr: fr.start_time):
 
         group_feelings = []
         missing_data = False
         total = 0
 
-        for i, fr in enumerate(frame_group):
-            missing_data = fr.missing_data
+        for i, fp in enumerate(time_group):
             if i == 0:
-                total = fr.tweets
-            else:
-                group_feelings.append(fr.tweets)
+                # only do this once - it is the same for every feeling
+                missing_data = fp.missing_data
+                total = fp.feeling_tweets
 
-        frame_data.append({
+            group_feelings.append(fp.percent)
+
+        feeling_data.append({
             'start_time': str(start_time),
-            'feeling_tweets': group_feelings,
+            'feeling_percents': group_feelings,
             'total_count': total,
             'missing_data': missing_data
         })
 
     return {
-        'frames': {
+        'recent': {
             'query_start': str(display_start),
             'query_end': str(display_end),
             'frame_duration': settings.TIME_FRAME_DURATION.total_seconds(),
-            'data': frame_data,
+            'frames': feeling_data,
             'notes': """A set of recent frames of fixed duration.
-            The order of entries in the 'feeling_tweets' array in each data frame corresponds
+            The order of entries in the 'feeling_percents' array in each frame corresponds
             to ordering the feelings by id.
             The 'missing_data' value indicates whether more than 20% of the frame was empty."""
         },
         'normal': {
             'start': str(normal_start),
             'end': str(normal_end),
-            'feeling_tweets': normal_counts,
+            'feeling_percents': normal_percents,
             'notes': """Gives the average percent of each feeling over
-             all available data.  The 'feeling_tweets' correspond to the ordering of the feelings by id.
+             all available data.  The 'feeling_percents' correspond to the ordering of the feelings by id.
              Does not include frames with missing data in the average."""
         },
         'historical': {
             'start': str(history_start),
             'end': str(history_end),
             'interval': settings.HISTORICAL_INTERVAL.total_seconds(),
-            'feeling_tweets': historical_counts,
+            'feeling_percents': history_percents,
             'notes': """Gives average percent of each feeling over
-             a historical interval. The 'feeling_tweets' correspond to the ordering of the feelings by id.
+             a historical interval. The 'feeling_percents' correspond to the ordering of the feelings by id.
              Does not include frames with missing data in the average."""
         },
         'feelings': feelings_data

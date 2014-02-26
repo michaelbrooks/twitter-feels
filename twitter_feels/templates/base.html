@@ -46,6 +46,11 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="{% ancestor 'thermometer' %}"><a href="{% url 'thermometer' %}">Thermometer</a></li>
+                {% if debug_mode %}
+                    <li class="{% ancestor 'demo_vis' %}"><a href="{% url 'demo_vis' %}">Demo Vis</a></li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
                 <li class="{% ancestor 'status' %}"><a href="{% url 'status' %}">Status</a></li>
             </ul>
         </div>
@@ -70,8 +75,11 @@
     </div>
 </div>
 
-<script src="{% bootstrap_jquery_url %}" type="text/javascript"></script>
-{% bootstrap_javascript %}
+{% block js_cdn %}
+    <script src="{% bootstrap_jquery_url %}" type="text/javascript"></script>
+    {% bootstrap_javascript %}
+{% endblock %}
+
 {% compress js %}
     <script type="text/javascript">
         (function () {
@@ -107,6 +115,7 @@
                 window.apps.configureLogger(Logger.WARN);
             {% endif %}
         </script>
+        {# Your JS will be added here if you extend this block. #}
     {% endblock %}
 {% endcompress %}
 

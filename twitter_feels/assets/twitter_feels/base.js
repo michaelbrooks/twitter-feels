@@ -17,7 +17,7 @@
             Logger.setHandler(function(messages, context) {
                 // Prepend the logger's name to the log message for easy identification.
                 if (context.name) {
-                    messages[0] = "[" + context.name + "] " + messages[0];
+                    messages[0] = (new Date()).toLocaleTimeString() + " [" + context.name + "] " + messages[0];
                 }
 
                 log.call(this, messages);
@@ -31,7 +31,7 @@
 
                 // Prepend the logger's name to the log message for easy identification.
                 if (context.name) {
-                    messages[0] = "[" + context.name + "] " + messages[0];
+                    messages[0] = (new Date()).toLocaleTimeString() + " [" + context.name + "] " + messages[0];
                 }
 
                 // Delegate through to custom warn/error loggers if present on the console.

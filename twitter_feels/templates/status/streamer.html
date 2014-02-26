@@ -5,6 +5,12 @@
     <span class="label {% if streamer.running %}label-success{% else %}label-warning{% endif %}">
         {% if streamer.running %}Running{% else %}Stopped{% endif %}
     </span>
+    &nbsp;
+    You are hoarding <strong>{{ streamer.tweet_count }}</strong> tweets, <strong>{{ streamer.analyzed_count }}</strong> analyzed.
+    {% if request.user.is_staff and streamer.analyzed_count %}
+        <button class="clean-tweets btn btn-xs"
+                data-clean-url="{% url 'status_clean_tweets' %}">Discard analyzed tweets</button>
+    {% endif %}
 </p>
 
 <p>Current filter terms:

@@ -18,7 +18,7 @@
 
         var headerRow = $('<tr>').appendTo(header);
         headerRow.append('<th>');
-        data.frames.data.forEach(function(frame, i) {
+        data.recent.frames.forEach(function(frame, i) {
             if (i > window_sizes[0]) {
                 headerRow.append('<th>' + i + '</th>');
             }
@@ -27,7 +27,7 @@
         var body = $('<tbody>').appendTo(table);
         data.feelings.forEach(function(feeling, i) {
 
-            var normal = data.normal.feeling_tweets[i];
+            var normal = data.normal.feeling_percents[i];
 
             var row = $('<tr>').appendTo(body);
             row.append('<td>' + feeling.word + '</td>');
@@ -36,8 +36,8 @@
                 var queue = [];
                 var current_sum = undefined;
 
-                data.frames.data.forEach(function(frame, j) {
-                    var percent = frame.feeling_tweets[i]
+                data.recent.frames.forEach(function(frame, j) {
+                    var percent = frame.feeling_percents[i]
                     if (current_sum === undefined) {
                         current_sum = percent;
                     }
@@ -51,14 +51,14 @@
                     }
 
                     if (j > window_size) {
-                        frame.feeling_tweets[i] = current_sum / queue.length;
+                        frame.feeling_percents[i] = current_sum / queue.length;
                     }
                 });
             });
 
-            data.frames.data.forEach(function(frame, j) {
+            data.recent.frames.forEach(function(frame, j) {
                 if (j > window_sizes[0]) {
-                    var diff = (frame.feeling_tweets[i] - normal) / normal;
+                    var diff = (frame.feeling_percents[i] - normal) / normal;
                     diff = (100 * diff).toFixed(1);
                     row.append('<td>' + diff + '%</td>');
                 }

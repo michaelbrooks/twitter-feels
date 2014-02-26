@@ -15,20 +15,20 @@
         <tbody>
         <tr>
             <td>Normal:</td>
-            {% for c in data.normal.feeling_tweets %}
+            {% for c in data.normal.feeling_percents %}
                 <td>{{ c|floatformat:3 }}</td>
             {% endfor %}
         </tr>
         <tr>
             <td>Last 12hrs:</td>
-            {% for c in data.historical.feeling_tweets %}
+            {% for c in data.historical.feeling_percents %}
                 <td>{{ c|floatformat:3 }}</td>
             {% endfor %}
         </tr>
         <tr>
             <td>Now:</td>
-            {% with data.frames.data|last as lastframe %}
-                {% for c in lastframe.feeling_tweets %}
+            {% with data.recent.frames|last as lastframe %}
+                {% for c in lastframe.feeling_percents %}
                     <td>{{ c|floatformat:3 }}</td>
                 {% endfor %}
             {% endwith %}

@@ -250,7 +250,7 @@ class Tweet(models.Model):
         """
         Returns all the tweets between start and end.
         """
-        return cls.objects.filter(created_at__range=[start, end])
+        return cls.objects.filter(created_at__gte=start, created_at__lt=end)
 
     @classmethod
     def get_earliest_created_at(cls):
@@ -268,15 +268,6 @@ class Tweet(models.Model):
         result = cls.objects.aggregate(latest_created_at=models.Max('created_at'))
         return result['latest_created_at']
 
-    @classmethod
-    def delete_analyzed(cls, analyzed_by):
-        """
-        Deletes all tweets with analysis counts at least this high.
-        """
-        match = cls.objects.filter(analyzed_by__gte=analyzed_by)
-        to_delete = match.count()
-        match.delete()
-        return to_delete
 
 class FilterTerm(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

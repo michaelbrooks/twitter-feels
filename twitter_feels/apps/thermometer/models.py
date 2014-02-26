@@ -11,7 +11,7 @@ logger = logging.getLogger('thermometer')
 
 
 # Regex for matching indicators
-from twitter_feels.libs.analysis import BaseTimeFrame
+from twitter_feels.libs.analysis import BaseTimeFrame, TimedIntervalMixin
 
 INDICATOR_REG_TEMPLATE = (r"([^\w]|^)"   # something that is not wordy
                           r"%s"          # the term/phrase
@@ -109,44 +109,24 @@ class FeelingWord(models.Model):
 
 class TimeFrame(BaseTimeFrame):
     """
-    Tweet percent for feeling word in a specific time window.
+    Analyze the percent of tweets for feeling words in this time window.
 
-    If the feeling is None, then the TimeFrame is a "global frame", and the
-    tweets field represents the total number of tweets that matched any indicator,
-    but where NO particular feeling was detected.
+    This frame tracks the total number of feeling tweets.
     """
 
     DURATION = settings.TIME_FRAME_DURATION
 
-    class Meta:
-        index_together = [
-            ["missing_data", "feeling"],
-            ["calculated", "start_time", "feeling"]
-        ]
-
-    # The word whose frequency we are counting, or none for the total tweet count
-    feeling = models.ForeignKey(FeelingWord, null=True, default=None, blank=True)
-
-    # The percent of tweets with this feeling
-    # If it is a global frame, this holds the ABSOLUTE NUMBER of tweets in the frame
-    tweets = models.FloatField(null=True, blank=True, default=None)
-
-    def create_subframe(self, feeling=None, tweets=None, calculated=False, missing_data=False):
-        """
-        Make a duplicate of this frame but with the feeling set.
-        """
-        return TimeFrame(
-            start_time=self.start_time,
-            feeling=feeling,
-            tweets=tweets,
-            calculated=calculated,
-            missing_data=missing_data
-        )
+    # The number of feeling and all tweets in the frame
+    feeling_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
+    total_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
 
     def calculate(self, tweets):
         """
         Calculates a new time frame from collected Twitter data.
         """
+
+        # Just get the non-rts
+        originals = tweets.filter(retweeted_status_id=None)
 
         # Get all the words we are currently interested in tracking
         indicators = FeelingIndicator.objects.filter(enabled=True)
@@ -162,7 +142,7 @@ class TimeFrame(BaseTimeFrame):
         indicator_matches = 0
         largest_gap = timedelta(seconds=0)
         last_tweet_time = None
-        for tweet in tweets:
+        for tweet in originals:
 
             # Detecting gaps in the data
             if last_tweet_time:
@@ -194,10 +174,10 @@ class TimeFrame(BaseTimeFrame):
                     logger.error("Error parsing tweet: %s", e.message)
 
         # If more than 20% of the frame was a gap, then consider it missing_data
-        missing_data = len(tweets) == 0 or (largest_gap.total_seconds() > (self.duration_seconds * 0.2))
+        missing_data = len(originals) == 0 or (largest_gap.total_seconds() > (self.duration_seconds * 0.2))
 
-        # Create a bunch of new data frames to store the per-feeling data.
-        sub_frames = []
+        # Create a bunch of new FeelingCount objects to store the per-feeling data.
+        feeling_counters = []
 
         for feeling in feelings:
             if indicator_matches > 0:
@@ -205,48 +185,76 @@ class TimeFrame(BaseTimeFrame):
             else:
                 percent = 0
 
-            sub_frames.append(self.create_subframe(
+            feeling_counters.append(FeelingPercent(
+                frame=self,
                 feeling=feeling,
-                tweets=percent,
-                calculated=True,
+                percent=percent,
+                start_time=self.start_time,
+                feeling_tweets=indicator_matches,
                 missing_data=missing_data
             ))
 
         # Save all the new frames
-        TimeFrame.objects.bulk_create(sub_frames)
+        FeelingPercent.objects.bulk_create(feeling_counters)
 
         # This global frame is now done
-        self.tweets = indicator_matches
-        self.mark_done(missing_data=missing_data)
+        self.feeling_tweets = indicator_matches
+        self.total_tweets = len(tweets)
+        self.mark_done(tweets, missing_data=missing_data)
 
 
-    ######
-    # Class methods specific to the thermometer views.
-    ######
+class FeelingPercent(TimedIntervalMixin, models.Model):
+    """
+    A class for storing the percent of tweets for a given feeling in a given time frame.
+    """
+
+    class Meta:
+        index_together = [
+            ["missing_data", "feeling"],
+            ["start_time", "missing_data", "feeling"]
+        ]
+
+    DURATION = TimeFrame.DURATION
+
+    frame = models.ForeignKey(TimeFrame)
+
+    # The word whose frequency we are counting, or none for the total tweet count
+    feeling = models.ForeignKey(FeelingWord, null=True, default=None, blank=True)
+
+    # The percent of tweets with this feeling
+    percent = models.FloatField(null=True, blank=True, default=None)
+
+    ## Fields shared with TimeFrame to avoid joins
+
+    # True if we think the data for this frame is missing data
+    missing_data = models.BooleanField(default=True)
+
+    # Total number of feeling tweets (of which percent is a percent)
+    feeling_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
 
     @classmethod
     def get_average_rates(cls, start=None, end=None):
         """
         Gets the average percentage for each feeling in an interval.
         """
-        query = cls.get_frames(start=start, end=end) \
-            .filter(missing_data=False, feeling__isnull=False)
+        query = cls.get_in_range(start=start, end=end) \
+            .filter(missing_data=False)
 
         query = query.values('feeling') \
-            .annotate(models.Avg('tweets')) \
+            .annotate(models.Avg('percent')) \
             .order_by('feeling')
 
-        result = [row['tweets__avg'] for row in query]
+        result = [row['percent__avg'] for row in query]
 
         return result
 
     @classmethod
-    def get_frames_in_interval(cls, start=None, end=None):
+    def get_percents_in_interval(cls, start=None, end=None):
         """
-        Gets the count of each feeling at time frames over an interval.
+        Gets FeelingPercents over an interval.
         Applies sorting etc to generate data useful for the view.
         """
-        query = super(TimeFrame, cls).get_frames(start, end, calculated=True)
+        query = cls.get_in_range(start=start, end=end)
 
         query = query.order_by('start_time', 'feeling')
 

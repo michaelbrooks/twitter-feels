@@ -8,7 +8,6 @@
 </p>
 
 {% if workers.workers %}
-    <p>Workers:</p>
     <table class="table">
         <thead>
         <tr>
@@ -22,8 +21,8 @@
             <tr class="{% if worker.state != 'busy' %}text-muted{% endif %}">
                 <td>
                 <span class="label
-                        {% if worker.state == 'idle' %}label-warning
-                        {% elif worker.state == 'busy' %}label-success
+                        {% if worker.state == 'idle' %}label-success
+                        {% elif worker.state == 'busy' %}label-warning
                         {% endif %}">
                     {{ worker.state.capitalize }}
                 </span>

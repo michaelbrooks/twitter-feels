@@ -179,7 +179,7 @@ class Command(BaseCommand):
 
             logger.info("Streaming from %s", tweets_file)
             if rate_limit:
-                logger.limit("Rate limit: %f", rate_limit)
+                logger.info("Rate limit: %f", rate_limit)
 
             listener = streaming.QueueStreamListener()
             checker = streaming.FeelsTermChecker(queue_listener=listener,

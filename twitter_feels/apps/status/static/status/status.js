@@ -13,11 +13,16 @@
             streamer_status: $('#streamer-status'),
             workers_status: $('#workers-status'),
             queues_status: $('#queues-status'),
-            general_status: $('#general-status')
+            general_status: $('#general-status'),
+            _clean_tweets_button: function() { return $('.clean-tweets') }
         };
 
         if (this.ui.refresh_button) {
             this.init_refresh();
+        }
+
+        if (this.ui._clean_tweets_button()) {
+            this.init_clean_tweets();
         }
 
         this.task_views = {};
@@ -26,11 +31,14 @@
 
     StatusApp.prototype.start = function () {
         if (this.status_url) {
-            logger.info("polling every " + (POLLING_INTERVAL / 1000) + " seconds");
+
+            logger.info("Polling every " + (POLLING_INTERVAL / 1000) + " seconds");
 
             //Start polling for status
             this.schedule_next_poll();
         }
+
+        this.updates_paused = false;
 
         logger.info("StatusApp started");
     };
@@ -43,8 +51,70 @@
         this.status_url = this.ui.refresh_button.data('status-url');
 
         this.ui.refresh_button.click(function () {
+            if (self.updates_paused) return;
+
             self.update_status();
         });
+    };
+
+    /**
+     * Disable or enable status updates and actions. One thing at a time.
+     */
+    StatusApp.prototype.pause_updates = function(updates_paused) {
+        this.updates_paused = updates_paused;
+
+        var clean_button = this.ui._clean_tweets_button()
+        if (clean_button) {
+            clean_button.prop('disabled', updates_paused);
+        }
+
+        if (this.ui.refresh_button) {
+            this.ui.refresh_button.prop('disabled', updates_paused);
+        }
+
+        if (updates_paused) {
+            logger.debug("Updates paused");
+        } else {
+            logger.debug("Updates resumed");
+        }
+    };
+
+    /**
+     * Set up handler for clean tweets button.
+     */
+    StatusApp.prototype.init_clean_tweets = function () {
+        var self = this;
+
+        this.ui.streamer_status.on('click', '.clean-tweets', function () {
+            if (self.updates_paused) return;
+            
+            self.clean_tweets()
+        });
+    };
+
+    /**
+     * Send a request to clean unneeded tweets.
+     */
+    StatusApp.prototype.clean_tweets = function() {
+        var self = this;
+        logger.debug("Removing analyzed tweets.");
+
+        var clean_url = this.ui._clean_tweets_button().data('clean-url');
+
+        this.pause_updates(true);
+
+        $.post(clean_url)
+            .done(function (response) {
+                logger.debug("Analyzed tweets successfully removed.");
+                self.display_status_block(self.ui.streamer_status, response);
+            })
+            .fail(function (err) {
+                logger.error("Failed to remove analyzed tweets.", err);
+                self.display_status_block(self.ui.streamer_status, undefined);
+            })
+            .always(function () {
+                self.pause_updates(false);
+            });
     };
 
     /**
@@ -62,9 +132,10 @@
     /**
      * Checks the status of all tasks.
      */
-    StatusApp.prototype.update_status = function () {
+    StatusApp.prototype.update_status = function (schedule_next) {
         var self = this;
-        this.ui.refresh_button.prop('disabled', true);
+
+        this.pause_updates(true);
 
         logger.debug("Querying task status.");
 
@@ -89,8 +160,10 @@
                 self.display_status_block(self.ui.general_status, undefined);
             })
             .always(function () {
-                self.schedule_next_poll();
-                self.ui.refresh_button.prop('disabled', false);
+                if (schedule_next) {
+                    self.schedule_next_poll();
+                }
+                self.pause_updates(false)
             });
     };
 
@@ -116,7 +189,8 @@
     /**
      * Display updated status for a block replace html element
      *
-     * @param [streamerStatus]
+     * @param element
+     * @param newHtml
      */
     StatusApp.prototype.display_status_block = function (element, newHtml) {
         if (newHtml) {
@@ -130,7 +204,13 @@
     StatusApp.prototype.schedule_next_poll = function () {
         var self = this;
         setTimeout(function () {
-            self.update_status()
+
+            if (self.updates_paused) {
+                self.schedule_next_poll();
+            } else {
+                self.update_status(true)
+            }
+
         }, POLLING_INTERVAL);
     };
 

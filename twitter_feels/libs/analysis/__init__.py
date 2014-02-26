@@ -1,3 +1,3 @@
-__all__ = ['BaseTimeFrame']
+__all__ = ['BaseTimeFrame', 'TimedIntervalMixin']
 
-from models import BaseTimeFrame
+from models import BaseTimeFrame, TimedIntervalMixin

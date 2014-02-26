@@ -59,6 +59,7 @@ CACHES = {
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
 INSTALLED_APPS += (
     'debug_toolbar',
+    'twitter_feels.apps.demo_vis'
 )
 
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
@@ -140,3 +141,11 @@ LOGGING = {
     }
 }
 ########## END LOGGING CONFIGURATION
+
+
+########## SCHEDULED TASKS SETTINGS
+ANALYSIS_TIME_FRAME_TASKS['demo_vis'] = {
+    "name": "Demo Vis Analysis",
+    "frame_class_path": "twitter_feels.apps.demo_vis.models.DemoTimeFrame",
+}
+########## END SCHEDULED TASKS SETTINGS

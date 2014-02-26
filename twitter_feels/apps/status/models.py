@@ -6,7 +6,7 @@ from django.utils import timezone
 import django_rq
 import rq
 
-from twitter_feels.libs.analysis.utils import AnalysisTask
+from twitter_feels.libs.analysis.utils import AnalysisTask, cleanup, get_analyzed_tweets
 from twitter_feels.libs.streamer.models import Tweet, StreamProcess, FilterTerm
 
 
@@ -97,7 +97,8 @@ def stream_status():
         'running': running,
         'terms': [t.term for t in terms],
         'processes': processes,
-        'tweet_count': Tweet.objects.count()
+        'tweet_count': Tweet.objects.count(),
+        'analyzed_count': get_analyzed_tweets().count()
     }
 
 
@@ -107,6 +108,8 @@ def _task_status(task):
         "name": task.name,
         "time_frame_path": task.frame_class_path,
         "duration": task.frame_class.DURATION.total_seconds(),
+        "frame_count": task.frame_class.count_completed(),
+        "avg_time": task.frame_class.get_average_analysis_time(),
         "running": False,
         "enqueued_at": None
     }
@@ -166,3 +169,8 @@ def schedule_task(key=None, cancel_first=True):
     else:
         for task in AnalysisTask.get():
             task.schedule(cancel_first=cancel_first)
+
+
+def clean_tweets():
+    """Clean old tweets we don't need anymore."""
+    cleanup.delay()
