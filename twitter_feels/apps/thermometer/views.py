@@ -22,13 +22,11 @@ def get_thermometer_data():
 
     # normal number of tweets per minute over all time
     effective_now = timezone.now()
-    try:
-        normal_start = TimeFrame.get_earliest().start_time
-        normal_end = TimeFrame.get_latest().end_time
+    normal_start = TimeFrame.get_earliest_start_time()
+    normal_end = TimeFrame.get_latest_end_time()
+    if normal_end:
         effective_now = normal_end
-    except ObjectDoesNotExist:
-        normal_start = None
-        normal_end = None
+
     normal_counts = TimeFrame.get_average_rates()
 
     # number of tweets per minute in the past historical interval
@@ -46,11 +44,11 @@ def get_thermometer_data():
     for start_time, frame_group in groupby(frames, lambda fr: fr.start_time):
 
         group_feelings = []
-        incomplete = False
+        missing_data = False
         total = 0
 
         for i, fr in enumerate(frame_group):
-            incomplete = fr.incomplete
+            missing_data = fr.missing_data
             if i == 0:
                 total = fr.tweets
             else:
@@ -60,7 +58,7 @@ def get_thermometer_data():
             'start_time': str(start_time),
             'feeling_tweets': group_feelings,
             'total_count': total,
-            'incomplete': incomplete
+            'missing_data': missing_data
         })
 
     return {
@@ -72,7 +70,7 @@ def get_thermometer_data():
             'notes': """A set of recent frames of fixed duration.
             The order of entries in the 'feeling_tweets' array in each data frame corresponds
             to ordering the feelings by id.
-            The 'incomplete' value indicates whether more than 20% of the frame was empty."""
+            The 'missing_data' value indicates whether more than 20% of the frame was empty."""
         },
         'normal': {
             'start': str(normal_start),
@@ -80,7 +78,7 @@ def get_thermometer_data():
             'feeling_tweets': normal_counts,
             'notes': """Gives the average percent of each feeling over
              all available data.  The 'feeling_tweets' correspond to the ordering of the feelings by id.
-             Does not include incomplete frames in the average."""
+             Does not include frames with missing data in the average."""
         },
         'historical': {
             'start': str(history_start),
@@ -89,7 +87,7 @@ def get_thermometer_data():
             'feeling_tweets': historical_counts,
             'notes': """Gives average percent of each feeling over
              a historical interval. The 'feeling_tweets' correspond to the ordering of the feelings by id.
-             Does not include incomplete frames in the average."""
+             Does not include frames with missing data in the average."""
         },
         'feelings': feelings_data
     }

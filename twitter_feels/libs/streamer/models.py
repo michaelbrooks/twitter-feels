@@ -179,6 +179,9 @@ class Tweet(models.Model):
     in_reply_to_status_id = models.BigIntegerField(null=True, blank=True, default=None)
     retweeted_status_id = models.BigIntegerField(null=True, blank=True, default=None)
 
+    # Track the number of analyses that have already considered this tweet
+    analyzed_by = models.SmallIntegerField(default=0)
+
     @classmethod
     def create_from_json(cls, raw):
         """
@@ -249,6 +252,31 @@ class Tweet(models.Model):
         """
         return cls.objects.filter(created_at__range=[start, end])
 
+    @classmethod
+    def get_earliest_created_at(cls):
+        """
+        Returns the earliest created_at time, or None
+        """
+        result = cls.objects.aggregate(earliest_created_at=models.Min('created_at'))
+        return result['earliest_created_at']
+
+    @classmethod
+    def get_latest_created_at(cls):
+        """
+        Returns the latest created_at time, or None
+        """
+        result = cls.objects.aggregate(latest_created_at=models.Max('created_at'))
+        return result['latest_created_at']
+
+    @classmethod
+    def delete_analyzed(cls, analyzed_by):
+        """
+        Deletes all tweets with analysis counts at least this high.
+        """
+        match = cls.objects.filter(analyzed_by__gte=analyzed_by)
+        to_delete = match.count()
+        match.delete()
+        return to_delete
 
 class FilterTerm(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

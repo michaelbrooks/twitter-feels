@@ -2,12 +2,10 @@ import logging
 from logging.config import dictConfig
 
 from django.core.management.base import BaseCommand
-from datetime import timedelta
-from django.utils import timezone
 
 
 # Setup logging if not already configured
-from ...tasks import cleanup
+from ...utils import cleanup
 
 logger = logging.getLogger('thermometer')
 if not logger.handlers:

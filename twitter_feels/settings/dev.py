@@ -132,6 +132,10 @@ LOGGING = {
         "thermometer": {
             "handlers": ['console'],
             "level": "DEBUG"
+        },
+        "analysis": {
+            "handlers": ['console'],
+            "level": "DEBUG",
         }
     }
 }

@@ -6,6 +6,7 @@ based on https://github.com/rdegges/django-skel/blob/master/project_name/setting
 
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
+import datetime
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
@@ -221,6 +222,9 @@ LOCAL_APPS = (
     # Collect streaming data from Twitter
     'twitter_feels.libs.streamer',
 
+    # Run repetitive analysis tasks
+    'twitter_feels.libs.analysis',
+
     # A thermometer visualization
     'twitter_feels.apps.thermometer',
 
@@ -278,7 +282,11 @@ LOGGING = {
         },
         "streamer": {
             "handlers": ['console'],
-            "level": "ERROR"
+            "level": "ERROR",
+        },
+        "analysis": {
+            "handlers": ['console'],
+            "level": "ERROR",
         }
     }
 }
@@ -318,11 +326,22 @@ BOOTSTRAP3 = {
 
 
 ########## SCHEDULED TASKS SETTINGS
-STATUS_SCHEDULED_TASKS = {
+ANALYSIS_TIME_FRAME_TASKS = {
     "thermometer": {
         "name": "Thermometer Analysis",
-        "path": "twitter_feels.apps.thermometer.tasks.create_tasks",
-        "interval": 30
+        "frame_class_path": "twitter_feels.apps.thermometer.models.TimeFrame",
     },
 }
 ########## END SCHEDULED TASKS SETTINGS
+
+
+########## THERMOMETER SETTINGS
+THERMOMETER_SETTINGS = {
+    'TIME_FRAME_DURATION': datetime.timedelta(60),
+    # the number of words before and after the indicators to examine
+    'WINDOW_AFTER': 5,
+    'WINDOW_BEFORE': 2,
+    'HISTORICAL_INTERVAL': datetime.timedelta(hours=24),
+    'DISPLAY_INTERVAL': datetime.timedelta(minutes=60),
+}
+########## END THERMOMETER SETTINGS

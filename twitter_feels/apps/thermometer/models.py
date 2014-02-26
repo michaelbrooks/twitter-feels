@@ -1,9 +1,18 @@
+from collections import defaultdict
+from datetime import timedelta
 from django.db import models
 import re
 import nltk
-from settings import WINDOW_AFTER, WINDOW_BEFORE
+import logging
+
+import settings
+
+logger = logging.getLogger('thermometer')
+
 
 # Regex for matching indicators
+from twitter_feels.libs.analysis import BaseTimeFrame
+
 INDICATOR_REG_TEMPLATE = (r"([^\w]|^)"   # something that is not wordy
                           r"%s"          # the term/phrase
                           r"([^\w]|$)")  # another non-wordy bit
@@ -52,8 +61,8 @@ class FeelingIndicator(models.Model):
             second_half = segments[3]
 
             # tokenize the phrases
-            before_tokens = nltk.word_tokenize(first_half)[-WINDOW_BEFORE:]
-            after_tokens = nltk.word_tokenize(second_half)[:WINDOW_AFTER]
+            before_tokens = nltk.word_tokenize(first_half)[-settings.WINDOW_BEFORE:]
+            after_tokens = nltk.word_tokenize(second_half)[:settings.WINDOW_AFTER]
 
             # see if any of the words are in the word set
             # search afterwards then backwards before
@@ -98,7 +107,7 @@ class FeelingWord(models.Model):
         return cls.objects.filter(untracked=False)
 
 
-class TimeFrame(models.Model):
+class TimeFrame(BaseTimeFrame):
     """
     Tweet percent for feeling word in a specific time window.
 
@@ -107,16 +116,13 @@ class TimeFrame(models.Model):
     but where NO particular feeling was detected.
     """
 
+    DURATION = settings.TIME_FRAME_DURATION
+
     class Meta:
         index_together = [
-            ["incomplete", "feeling"],
-            ["calculated", "end_time", "feeling"]
+            ["missing_data", "feeling"],
+            ["calculated", "start_time", "feeling"]
         ]
-
-    # Some slightly redundant timing info for convenience
-    start_time = models.DateTimeField(db_index=True)
-    end_time = models.DateTimeField(db_index=True)
-    duration_seconds = models.PositiveIntegerField()
 
     # The word whose frequency we are counting, or none for the total tweet count
     feeling = models.ForeignKey(FeelingWord, null=True, default=None, blank=True)
@@ -125,71 +131,108 @@ class TimeFrame(models.Model):
     # If it is a global frame, this holds the ABSOLUTE NUMBER of tweets in the frame
     tweets = models.FloatField(null=True, blank=True, default=None)
 
-    # True if this frame has been calculated
-    calculated = models.BooleanField(default=False)
-
-    # True if we think the data for this frame is incomplete
-    incomplete = models.BooleanField(default=True)
-
-    @classmethod
-    def create_global(cls, start_time, time_delta):
-        """
-        Creates a TimeFrame without a feeling assigned.
-        """
-        return cls(
-            start_time=start_time,
-            end_time=start_time + time_delta,
-            duration_seconds=time_delta.total_seconds(),
-            feeling=None,
-            tweets=None,
-            calculated=False,
-            incomplete=True
-        )
-
-    def create_subframe(self, feeling=None, tweets=None, calculated=False, incomplete=False):
+    def create_subframe(self, feeling=None, tweets=None, calculated=False, missing_data=False):
         """
         Make a duplicate of this frame but with the feeling set.
         """
         return TimeFrame(
             start_time=self.start_time,
-            end_time=self.end_time,
-            duration_seconds=self.duration_seconds,
             feeling=feeling,
             tweets=tweets,
             calculated=calculated,
-            incomplete=incomplete
+            missing_data=missing_data
         )
 
-    @classmethod
-    def get_latest(cls):
+    def calculate(self, tweets):
         """
-        Returns the latest timeframe for the given word.
+        Calculates a new time frame from collected Twitter data.
         """
-        return cls.objects \
-            .latest(field_name='start_time')
 
-    @classmethod
-    def get_earliest(cls):
-        """
-        Returns the earliest timeframe for the given word.
-        """
-        return cls.objects \
-            .earliest(field_name='start_time')
+        # Get all the words we are currently interested in tracking
+        indicators = FeelingIndicator.objects.filter(enabled=True)
+        feelings = FeelingWord.get_tracked_list()
+        feelings_set = set(f.word for f in feelings)
+
+        # Create a dict for holding the counts -- these will be initialized to 0 as needed
+        # Index into this with feeling words
+        # For example: tweet_counts_by_feeling['fine'] += 1
+        tweet_counts_by_feeling = defaultdict(float)
+
+        # The number of tweets that matched an indicator but did NOT contain a recognized feeling.
+        indicator_matches = 0
+        largest_gap = timedelta(seconds=0)
+        last_tweet_time = None
+        for tweet in tweets:
+
+            # Detecting gaps in the data
+            if last_tweet_time:
+                gap = tweet.created_at - last_tweet_time
+                if gap > largest_gap:
+                    largest_gap = gap
+
+            last_tweet_time = tweet.created_at
+
+            # find out if an indicator matches
+            for indicator in indicators:
+
+                try:
+                    indicator_phrase, feeling_word = indicator.extract_feeling(tweet.text, feelings_set)
+
+                    if feeling_word:
+                        # we have a valid feeling for this indicator
+                        tweet_counts_by_feeling[feeling_word] += 1
+                        indicator_matches += 1
+
+                        break  # only one indicator per tweet, please
+
+                    elif indicator_phrase:
+
+                        # we have a match on the indicator but no detectable feeling
+                        indicator_matches += 1
+
+                except Exception as e:
+                    logger.error("Error parsing tweet: %s", e.message)
+
+        # If more than 20% of the frame was a gap, then consider it missing_data
+        missing_data = len(tweets) == 0 or (largest_gap.total_seconds() > (self.duration_seconds * 0.2))
+
+        # Create a bunch of new data frames to store the per-feeling data.
+        sub_frames = []
+
+        for feeling in feelings:
+            if indicator_matches > 0:
+                percent = tweet_counts_by_feeling[feeling.word] / indicator_matches
+            else:
+                percent = 0
+
+            sub_frames.append(self.create_subframe(
+                feeling=feeling,
+                tweets=percent,
+                calculated=True,
+                missing_data=missing_data
+            ))
+
+        # Save all the new frames
+        TimeFrame.objects.bulk_create(sub_frames)
+
+        # This global frame is now done
+        self.tweets = indicator_matches
+        self.mark_done(missing_data=missing_data)
+
+
+    ######
+    # Class methods specific to the thermometer views.
+    ######
 
     @classmethod
     def get_average_rates(cls, start=None, end=None):
         """
-        Gets the average percentage for each feeling.
+        Gets the average percentage for each feeling in an interval.
         """
-        query = cls.objects \
-            .filter(incomplete=False, feeling__isnull=False)
+        query = cls.get_frames(start=start, end=end) \
+            .filter(missing_data=False, feeling__isnull=False)
 
-        if end:
-            query = query.filter(start_time__lt=end)
-        if start:
-            query = query.filter(end_time__gt=start)
-
-        query = query.values('feeling')\
+        query = query.values('feeling') \
             .annotate(models.Avg('tweets')) \
             .order_by('feeling')
 
@@ -198,20 +241,13 @@ class TimeFrame(models.Model):
         return result
 
     @classmethod
-    def get_frames(cls, start=None, end=None):
+    def get_frames_in_interval(cls, start=None, end=None):
         """
         Gets the count of each feeling at time frames over an interval.
+        Applies sorting etc to generate data useful for the view.
         """
-        query = cls.objects.filter(calculated=True)
+        query = super(TimeFrame, cls).get_frames(start, end, calculated=True)
 
-        if end:
-            query = query.filter(start_time__lt=end)
-        if start:
-            query = query.filter(end_time__gt=start)
-
-        query = query.order_by('end_time', 'feeling')
+        query = query.order_by('start_time', 'feeling')
 
         return query
-
-    def __unicode__(self):
-        return "[%s, %s] %s (%d tweets)" % (self.start_time, self.end_time, self.feeling, self.tweets or 0)
