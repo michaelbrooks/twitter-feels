@@ -7,7 +7,13 @@ if ! exists $_PYTHON; then
     loggy "Installing $_PYTHON..." "warn"
 
     yum -y groupinstall "Development tools"
-    yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel
+    # https://gist.github.com/hangtwenty/5546945
+    yum -y install zlib-devel  # gen'l reqs
+    yum -y install bzip2-devel openssl-devel ncurses-devel  # gen'l reqs
+    yum -y install mysql-devel  # req'd to use MySQL with python ('mysql-python' package)
+    yum -y install libxml2-devel libxslt-devel  # req'd by python package 'lxml'
+    yum -y install unixODBC-devel  # req'd by python package 'pyodbc'
+    yum -y install sqlite sqlite-devel  # you will be sad if you don't install this before compiling python, and later need it.
 
     curl -LO http://python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz
     tar xf Python-2.7.6.tar.xz
