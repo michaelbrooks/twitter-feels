@@ -24,3 +24,6 @@ local_settings.py
 /.idea/sqlDataSources.xml
 /.idea/dynamic.xml
 /.idea/dataSources.ids
+
+# Vagrant files
+.vagrant
