@@ -57,7 +57,6 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 # use Python 2.7
-alias python=$(command -v python2.7)
 export VIRTUALENVWRAPPER_PYTHON=$(command -v python2.7)
 
 export WORKON_HOME=$HOME/.virtualenvs
