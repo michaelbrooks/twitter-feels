@@ -53,6 +53,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Run the provisioning script
-  config.vm.provision "shell", path: "scripts/provision/install.sh", :args => "twitter-feels"
+  config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels"]
+
+  # Use this to create a version suitable for packaging
+  # config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels", "base"]
 
 end

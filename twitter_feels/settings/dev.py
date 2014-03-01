@@ -27,12 +27,10 @@ CACHES = {
 }
 ########## END CACHE CONFIGURATION
 
-
 ########## TOOLBAR CONFIGURATION
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
 INSTALLED_APPS += (
     'debug_toolbar',
-    'twitter_feels.apps.demo_vis',
 )
 
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
@@ -46,6 +44,8 @@ MIDDLEWARE_CLASSES += (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
 ########## END TOOLBAR CONFIGURATION
 
 
@@ -122,3 +122,9 @@ ANALYSIS_TIME_FRAME_TASKS['demo_vis'] = {
     "frame_class_path": "twitter_feels.apps.demo_vis.models.DemoTimeFrame",
 }
 ########## END SCHEDULED TASKS SETTINGS
+
+########## DEMO VIS CONFIG
+INSTALLED_APPS += (
+    'twitter_feels.apps.demo_vis',
+)
+########## END DEMO VIS CONFIG

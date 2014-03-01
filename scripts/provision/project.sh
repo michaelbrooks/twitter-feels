@@ -22,6 +22,6 @@ echo "workon $VIRTUALENV_NAME" >> /home/vagrant/.bashrc
 chmod a+x $PROJECT_DIR/manage.py
 
 # Django project setup
-su - vagrant -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && honcho ./manage.py syncdb --noinput && honcho ./manage.py migrate"
+su - vagrant -c "source $VIRTUALENV_DIR/bin/activate && cd $PROJECT_DIR && honcho run ./manage.py syncdb --noinput && honcho run ./manage.py migrate"
 
 loggy "Project setup complete."

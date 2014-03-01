@@ -27,9 +27,14 @@ if ! exists "mysql"; then
     # Make mysql start automatically
     chkconfig mysqld on
 
-    # To secure the installation
     # mysql_secure_installation
-    loggy "MySQL installed."
+
+    if ! exists "mysql"; then
+        loggy "MySQL failed to install!" "error"
+    else:
+        # To secure the installation
+        loggy "MySQL installed."
+    fi
 else
     loggy "MySQL already installed."
 fi
@@ -53,7 +58,12 @@ fi
 if ! started "mysqld"; then
     loggy "Starting MySQL..." "warn"
     service mysqld start
-    loggy "MySQL started."
+
+    if ! started "mysql"; then
+        loggy "MySQL failed to start!" "error"
+    else:
+        loggy "MySQL started."
+    fi
 fi
 
 # mysql setup for project

@@ -78,6 +78,12 @@ source $PROVISION_SCRIPTS/mysql.sh
 source $PROVISION_SCRIPTS/redis.sh
 source $PROVISION_SCRIPTS/nginx.sh
 source $PROVISION_SCRIPTS/python.sh
-source $PROVISION_SCRIPTS/project.sh
+
+if [ "$2" = "base" ]; then
+    echo "Project settings not initialized."
+    echo "Run 'vagrant package --base my-virtual-machine' to package as a vagrant box."
+else
+    source $PROVISION_SCRIPTS/project.sh
+fi
 
 exit 0

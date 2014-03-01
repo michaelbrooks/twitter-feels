@@ -30,8 +30,8 @@ if different $PROVISION_SCRIPTS/redis.conf /etc/redis/redis.conf; then
     mkdir -p /var/lib/redis
 
     cp -p $PROVISION_SCRIPTS/redis.conf /etc/redis/redis.conf
-    chown root:root /etc/redis/redis.cnf
-    chmod 644 /etc/redis/redis.cnf
+    chown root:root /etc/redis/redis.conf
+    chmod 644 /etc/redis/redis.conf
 
     if started "redis"; then
         loggy "Restarting redis..." "warn"

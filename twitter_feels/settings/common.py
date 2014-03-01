@@ -48,10 +48,9 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-import os
-print os.environ.get('DATABASE_URL')
-print dj_database_url.config()
 DATABASES = {'default': dj_database_url.config() }
+# enable utf8mb4
+DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
 
 ########## END DATABASE CONFIGURATION
 
