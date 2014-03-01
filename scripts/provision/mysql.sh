@@ -24,6 +24,9 @@ if ! exists "mysql"; then
     # Then install mysql, and mysql-devel (needed to build mysql-python later)
     yum install -y mysql-server mysql-devel
 
+    # Make mysql start automatically
+    chkconfig mysqld on
+
     # To secure the installation
     # mysql_secure_installation
     loggy "MySQL installed."

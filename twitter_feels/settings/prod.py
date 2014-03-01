@@ -11,17 +11,7 @@ from common import *
 ########## CACHE CONFIGURATION
 ########## STORAGE CONFIGURATION
 ########## COMPRESSION CONFIGURATION
-
-########## Redis Queue (RQ) CONFIGURATION
-RQ_QUEUES = {
-    'default': {
-        'URL': environ.get('REDIS_URL', 'redis://localhost:6379'), # If you're on Heroku
-        'DB': 0,
-        },
-    }
-
-######### END RQ CONFIGURATION
-
+########## REDIS CONFIGURATION
 
 ########## SECRET CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key

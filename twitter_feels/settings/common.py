@@ -3,10 +3,12 @@ Common Django settings for twitter_feels project.
 
 based on https://github.com/rdegges/django-skel/blob/master/project_name/settings/common.py
 """
+import dj_database_url
 
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
 import datetime
+from os import environ
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
@@ -46,22 +48,20 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
-}
+import os
+print os.environ.get('DATABASE_URL')
+print dj_database_url.config()
+DATABASES = {'default': dj_database_url.config() }
+
 ########## END DATABASE CONFIGURATION
 
 
 ########## Redis Queue (RQ) CONFIGURATION
 RQ_QUEUES = {
-    'default': {},
+    'default': {
+        'URL': environ.get('REDIS_URL', 'redis://localhost:6379'), # If you're on Heroku
+        'DB': 0,
+    },
 }
 # Warning: Overrides the admin template!
 RQ_SHOW_ADMIN_LINK = True

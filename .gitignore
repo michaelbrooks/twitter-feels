@@ -26,4 +26,7 @@ local_settings.py
 /.idea/dataSources.ids
 
 # Vagrant files
-.vagrant
+/.vagrant
+
+# .env files
+/.env

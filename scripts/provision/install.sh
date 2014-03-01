@@ -76,6 +76,7 @@ source $PROVISION_SCRIPTS/system.sh
 source $PROVISION_SCRIPTS/git.sh
 source $PROVISION_SCRIPTS/mysql.sh
 source $PROVISION_SCRIPTS/redis.sh
+source $PROVISION_SCRIPTS/nginx.sh
 source $PROVISION_SCRIPTS/python.sh
 source $PROVISION_SCRIPTS/project.sh
 
