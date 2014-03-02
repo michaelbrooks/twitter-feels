@@ -48,9 +48,10 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {'default': dj_database_url.config() }
-# enable utf8mb4
-DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
+DATABASES = {'default': dj_database_url.config('sqlite://default.db') }
+if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
+    # enable utf8mb4 on mysql
+    DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
 
 ########## END DATABASE CONFIGURATION
 
@@ -58,7 +59,7 @@ DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
 ########## Redis Queue (RQ) CONFIGURATION
 RQ_QUEUES = {
     'default': {
-        'URL': environ.get('REDIS_URL', 'redis://localhost:6379'), # If you're on Heroku
+        'URL': environ.get('REDIS_URL', 'redis://localhost:6379'),
         'DB': 0,
     },
 }
