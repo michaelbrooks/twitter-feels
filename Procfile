@@ -1,4 +1,4 @@
-web: PYTHONUNBUFFERED=1 gunicorn twitter_feels.wsgi:application
+web: PYTHONUNBUFFERED=1 gunicorn twitter_feels.wsgi:application --access-logfile -
 worker: PYTHONUNBUFFERED=1 python manage.py rqworker
 stream: PYTHONUNBUFFERED=1 python manage.py stream --scheduler-queue default
 
