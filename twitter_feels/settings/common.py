@@ -48,7 +48,7 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {'default': dj_database_url.config('sqlite://default.db') }
+DATABASES = {'default': dj_database_url.config(default='sqlite://default.db') }
 if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
     # enable utf8mb4 on mysql
     DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
@@ -248,7 +248,7 @@ LOGGING = {
         }
     },
     "formatters": {
-        "rq_console": {
+        "time_console": {
             "format": "%(asctime)s %(message)s",
             "datefmt": "%H:%M:%S",
         },
@@ -261,7 +261,8 @@ LOGGING = {
         },
         'console': {
             'level': 'DEBUG',
-            'class': 'logging.StreamHandler'
+            'class': 'logging.StreamHandler',
+            'formatter': 'time_console'
         },
         "rq_console": {
             "level": "DEBUG",
@@ -283,6 +284,10 @@ LOGGING = {
         "streamer": {
             "handlers": ['console'],
             "level": "ERROR",
+        },
+        "thermometer": {
+            "handlers": ['console'],
+            "level": "DEBUG"
         },
         "analysis": {
             "handlers": ['console'],
