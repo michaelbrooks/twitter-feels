@@ -57,60 +57,27 @@ COMPRESS_ENABLED = False
 
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
+LOGGING['loggers'] = {
+    'django.request': {
+        'handlers': ['mail_admins', 'console'],
+        'level': 'DEBUG',
+        'propagate': True,
     },
-    "formatters": {
-        "time_console": {
-            "format": "%(asctime)s %(message)s",
-            "datefmt": "%H:%M:%S",
-        },
+    "rq.worker": {
+        "handlers": ["rq_console"],
+        "level": "INFO"
     },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'time_console'
-        },
-        "rq_console": {
-            "level": "DEBUG",
-            "class": "rq.utils.ColorizingStreamHandler",
-            "formatter": "time_console",
-            "exclude": ["%(asctime)s"],
-        },
+    "streamer": {
+        "handlers": ['console'],
+        "level": "DEBUG"
     },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        "rq.worker": {
-            "handlers": ["rq_console"],
-            "level": "INFO"
-        },
-        "streamer": {
-            "handlers": ['console'],
-            "level": "DEBUG"
-        },
-        "thermometer": {
-            "handlers": ['console'],
-            "level": "DEBUG"
-        },
-        "analysis": {
-            "handlers": ['console'],
-            "level": "DEBUG",
-        }
+    "thermometer": {
+        "handlers": ['console'],
+        "level": "DEBUG"
+    },
+    "analysis": {
+        "handlers": ['console'],
+        "level": "DEBUG",
     }
 }
 ########## END LOGGING CONFIGURATION

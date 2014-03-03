@@ -10,7 +10,7 @@ from common import *
 ########## DATABASE CONFIGURATION
 ########## CACHE CONFIGURATION
 ########## STORAGE CONFIGURATION
-########## COMPRESSION CONFIGURATION
+
 ########## REDIS CONFIGURATION
 
 ########## SECRET CONFIGURATION
@@ -27,3 +27,8 @@ DEBUG = False
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
 TEMPLATE_DEBUG = DEBUG
 ########## END DEBUG CONFIGURATION
+
+########## COMPRESSION CONFIGURATION
+# See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
+COMPRESS_ENABLED = True
+########## END COMPRESSION CONFIGURATION

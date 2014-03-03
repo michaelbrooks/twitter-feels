@@ -251,7 +251,7 @@ LOGGING = {
         }
     },
     "formatters": {
-        "rq_console": {
+        "time_console": {
             "format": "%(asctime)s %(message)s",
             "datefmt": "%H:%M:%S",
         },
@@ -264,7 +264,8 @@ LOGGING = {
         },
         'console': {
             'level': 'DEBUG',
-            'class': 'logging.StreamHandler'
+            'class': 'logging.StreamHandler',
+            'formatter': 'time_console'
         },
         "rq_console": {
             "level": "DEBUG",
@@ -286,6 +287,10 @@ LOGGING = {
         "streamer": {
             "handlers": ['console'],
             "level": "ERROR",
+        },
+        "thermometer": {
+            "handlers": ['console'],
+            "level": "DEBUG"
         },
         "analysis": {
             "handlers": ['console'],
