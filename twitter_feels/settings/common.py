@@ -86,6 +86,9 @@ USE_L10N = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
+
+# Path to prepend to the start of urls
+SITE_PREFIX=environ.get('SITE_PREFIX', '/')
 ########## END GENERAL CONFIGURATION
 
 
@@ -94,7 +97,7 @@ USE_TZ = True
 MEDIA_ROOT = normpath(join(DJANGO_ROOT, 'media'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = '/media/'
+MEDIA_URL = '%smedia/' % SITE_PREFIX
 ########## END MEDIA CONFIGURATION
 
 
@@ -103,7 +106,7 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = normpath(join(DJANGO_ROOT, 'static'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
-STATIC_URL = '/static/'
+STATIC_URL = '%sstatic/' % SITE_PREFIX
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (

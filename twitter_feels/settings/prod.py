@@ -32,3 +32,6 @@ TEMPLATE_DEBUG = DEBUG
 # See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
 COMPRESS_ENABLED = True
 ########## END COMPRESSION CONFIGURATION
+
+# The hosts that we are allowed to serve as
+ALLOWED_HOSTS = environ.get("ALLOWED_HOSTS", 'localhost').split(',')
