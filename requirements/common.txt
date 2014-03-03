@@ -28,3 +28,5 @@ tweepy==2.2
 django-bootstrap3==2.5.6
 
 nltk==2.0.4
+
+honcho==0.5.0
