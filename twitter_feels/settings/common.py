@@ -227,6 +227,9 @@ LOCAL_APPS = (
 
     # A thermometer visualization
     'twitter_feels.apps.thermometer',
+    
+	# A thermometer visualization
+    'twitter_feels.apps.map',
 
     # A status monitoring app
     'twitter_feels.apps.status',
@@ -335,6 +338,10 @@ ANALYSIS_TIME_FRAME_TASKS = {
     "thermometer": {
         "name": "Thermometer Analysis",
         "frame_class_path": "twitter_feels.apps.thermometer.models.TimeFrame",
+    },
+    "map": {
+        "name": "Map Analysis",
+        "frame_class_path": "twitter_feels.apps.map.models.MapTimeFrame",
     },
 }
 ########## END SCHEDULED TASKS SETTINGS
