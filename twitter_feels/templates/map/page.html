@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load staticfiles humanize %}
+
+{% block title %}Map Visualization{% endblock %}
+{% block header %}Map Visualization{% endblock %}
+
+{% block content %}
+
+    <div class="vis">
+
+        {# We'll just render the data into this table #}
+        <table class="table table-alternate">
+            <thead>
+            <tr>
+                <th>Time (local)</th>
+                <th>Tweet Count</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    {# Load custom stylesheets here. These are located in twitter_feels/apps/demo_vis/static #}
+    <link rel="stylesheet" type=text/css" href="{% static 'map/demo.css' %}"/>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    {# Load custom javascript here. These are located in twitter_feels/apps/demo_vis/static #}
+    <script type="text/javascript" src="{% static 'map/demo.js' %}"></script>
+{% endblock %}
+
+{% block js_cdn %}
+    {{ block.super }}
+    {# Load javascript from a CDN here. #}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
+{% endblock %}

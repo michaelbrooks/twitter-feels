@@ -48,7 +48,7 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {'default': dj_database_url.config('sqlite://default.db') }
+DATABASES = {'default': dj_database_url.config(default='sqlite://default.db') }
 if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
     # enable utf8mb4 on mysql
     DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
@@ -227,6 +227,9 @@ LOCAL_APPS = (
 
     # A thermometer visualization
     'twitter_feels.apps.thermometer',
+    
+	# A thermometer visualization
+    'twitter_feels.apps.map',
 
     # A status monitoring app
     'twitter_feels.apps.status',
@@ -330,6 +333,10 @@ ANALYSIS_TIME_FRAME_TASKS = {
     "thermometer": {
         "name": "Thermometer Analysis",
         "frame_class_path": "twitter_feels.apps.thermometer.models.TimeFrame",
+    },
+    "map": {
+        "name": "Map Analysis",
+        "frame_class_path": "twitter_feels.apps.map.models.MapTimeFrame",
     },
 }
 ########## END SCHEDULED TASKS SETTINGS
