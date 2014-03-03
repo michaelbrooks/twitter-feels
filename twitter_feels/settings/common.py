@@ -267,7 +267,7 @@ LOGGING = {
         "rq_console": {
             "level": "DEBUG",
             "class": "rq.utils.ColorizingStreamHandler",
-            "formatter": "rq_console",
+            "formatter": "time_console",
             "exclude": ["%(asctime)s"],
         },
     },
