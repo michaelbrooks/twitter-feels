@@ -1,17 +1,20 @@
 from collections import defaultdict
 from datetime import timedelta
-from django.db import models
 import re
-import nltk
 import logging
 
+from django.db import models
+
+import nltk
 import settings
+from twitter_feels.libs.twitter_analysis import TweetTimeFrame
+from stream_analysis import TimedIntervalMixin
+
 
 logger = logging.getLogger('thermometer')
 
 
 # Regex for matching indicators
-from twitter_feels.libs.analysis import BaseTimeFrame, TimedIntervalMixin
 
 INDICATOR_REG_TEMPLATE = (r"([^\w]|^)"   # something that is not wordy
                           r"%s"          # the term/phrase
@@ -107,7 +110,7 @@ class FeelingWord(models.Model):
         return cls.objects.filter(untracked=False)
 
 
-class TimeFrame(BaseTimeFrame):
+class TimeFrame(TweetTimeFrame):
     """
     Analyze the percent of tweets for feeling words in this time window.
 
@@ -120,13 +123,13 @@ class TimeFrame(BaseTimeFrame):
     feeling_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
     total_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
 
-    def calculate(self, tweets):
+    def calculate(self, stream_data, task):
         """
         Calculates a new time frame from collected Twitter data.
         """
 
         # Just get the non-rts
-        originals = tweets.filter(retweeted_status_id=None)
+        originals = stream_data.filter(retweeted_status_id=None)
 
         # Get all the words we are currently interested in tracking
         indicators = FeelingIndicator.objects.filter(enabled=True)
@@ -174,7 +177,7 @@ class TimeFrame(BaseTimeFrame):
                     logger.error("Error parsing tweet: %s", e.message)
 
         # If more than 20% of the frame was a gap, then consider it missing_data
-        missing_data = len(originals) == 0 or (largest_gap.total_seconds() > (self.duration_seconds * 0.2))
+        self.missing_data = len(originals) == 0 or (largest_gap.total_seconds() > (self.duration_seconds * 0.2))
 
         # Create a bunch of new FeelingCount objects to store the per-feeling data.
         feeling_counters = []
@@ -191,7 +194,7 @@ class TimeFrame(BaseTimeFrame):
                 percent=percent,
                 start_time=self.start_time,
                 feeling_tweets=indicator_matches,
-                missing_data=missing_data
+                missing_data=self.missing_data
             ))
 
         # Save all the new frames
@@ -199,8 +202,8 @@ class TimeFrame(BaseTimeFrame):
 
         # This global frame is now done
         self.feeling_tweets = indicator_matches
-        self.total_tweets = len(tweets)
-        self.mark_done(tweets, missing_data=missing_data)
+        self.total_tweets = len(stream_data)
+        return stream_data
 
 
 class FeelingPercent(TimedIntervalMixin, models.Model):

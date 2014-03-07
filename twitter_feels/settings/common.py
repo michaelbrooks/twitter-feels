@@ -48,7 +48,7 @@ MANAGERS = ADMINS
 
 ########## DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {'default': dj_database_url.config(default='sqlite://default.db') }
+DATABASES = {'default': dj_database_url.config(default='sqlite://default.db')}
 if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
     # enable utf8mb4 on mysql
     DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
@@ -88,7 +88,7 @@ USE_L10N = True
 USE_TZ = True
 
 # Path to prepend to the start of urls
-SITE_PREFIX=environ.get('SITE_PREFIX', '/')
+SITE_PREFIX = environ.get('SITE_PREFIX', '/')
 ########## END GENERAL CONFIGURATION
 
 
@@ -219,23 +219,27 @@ THIRD_PARTY_APPS = (
 
     # Hierarchical navigation template tags
     'lineage',
+
+    # Streaming tweets
+    'twitter_stream',
+
+    # Anslysis tasks for the stream
+    "stream_analysis",
 )
 
 LOCAL_APPS = (
-    # Collect streaming data from Twitter
-    'twitter_feels.libs.streamer',
-
-    # Run repetitive analysis tasks
-    'twitter_feels.libs.analysis',
 
     # A thermometer visualization
     'twitter_feels.apps.thermometer',
-    
-	# A thermometer visualization
+
+    # A thermometer visualization
     'twitter_feels.apps.map',
 
     # A status monitoring app
     'twitter_feels.apps.status',
+
+    # Utilities for twitter streaming analysis
+    'twitter_feels.libs.twitter_analysis'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

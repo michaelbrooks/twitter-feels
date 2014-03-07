@@ -5,8 +5,6 @@ Django==1.6.2
 gunicorn==18.0
 
 mysql-python==1.2.5
-django-rq==0.6.1
-rq-scheduler==0.4.0
 
 # Configuring databases
 dj-database-url==0.2.2
@@ -21,9 +19,9 @@ django-lineage==0.2.0
 # Customized to not always print out the json module being used
 -e git+https://github.com/michaelbrooks/django-jsonview.git@no-logging#egg=django-jsonview
 
-# Interfacing with Twitter
-tweepy==2.2
--e git+https://github.com/michaelbrooks/twitter-monitor.git@simpler-threading#egg=twitter-monitor
+# Twitter streaming and stream analysis
+-e git+https://github.com/michaelbrooks/django-twitter-stream#egg=django-twitter-stream-0.1.0
+-e git+https://github.com/michaelbrooks/django-stream-analysis#egg=django-stream-analysis-0.1.0
 
 django-bootstrap3==2.5.6
 

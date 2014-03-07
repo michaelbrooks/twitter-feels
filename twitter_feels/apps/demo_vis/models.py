@@ -1,9 +1,9 @@
 from django.db import models
-from twitter_feels.libs.analysis import BaseTimeFrame
+from twitter_feels.libs.twitter_analysis import TweetTimeFrame
 from datetime import timedelta
 
 
-class DemoTimeFrame(BaseTimeFrame):
+class DemoTimeFrame(TweetTimeFrame):
     """
     A basic time frame for demo analysis.
 
@@ -12,7 +12,7 @@ class DemoTimeFrame(BaseTimeFrame):
     3. Add any fields you need to calculate. You can also store data on separate models,
        if your data is not strictly 1:1 with time frames.
     4. Implement calculate(tweets). This is where you do your work.
-       At the end, make sure to call self.mark_done(tweets)
+       At the end, make sure to return any stream data you will never need again.
     5. Add any additional functions related to your time frames
        that will make them easier to work with.
     """
@@ -23,9 +23,9 @@ class DemoTimeFrame(BaseTimeFrame):
     # Simply store the total tweet count in this time frame
     tweet_count = models.IntegerField(default=0)
 
-    def calculate(self, tweets):
-        self.tweet_count = len(tweets)
-        self.mark_done(tweets)
+    def calculate(self, stream_data, task):
+        self.tweet_count = len(stream_data)
+        return stream_data
 
     @classmethod
     def get_most_recent(cls, limit=20):

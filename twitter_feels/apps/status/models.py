@@ -6,9 +6,9 @@ from django.utils import timezone
 import django_rq
 import rq
 
-from twitter_feels.libs.analysis.utils import AnalysisTask, cleanup, get_analyzed_tweets
-from twitter_feels.libs.streamer.models import Tweet, StreamProcess, FilterTerm
-
+from stream_analysis import AnalysisTask, cleanup
+from twitter_stream.models import Tweet, StreamProcess, FilterTerm
+from twitter_feels.libs.twitter_analysis.models import TweetStream
 
 logger = logging.getLogger('status')
 scheduler = django_rq.get_scheduler()
@@ -93,12 +93,19 @@ def stream_status():
             running = True
             break
 
+    tasks = AnalysisTask.get()
+    num_tweet_tasks = 0
+    for t in tasks:
+        if t.STREAM_CLASS == TweetStream:
+            num_tweet_tasks += 1
+    analyzed_count = TweetStream.count_analyzed(num_analyses=num_tweet_tasks)
+
     return {
         'running': running,
         'terms': [t.term for t in terms],
         'processes': processes,
         'tweet_count': Tweet.objects.count(),
-        'analyzed_count': get_analyzed_tweets().count()
+        'analyzed_count': analyzed_count
     }
 
 
