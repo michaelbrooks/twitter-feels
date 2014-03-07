@@ -23,7 +23,7 @@ class DemoTimeFrame(TweetTimeFrame):
     # Simply store the total tweet count in this time frame
     tweet_count = models.IntegerField(default=0)
 
-    def calculate(self, stream_data, task):
+    def calculate(self, stream_data):
         self.tweet_count = len(stream_data)
         return stream_data
 

@@ -291,15 +291,15 @@ LOGGING = {
             "handlers": ["rq_console"],
             "level": "ERROR"
         },
-        "streamer": {
+        "twitter_stream": {
             "handlers": ['console'],
             "level": "ERROR",
         },
         "thermometer": {
             "handlers": ['console'],
-            "level": "DEBUG"
+            "level": "ERROR"
         },
-        "analysis": {
+        "stream_analysis": {
             "handlers": ['console'],
             "level": "ERROR",
         }

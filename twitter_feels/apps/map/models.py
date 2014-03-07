@@ -1,8 +1,10 @@
 from django.db import models
-from twitter_feels.libs.analysis import BaseTimeFrame
+
 from datetime import timedelta
-from twitter_feels.libs.streamer.models import Tweet
-import re
+
+from twitter_feels.libs.twitter_analysis import TweetTimeFrame
+from twitter_stream.models import Tweet
+
 
 class TreeNode(models.Model):
     
@@ -26,7 +28,7 @@ class TweetChunk(models.Model):
     created_at = models.DateTimeField()
     tz_country = models.ForeignKey(Tz_Country, null=True, blank=True)
 
-class MapTimeFrame(BaseTimeFrame):
+class MapTimeFrame(TweetTimeFrame):
     """
     A basic time frame for demo analysis.
 
@@ -81,7 +83,7 @@ class MapTimeFrame(BaseTimeFrame):
 
         TweetChunk.objects.bulk_create(new_tweet_chunks)
 
-        self.mark_done(tweets)
+        return tweets
 
     @classmethod
     def get_most_recent(cls, limit=20):

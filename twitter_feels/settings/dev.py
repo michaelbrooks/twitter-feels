@@ -65,17 +65,17 @@ LOGGING['loggers'] = {
     },
     "rq.worker": {
         "handlers": ["rq_console"],
-        "level": "INFO"
-    },
-    "streamer": {
-        "handlers": ['console'],
         "level": "DEBUG"
+    },
+    "twitter_stream": {
+        "handlers": ['console'],
+        "level": "DEBUG",
     },
     "thermometer": {
         "handlers": ['console'],
         "level": "DEBUG"
     },
-    "analysis": {
+    "stream_analysis": {
         "handlers": ['console'],
         "level": "DEBUG",
     }

@@ -123,7 +123,7 @@ class TimeFrame(TweetTimeFrame):
     feeling_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
     total_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
 
-    def calculate(self, stream_data, task):
+    def calculate(self, stream_data):
         """
         Calculates a new time frame from collected Twitter data.
         """

@@ -96,9 +96,10 @@ def stream_status():
     tasks = AnalysisTask.get()
     num_tweet_tasks = 0
     for t in tasks:
-        if t.STREAM_CLASS == TweetStream:
+        if t.get_frame_class().STREAM_CLASS == TweetStream:
             num_tweet_tasks += 1
-    analyzed_count = TweetStream.count_analyzed(num_analyses=num_tweet_tasks)
+
+    analyzed_count = TweetStream().count_analyzed(num_analyses=num_tweet_tasks)
 
     return {
         'running': running,
@@ -110,13 +111,14 @@ def stream_status():
 
 
 def _task_status(task):
+    frame_class = task.get_frame_class()
     result = {
         "key": task.key,
         "name": task.name,
         "time_frame_path": task.frame_class_path,
-        "duration": task.frame_class.DURATION.total_seconds(),
-        "frame_count": task.frame_class.count_completed(),
-        "avg_time": task.frame_class.get_average_analysis_time(),
+        "duration": frame_class.DURATION.total_seconds(),
+        "frame_count": frame_class.count_completed(),
+        "avg_time": frame_class.get_average_analysis_time(),
         "running": False,
         "enqueued_at": None
     }
@@ -173,6 +175,7 @@ def schedule_task(key=None, cancel_first=True):
         task = AnalysisTask.get(key=key)
         if task:
             task.schedule(cancel_first=cancel_first)
+
     else:
         for task in AnalysisTask.get():
             task.schedule(cancel_first=cancel_first)
