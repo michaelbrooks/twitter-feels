@@ -20,7 +20,7 @@ django-lineage==0.2.0
 -e git+https://github.com/michaelbrooks/django-jsonview.git@no-logging#egg=django-jsonview
 
 # Twitter streaming and stream analysis
--e git+https://github.com/michaelbrooks/django-twitter-stream#egg=django-twitter-stream-0.1.0
+-e git+https://github.com/michaelbrooks/django-twitter-stream#egg=django-twitter-stream-0.1.1
 -e git+https://github.com/michaelbrooks/django-stream-analysis#egg=django-stream-analysis-0.1.0
 
 django-bootstrap3==2.5.6

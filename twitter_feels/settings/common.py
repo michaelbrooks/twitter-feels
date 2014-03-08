@@ -258,8 +258,8 @@ LOGGING = {
         }
     },
     "formatters": {
-        "time_console": {
-            "format": "%(asctime)s %(message)s",
+        "time_formatter": {
+            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
             "datefmt": "%H:%M:%S",
         },
     },
@@ -272,13 +272,7 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'time_console'
-        },
-        "rq_console": {
-            "level": "DEBUG",
-            "class": "rq.utils.ColorizingStreamHandler",
-            "formatter": "time_console",
-            "exclude": ["%(asctime)s"],
+            'formatter': 'time_formatter'
         },
     },
     'loggers': {
@@ -287,13 +281,17 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        "rq.worker": {
-            "handlers": ["rq_console"],
+        "rq": {
+            "handlers": ["console"],
             "level": "ERROR"
         },
         "twitter_stream": {
             "handlers": ['console'],
             "level": "ERROR",
+        },
+        "twitter_monitor": {
+            "handlers": ['console'],
+            "level": "WARN"
         },
         "thermometer": {
             "handlers": ['console'],

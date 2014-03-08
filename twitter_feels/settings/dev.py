@@ -63,13 +63,17 @@ LOGGING['loggers'] = {
         'level': 'DEBUG',
         'propagate': True,
     },
-    "rq.worker": {
-        "handlers": ["rq_console"],
+    "rq": {
+        "handlers": ["console"],
         "level": "DEBUG"
     },
     "twitter_stream": {
         "handlers": ['console'],
         "level": "DEBUG",
+    },
+    "twitter_monitor": {
+        "handlers": ['console'],
+        "level": "DEBUG"
     },
     "thermometer": {
         "handlers": ['console'],
