@@ -17,4 +17,6 @@ urlpatterns = patterns('',
 )
 
 if settings.DEBUG:
-    urlpatterns += url(r'^demo_vis/', include('twitter_feels.apps.demo_vis.urls')),
+    urlpatterns += patterns('', url(r'^demo_vis/', include('twitter_feels.apps.demo_vis.urls')))
+    import debug_toolbar
+    urlpatterns += patterns('', url(r'^__debug__/', include(debug_toolbar.urls)))

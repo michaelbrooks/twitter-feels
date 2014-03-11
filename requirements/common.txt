@@ -28,3 +28,4 @@ django-bootstrap3==2.5.6
 nltk==2.0.4
 
 honcho==0.5.0
+supervisor==3.0

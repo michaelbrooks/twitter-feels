@@ -2,50 +2,66 @@
 
 # Install python 2.7.6
 # see: http://toomuchdata.com/2014/02/16/how-to-install-python-on-centos/
-_PYTHON=python2.7
-if ! exists $_PYTHON; then
-    loggy "Installing $_PYTHON..." "warn"
 
-    yum -y groupinstall "Development tools"
-    # https://gist.github.com/hangtwenty/5546945
-    yum -y install zlib-devel  # gen'l reqs
-    yum -y install bzip2-devel openssl-devel ncurses-devel  # gen'l reqs
-    yum -y install mysql-devel  # req'd to use MySQL with python ('mysql-python' package)
-    yum -y install libxml2-devel libxslt-devel  # req'd by python package 'lxml'
-    yum -y install unixODBC-devel  # req'd by python package 'pyodbc'
-    yum -y install sqlite sqlite-devel  # you will be sad if you don't install this before compiling python, and later need it.
+set -e
 
-    curl -LO http://python.org/ftp/python/2.7.6/Python-2.7.6.tar.xz
-    tar xf Python-2.7.6.tar.xz
-    cd Python-2.7.6
-    ./configure --prefix=/usr/local --enable-unicode=ucs4 --enable-shared LDFLAGS="-Wl,-rpath /usr/local/lib"
-    make && make altinstall
+PYTHON_VERSION=$1
+INSTALL_TARGET=$2
+PYTHON_EXE=$3
 
-    cd ..
-    rm -rf Python-2.7.6 Python-2.7.6.tar.gx
+MY_DIR=`dirname $0`
+source $MY_DIR/functions.sh
 
-    loggy "Done installing $_PYTHON."
-else
-    loggy "$_PYTHON already installed."
+
+loggy "Installing Python $PYTHON_VERSION..." "warn"
+
+PACKAGE_NAME=Python-$PYTHON_VERSION
+PACKAGE_URL=http://python.org/ftp/python/$PYTHON_VERSION/$PACKAGE_NAME.tar.xz
+PACKAGE_DIR='/usr/src'
+
+if ! [ -e $PACKAGE_DIR/$PACKAGE_NAME.tar.xz ]; then
+    curl -L -o $PACKAGE_DIR/$PACKAGE_NAME.tar.xz  $PACKAGE_URL
 fi
 
-_PIP=pip2.7
-if ! exists $_PIP; then
-    loggy "Installing $_PIP..." "warn"
+# Extract
+SRC_DIR='/tmp'
+tar -xJf $PACKAGE_DIR/$PACKAGE_NAME.tar.xz -C $SRC_DIR
 
-    # Install pip and setuptools
-    curl -L https://raw.github.com/pypa/pip/master/contrib/get-pip.py | $_PYTHON
-    loggy "Done installing $_PIP."
-else
-    loggy "$_PIP already installed."
-fi
+# Configure
+cd $SRC_DIR/$PACKAGE_NAME
+$SRC_DIR/$PACKAGE_NAME/configure --prefix=$INSTALL_TARGET --enable-unicode=ucs4 --enable-shared LDFLAGS="-Wl,-rpath ${INSTALL_TARGET}/lib"
 
-# virtualenv global setup
-_VIRTUALENV=virtualenv-2.7
-if ! exists $_VIRTUALENV; then
-    loggy "Installing $_VIRTUALENV..." "warn"
-    $_PIP install virtualenv virtualenvwrapper
-    loggy "$_VIRTUALENV installed."
+# Install
+/usr/bin/make && /usr/bin/make altinstall
+
+cd $SRC_DIR
+rm -rf $SRC_DIR/$PACKAGE_NAME $PACKAGE_DIR/$PACKAGE_NAME.tar.xz
+
+if exists $PYTHON_EXE; then
+    loggy "Python ${PYTHON_VERSION} installed to ${PYTHON_EXE}."
+    exit 0
 else
-    loggy "$_VIRTUALENV already installed."
+    loggy "Failed to install Python ${PYTHON_VERSION} to ${PYTHON_EXE}!" "error"
+    exit 1
 fi
+#
+#_PIP=pip2.7
+#if ! exists $_PIP; then
+#    loggy "Installing $_PIP..." "warn"
+#
+#    # Install pip and setuptools
+#    curl -L https://raw.github.com/pypa/pip/master/contrib/get-pip.py | $_PYTHON
+#    loggy "Done installing $_PIP."
+#else
+#    loggy "$_PIP already installed."
+#fi
+#
+## virtualenv global setup
+#_VIRTUALENV=virtualenv-2.7
+#if ! exists $_VIRTUALENV; then
+#    loggy "Installing $_VIRTUALENV..." "warn"
+#    $_PIP install virtualenv virtualenvwrapper
+#    loggy "$_VIRTUALENV installed."
+#else
+#    loggy "$_VIRTUALENV already installed."
+#fi
