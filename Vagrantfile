@@ -7,10 +7,8 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
-  # config.vm.box = "centos65-twitter-feels"
   config.vm.box = "centos65-twitter-feels"
-
-  config.vm.box_url = "http://sccl.hcde.washington.edu/~mjbrooks/vagrant/centos65-twitter-feels-20140228.box"
+  config.vm.box_url = "http://sccl.hcde.washington.edu/~mjbrooks/vagrant/centos65-twitter-feels-20140311.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -78,6 +76,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "centos65"
     config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.3/centos65-x86_64-20140116.box"
 
+    # Don't sync to the home folder
     config.vm.synced_folder ".", "/home/vagrant/twitter-feels", disabled: true
 
     # Provision with Puppet

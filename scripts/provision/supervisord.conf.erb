@@ -16,6 +16,3 @@ serverurl = unix:///var/run/<%= @app_name %>/supervisord.sock
 
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory=supervisor.rpcinterface:make_main_rpcinterface
-
-[program:test]
-command=pip --version
