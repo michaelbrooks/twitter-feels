@@ -29,3 +29,5 @@ nltk==2.0.4
 
 honcho==0.5.0
 supervisor==3.0
+
+Fabric==1.8.2

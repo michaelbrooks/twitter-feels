@@ -174,6 +174,7 @@ class project::requirements () inherits project::params {
     require => File['copy requirements']
   }
 
+  # Set up the database schema
   exec { "manage.py syncdb":
     command => "source ${virtualenvwrapper_sh} &&
                 workon ${app_name} &&
@@ -186,6 +187,22 @@ class project::requirements () inherits project::params {
     require => Exec['install requirements'],
   }
 
+  if $django_environment == 'dev' {
+    # Optionally insert a default user
+    exec { "createsuperuser":
+      command => "source ${virtualenvwrapper_sh} &&
+                  workon ${app_name} &&
+                  honcho run ${project_dir}/manage.py loaddata ${scripts_dir}/provision/django_superuser.json",
+
+      provider => "shell",
+      user => $user_name,
+      environment => $environment,
+
+      require => Exec['manage.py syncdb'],
+    }
+  } else {
+    notify{ "No superuser created. You'll need to run manage.py createsuperuser.": }
+  }
 }
 
 class project::supervisor (
@@ -215,7 +232,10 @@ class project::supervisor (
   $concurrency = join($processes, ',')
 
   # Generate a supervisor script from the Procfile
-  # The 'sed' replacement adds the virtualenv bin path in front of all commands
+  # The 'sed' replacements are needed to:
+  # - add the virtualenv bin path in front of all commands
+  # - remove the app name from the front of all paths
+  # The grep commands remove the program group
   exec { "supervisor conf":
     command => "source ${virtualenvwrapper_sh} &&
                 workon ${app_name} &&
@@ -226,8 +246,11 @@ class project::supervisor (
                   --concurrency ${concurrency} \
                   supervisord /tmp &&
                 sed -i 's;^command=;command=${workon_home}/${app_name}/bin/;g' /tmp/${app_name}.conf &&
+                sed -i 's;^\\[program:${app_name}-;\\[program:;g' /tmp/${app_name}.conf &&
+                grep -v '^\\[group:${app_name}' /tmp/${app_name}.conf > /tmp/${app_name}-2.conf &&
+                grep -v '^programs=${app_name}-' /tmp/${app_name}-2.conf > /tmp/${app_name}.conf &&
                 cat /tmp/supervisor.${app_name}.conf-top /tmp/${app_name}.conf > ${supervisor_conf} &&
-                rm /tmp/${app_name}.conf",
+                rm /tmp/${app_name}*.conf",
 
     provider => "shell",
     user => $user_name,

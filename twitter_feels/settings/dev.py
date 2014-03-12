@@ -57,33 +57,8 @@ COMPRESS_ENABLED = False
 
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
-LOGGING['loggers'] = {
-    'django.request': {
-        'handlers': ['mail_admins', 'console'],
-        'level': 'DEBUG',
-        'propagate': True,
-    },
-    "rq": {
-        "handlers": ["console"],
-        "level": "DEBUG"
-    },
-    "twitter_stream": {
-        "handlers": ['console'],
-        "level": "DEBUG",
-    },
-    "twitter_monitor": {
-        "handlers": ['console'],
-        "level": "DEBUG"
-    },
-    "thermometer": {
-        "handlers": ['console'],
-        "level": "DEBUG"
-    },
-    "stream_analysis": {
-        "handlers": ['console'],
-        "level": "DEBUG",
-    }
-}
+for logger in LOGGING['loggers']:
+    LOGGING['loggers'][logger]['level'] = 'DEBUG'
 ########## END LOGGING CONFIGURATION
 
 

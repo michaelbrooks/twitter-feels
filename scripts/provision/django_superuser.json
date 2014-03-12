@@ -1,0 +1,20 @@
+[
+{
+   "pk": 1, 
+   "model": "auth.user", 
+   "fields": {
+      "username": "vagrant", 
+      "first_name": "", 
+      "last_name": "", 
+      "is_active": true, 
+      "is_superuser": true, 
+      "is_staff": true, 
+      "last_login": "2014-03-12T04:32:18Z", 
+      "groups": [], 
+      "user_permissions": [], 
+      "password": "pbkdf2_sha256$12000$RVrfPHVpEIVj$HvdIH8z/BRniHXbUv7oXYd3NVtTzMCGtVS5gqwCZrSE=", 
+      "email": "", 
+      "date_joined": "2014-03-12T04:32:18Z"
+   }
+}
+]

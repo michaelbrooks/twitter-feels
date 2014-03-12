@@ -13,7 +13,7 @@ class database (
     override_options => {
       'mysqld' => {
         'collation-server' => 'utf8mb4_unicode_ci',
-        'init-connect' => 'SET NAMES utf8mb4',
+        'init_connect' => '"SET NAMES utf8mb4"',
         'character-set-server' => 'utf8mb4',
       },
       'client' => {
@@ -28,6 +28,8 @@ class database (
     databases => {
       "${database_name}" => {
         ensure  => 'present',
+        charset => 'utf8mb4',
+        collate => 'utf8mb4_unicode_ci',
       },
     },
   }
