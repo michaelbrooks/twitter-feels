@@ -1,19 +1,17 @@
 # requirements/common.txt
 
+# Management tools
+honcho==0.5.0
+supervisor==3.0
+Fabric==1.8.2
+
+# Django libraries
 Django==1.6.2
-
-gunicorn==18.0
-
-mysql-python==1.2.5
-
-# Configuring databases
+South==0.8.4
 dj-database-url==0.2.2
-
-# Managing static assets
 dj-static==0.0.5
 django-compressor==1.3
-
-# Making navbar menus easier
+django-bootstrap3==2.5.6
 django-lineage==0.2.0
 
 # Customized to not always print out the json module being used
@@ -23,11 +21,6 @@ django-lineage==0.2.0
 -e git+https://github.com/michaelbrooks/django-twitter-stream#egg=django-twitter-stream-0.1.1
 -e git+https://github.com/michaelbrooks/django-stream-analysis#egg=django-stream-analysis-0.1.0
 
-django-bootstrap3==2.5.6
-
 nltk==2.0.4
-
-honcho==0.5.0
-supervisor==3.0
-
-Fabric==1.8.2
+gunicorn==18.0
+mysql-python==1.2.5
