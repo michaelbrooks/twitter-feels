@@ -67,11 +67,13 @@ def dev_web():
     with lcd(root_dir):
         local('honcho run ./manage.py runserver')
 
-def dump_key():
+def dump_key(file='.twitter_api_key.json'):
+    """Dump a Twitter API key to a fixture file (defaults to .twitter_api_key.json)"""
     with lcd(root_dir):
-        local('honcho run ./manage.py dumpdata twitter_stream.ApiKey --indent=3 > .twitter_api_key.json')
+        local('honcho run ./manage.py dumpdata twitter_stream.ApiKey --indent=3 > %s' % file)
 
 def load_key(file='.twitter_api_key.json'):
+    """Load a Twitter API key from a previously-exported fixture (defaults to .twitter_api_key.json)"""
     with lcd(root_dir):
 
         # Make sure it is a legit key file

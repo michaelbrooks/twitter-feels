@@ -1,10 +1,10 @@
-twitter-feels
-=============
+Twitter Feelings Stream
+=======================
 
 This is a Django web application that runs visualizations
 of streaming data from Twitter.
 
-The architecture includes 6 different components:
+The project architecture has 6 major components:
 
 1. A MySQL database that stores analysis results and tweets (temporarily).
 2. A Redis database that queues background processing jobs.
@@ -30,7 +30,7 @@ Vagrant is a manager for virtual machines that makes them very easy to work with
 You will also need Git. GitHub has an [excellent guide](https://help.github.com/articles/set-up-git) to setting
 this up, if your system does not come with it.
 
-Now that we have the prerequisites, you need to obtain a copy of the code.
+Now you need to obtain a copy of the code.
 Clone the repository to your machine:
 
 ```bash
@@ -48,8 +48,8 @@ $ vagrant up
 ```
 
 This will download a Vagrant "base box" and use it to start up a Virtualbox VM.
-The configuration for Vagrant is in the `Vagrantfile` and you can read more about
-Vagrant [here](http://docs.vagrantup.com/).
+You can read more about Vagrant [here](http://docs.vagrantup.com/).
+
 After running `vagrant up`, a Virtualbox window should appear,
 where you will see the Linux boot messages.
 
@@ -78,21 +78,45 @@ web page at [http://localhost:8080](http://localhost:8080).
 The provisioning script should have created a Django "superuser"
 account which you can use to log into the Django admin site at
 [http://localhost:8080/admin](http://localhost:8080/admin).
-The username is 'vagrant' and the password is 'vagrant.
+The username is *vagrant* and the password is *vagrant*.
 
 Once you are logged in as the admin account,
 you can visit the [Status](http://localhost:8080/status) page
-to view the status of various components of the project.
+to check on various components of the project.
+
+
+### Accessing the VM
+
+To control the execution of the project, you should log into the VM.
+You can use the convenient `vagrant ssh` command to easily SSH into the machine.
+
+You can also SSH into the machine with other SSH clients (such as Putty), at
+`localhost:2222` (username and password are `vagrant`).
+
+Vagrant itself generates and uses an SSH key to log in, which you can locate
+using the command `vagrant ssh-config` (look at the IdentityFile field in the output).
+You can refer to this key in other programs that need SSH access to the VM if you
+want to avoid the username/password.
+
+Once the VM is started, you also have the ability to log in directly through
+the Virtualbox window with the username `vagrant` and password `vagrant`.
+
+> *Fabric commands:* Once you are SSHed into the machine, you can do many
+> common tasks through the [Fabric](http://fabfile.org/) commands
+> defined in `fabfile.py`. You can list all of the available Fabric commands with `fab -l`.
+> These are intended to be run *on the virtual machine*.
 
 
 ### Configure Twitter streaming
 
 In order to stream tweets, you need to provide your Twitter
 API credentials and set some filter terms for streaming with.
+These are stored in the MySQL database.
 
-First, create an app for your development environment at https://apps.twitter.com.
+If you don't already have some Twitter API credentials to use,
+you should create an app for your development environment at https://apps.twitter.com.
 Once you have created the app, go to the "API Keys" tab to obtain your API keys.
-Make sure to authorize the app for your own Twitter account to get an Access token and token secret.
+Authorize the app for your own Twitter account to get an access token and token secret.
 
 Next, add a new set of [Api keys](http://localhost:8080/admin/twitter_stream/apikey/add/)
 in the Django Admin site. Provide your name and email, as well as the API key/secret and access token/secret.
@@ -109,24 +133,6 @@ on the Status page under "Twitter Streaming".
 > *Note:* If you want to avoid having to deal with adding your API Key in the future,
 > you can use the command `fab dump_key` to write your API Key data to the `.twitter_api_key.json` file.
 > Then, if you later have to restore it into the database again, just use `fab load_key`.
-
-
-Accessing the VM
-----------------
-
-To control the execution of the project, you should log into the VM.
-You can use the convenient `vagrant ssh` command to easily SSH into the machine.
-
-You can also SSH into the machine with other SSH clients (such as Putty), at
-`localhost:2222` (username and password are `vagrant`).
-
-Vagrant itself generates and uses an SSH key to log in, which you can locate
-using the command `vagrant ssh-config` (look at the IdentityFile field in the output).
-You can refer to this key in other programs that need SSH access to the VM if you
-want to avoid the username/password.
-
-Once the VM is started, you also have the ability to log in directly through
-the Virtualbox window with the username `vagrant` and password `vagrant`.
 
 
 Editing Workflow
@@ -164,9 +170,7 @@ When the machine boots, Supervisor will be started. It will
 read your `supervisord.conf` file and then start all of the
 needed project processes automatically.
 
-Once you are SSHed into the machine, you can control the project
-processes through a series of [Fabric](http://fabfile.org/) commands
-defined in `fabfile.py`. For example:
+There are Fabric commands for many common process manipulations:
 
 ```bash
 # Stop all project processes
@@ -180,10 +184,10 @@ $ fab start
 
 # Restart the worker process
 $ fab restart:worker
-```
 
-You can get the status of your processes with the command `fab status` and you can
-list all of the available Fabric commands with `fab -l`.
+# See list of processes and status
+$ fab status
+```
 
 You may also work directly with the `supervisorctl` tool (part of Supervisor)
 to manage your processes.
@@ -213,6 +217,8 @@ $ fab watch:web
 $ fab watch:web.error
 ```
 
+You can use `fab clear_logs` to empty all of the log files.
+
 
 #### Django Development Web Server
 
@@ -226,8 +232,8 @@ built in to Django, you can do that with the following command:
 $ fab dev_web
 ```
 
-The development webserver features auto-reloading on file changes,
-which can be convenient sometimes.
+The development webserver auto-reloads on file changes,
+which can be convenient.
 
 
 #### Adding Python Packages
@@ -241,7 +247,7 @@ Packages can be installed into your Python environment using pip:
 $ pip install some-package
 ```
 
-You can refresh all of the requirements (from the `requirements/dev.txt` file) with this command:
+You can refresh all of the Python packages (from `requirements/dev.txt`) with this command:
 
 ```bash
 $ fab pip_refresh
