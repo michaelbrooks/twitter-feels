@@ -29,8 +29,9 @@ local_settings.py
 # Vagrant files
 /.vagrant
 
-# .env files
+# Project files to ignore
 /.env
-
+/.twitter_api_key.json
 /supervisord.conf
 /logs
+

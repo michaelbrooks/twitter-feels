@@ -235,6 +235,7 @@ class project::supervisor (
   # The 'sed' replacements are needed to:
   # - add the virtualenv bin path in front of all commands
   # - remove the app name from the front of all paths
+  # - remove the number from the logfile names
   # The grep commands remove the program group
   exec { "supervisor conf":
     command => "source ${virtualenvwrapper_sh} &&
@@ -247,6 +248,7 @@ class project::supervisor (
                   supervisord /tmp &&
                 sed -i 's;^command=;command=${workon_home}/${app_name}/bin/;g' /tmp/${app_name}.conf &&
                 sed -i 's;^\\[program:${app_name}-;\\[program:;g' /tmp/${app_name}.conf &&
+                sed -i 's;${log_dir}/\\([^.]\\+\\)-1;${log_dir}/\\1;g' /tmp/${app_name}.conf &&
                 grep -v '^\\[group:${app_name}' /tmp/${app_name}.conf > /tmp/${app_name}-2.conf &&
                 grep -v '^programs=${app_name}-' /tmp/${app_name}-2.conf > /tmp/${app_name}.conf &&
                 cat /tmp/supervisor.${app_name}.conf-top /tmp/${app_name}.conf > ${supervisor_conf} &&

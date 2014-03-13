@@ -44,24 +44,3 @@ else
     loggy "Failed to install Python ${PYTHON_VERSION} to ${PYTHON_EXE}!" "error"
     exit 1
 fi
-#
-#_PIP=pip2.7
-#if ! exists $_PIP; then
-#    loggy "Installing $_PIP..." "warn"
-#
-#    # Install pip and setuptools
-#    curl -L https://raw.github.com/pypa/pip/master/contrib/get-pip.py | $_PYTHON
-#    loggy "Done installing $_PIP."
-#else
-#    loggy "$_PIP already installed."
-#fi
-#
-## virtualenv global setup
-#_VIRTUALENV=virtualenv-2.7
-#if ! exists $_VIRTUALENV; then
-#    loggy "Installing $_VIRTUALENV..." "warn"
-#    $_PIP install virtualenv virtualenvwrapper
-#    loggy "$_VIRTUALENV installed."
-#else
-#    loggy "$_VIRTUALENV already installed."
-#fi
