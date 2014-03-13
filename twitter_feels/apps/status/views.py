@@ -140,3 +140,13 @@ def clean_tweets(request):
         models.clean_tweets()
     status = models.stream_status()
     return _process_streamer_status(request, status)
+
+@staff_member_required
+@json_view
+def requeue_failed(request):
+    if request.method == 'POST':
+        models.requeue_failed()
+
+    queue_status = models.queues_status()
+
+    return _process_queues_status(request, queue_status)

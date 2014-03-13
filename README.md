@@ -44,13 +44,14 @@ $ cd twitter-feels
 Next, initialize your Linux virtual machine using Vagrant:
 
 ```bash
-$ vagrant up
+# Don't forget to add 'default' here!
+$ vagrant up default
 ```
 
 This will download a Vagrant "base box" and use it to start up a Virtualbox VM.
 You can read more about Vagrant [here](http://docs.vagrantup.com/).
 
-After running `vagrant up`, a Virtualbox window should appear,
+After running `vagrant up default`, a Virtualbox window should appear,
 where you will see the Linux boot messages.
 
 An important feature of Vagrant is that it will set up a "synced folder" between
@@ -64,7 +65,7 @@ If you should need to rerun these provisioning scripts for some reason later,
 you can do this with the command `vagrant provision`.
 
 If you want to gracefully shut down the VM, you can do so with `vagrant halt`.
-The machine still exists, and may be booted again with `vagrant up`.
+The machine still exists, and may be booted again with `vagrant up default`.
 
 You may destroy the VM permanently with `vagrant destroy`, but note
 that anything on the server (such as the database) will also be lost.
@@ -191,10 +192,17 @@ $ fab status
 # Run the web process directly through the terminal (not through Supervisor)
 # (this will stop Supervisor's version first)
 $ fab run:web
+
+# There are commands for scaling web and worker processes:
+$ fab scale_web
+$ fab scale_web:down
+$ fab count_web
+$ fab scale_worker:3
 ```
 
 You may also work directly with the `supervisorctl` tool (part of Supervisor)
 to manage your processes.
+
 
 
 #### Logging

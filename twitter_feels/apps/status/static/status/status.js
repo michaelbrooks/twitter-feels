@@ -14,7 +14,8 @@
             workers_status: $('#workers-status'),
             queues_status: $('#queues-status'),
             general_status: $('#general-status'),
-            _clean_tweets_button: function() { return $('.clean-tweets') }
+            _clean_tweets_button: function() { return $('.clean-tweets') },
+            _requeue_failed_button: function() { return $('.requeue-failed') }
         };
 
         if (this.ui.refresh_button) {
@@ -23,6 +24,10 @@
 
         if (this.ui._clean_tweets_button()) {
             this.init_clean_tweets();
+        }
+
+        if (this.ui._requeue_failed_button()) {
+            this.init_requeue_failed();
         }
 
         this.task_views = {};
@@ -88,7 +93,20 @@
         this.ui.streamer_status.on('click', '.clean-tweets', function () {
             if (self.updates_paused) return;
             
-            self.clean_tweets()
+            self.clean_tweets();
+        });
+    };
+
+    /**
+     * Set up handler for requeue failed jobs button.
+     */
+    StatusApp.prototype.init_requeue_failed = function () {
+        var self = this;
+
+        this.ui.queues_status.on('click', '.requeue-failed', function () {
+            if (self.updates_paused) return;
+
+            self.requeue_failed();
         });
     };
 
@@ -111,6 +129,31 @@
             .fail(function (err) {
                 logger.error("Failed to remove analyzed tweets.", err);
                 self.display_status_block(self.ui.streamer_status, undefined);
+            })
+            .always(function () {
+                self.pause_updates(false);
+            });
+    };
+
+    /**
+     * Send a request to requeue failed jobs.
+     */
+    StatusApp.prototype.requeue_failed = function() {
+        var self = this;
+        logger.debug("Requeuing failed jobs.");
+
+        var requeue_url = this.ui._requeue_failed_button().data('requeue-url');
+
+        this.pause_updates(true);
+
+        $.post(requeue_url)
+            .done(function (response) {
+                logger.debug("Failed jobs successfully requeued.");
+                self.display_status_block(self.ui.queues_status, response);
+            })
+            .fail(function (err) {
+                logger.error("Failed to requeue jobs.", err);
+                self.display_status_block(self.ui.queues_status, undefined);
             })
             .always(function () {
                 self.pause_updates(false);

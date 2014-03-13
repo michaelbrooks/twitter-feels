@@ -15,7 +15,12 @@
         <tbody>
         {% for name, queue in queues.items %}
             <tr>
-                <td>{{ name }}</td>
+                <td><b>{{ name }}</b>
+                {% if name == 'failed' and queue.count > 0 %}
+                    &nbsp;
+                    <button class="btn btn-xs requeue-failed" data-requeue-url="{% url 'status_requeue_failed' %}">Requeue</button>
+                {% endif %}
+                </td>
                 <td>{{ queue.count }}</td>
                 <td>{{ queue.oldest|naturaltime }}</td>
                 <td>

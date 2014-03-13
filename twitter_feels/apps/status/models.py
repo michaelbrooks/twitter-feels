@@ -4,7 +4,7 @@ from collections import defaultdict
 import redis
 from django.utils import timezone
 import django_rq
-import rq
+import rq, rq.queue, rq.job, rq.exceptions
 
 from stream_analysis import AnalysisTask, cleanup
 from twitter_stream.models import Tweet, StreamProcess, FilterTerm
@@ -180,6 +180,32 @@ def schedule_task(key=None, cancel_first=True):
         for task in AnalysisTask.get():
             task.schedule(cancel_first=cancel_first)
 
+
+def requeue_failed():
+    """Requeue jobs in the failed queue."""
+    connection = django_rq.get_connection()
+    failed_queue = rq.queue.get_failed_queue(connection)
+    job_ids = failed_queue.job_ids
+
+    requeued = 0
+    for job_id in job_ids:
+
+        try:
+            job = rq.job.Job.fetch(job_id, connection=connection)
+        except rq.job.NoSuchJobError:
+            # Silently ignore/remove this job and return (i.e. do nothing)
+            failed_queue.remove(job_id)
+            continue
+
+        if job.status == rq.job.Status.FAILED:
+            failed_queue.requeue(job_id)
+            requeued += 1
+        else:
+            failed_queue.remove(job_id)
+
+    logger.info("Requeued %d failed jobs", requeued)
+
+    return requeued
 
 def clean_tweets():
     """Clean old tweets we don't need anymore."""

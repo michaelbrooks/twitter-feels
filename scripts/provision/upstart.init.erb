@@ -1,4 +1,7 @@
-start on [2345]
+# Start after vagrant share is mounted
+# http://razius.com/articles/launching-services-after-vagrant-mount/
+start on vagrant-mounted MOUNTPOINT=<%= @project_dir %>
+
 stop on [06]
 
 respawn

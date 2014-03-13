@@ -1,9 +1,10 @@
 import os
 
 from fabric.api import local
-from fabric.context_managers import lcd
+from fabric.context_managers import lcd, hide
 from fabric.state import env
 from fabric import utils
+import time
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -62,6 +63,14 @@ def status(*args):
     """Get the status of one or more supervisor processes"""
     _supervisor('status', *args)
 
+def scale_worker(number):
+    """Scale the workers to the given number of processes."""
+    with lcd(root_dir):
+        local(r'sed -i -r -e "/^\[program:%(process)s\]/ { n ; s/^numprocs=[[:digit:]]+/numprocs=%(number)s/ }" supervisord.conf' % {
+            'process': 'worker',
+            'number': number
+        })
+        _supervisor('update')
 
 def refresh_web():
     """Trigger's Gunicorn's 'hot refresh' feature."""
@@ -69,6 +78,48 @@ def refresh_web():
         pid = local('supervisorctl pid web', capture=True)
         local('kill -HUP %s' % pid)
 
+def count_web():
+    """Get the current gunicorn web worker count"""
+    with lcd(root_dir):
+        with hide('running'):
+            count = int(local('ps -C gunicorn --no-headers | wc -l', capture=True))
+
+        if count > 0:
+            count -= 1
+
+        if count == 1:
+            print ("There is %d gunicorn worker running" % count)
+        else:
+            print ("There are %d gunicorn workers running" % count)
+
+        return count
+
+def scale_web(direction='up'):
+    """Scale up or down the gunicorn web workers"""
+    with lcd(root_dir):
+
+        before = count_web()
+
+        with hide('running'):
+            pid = local('supervisorctl pid web', capture=True)
+
+            if direction == 'up':
+                print ("Scaling up gunicorn workers for master pid %s..." % pid)
+                local('kill -TTIN %s' % pid)
+            elif direction == 'down':
+                if before > 1:
+                    print ("Scaling down gunicorn workers for master pid %s..." % pid)
+                    local('kill -TTOU %s' % pid)
+                else:
+                    print ("There is only one web worker running. Use fab stop:web to kill gunicorn.")
+                    return
+            else:
+                raise Exception("Direction argument must be 'up' or 'down'")
+
+        time.sleep(1)
+        count = count_web()
+        if count == before:
+            print ("Changes may not be immediately reflected. Check 'fab count_web' in a moment.")
 
 def clear_logs():
     """Empties the log files"""
@@ -201,3 +252,8 @@ def generate_supervisor_conf(app='my_app', port=8000, log=None, user=None, **kwa
             'app': app,
             'tmpconf': tmpconf
         })
+
+        # Make the worker processes scalable
+        local(r'sed -i "/^\[program:worker\]/a process_name=%(program_name)s_%(process_num)02d" ' + tmpconf)
+        local(r'sed -i "/^\[program:worker\]/a numprocs=1" ' + tmpconf)
+
