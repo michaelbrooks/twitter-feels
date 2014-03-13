@@ -5,41 +5,12 @@
 {% block header %}Thermometer{% endblock %}
 
 {% block content %}
-    <table class="table">
-        <thead>
-        <th></th>
-        {% for feeling in data.feelings %}
-            <th style="background-color: #{{ feeling.color }}">{{ feeling.word }}</th>
-        {% endfor %}
-        </thead>
-        <tbody>
-        <tr>
-            <td>Normal:</td>
-            {% for c in data.normal.feeling_percents %}
-                <td>{{ c|floatformat:3 }}</td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td>Last 12hrs:</td>
-            {% for c in data.historical.feeling_percents %}
-                <td>{{ c|floatformat:3 }}</td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td>Now:</td>
-            {% with data.recent.frames|last as lastframe %}
-                {% for c in lastframe.feeling_percents %}
-                    <td>{{ c|floatformat:3 }}</td>
-                {% endfor %}
-            {% endwith %}
-        </tr>
-        </tbody>
-    </table>
-    <table class="table timeline"></table>
+    <div class="tray" data-data_url="{% url 'thermometer_json' %}"></div>
+    <div class="timelines"></div>
 
     <script>
         (function () {
-            window.thermometer_data = {{ json_data|safe }};
+            window.all_feelings = {{ all_feelings|safe }};
         })();
     </script>
 {% endblock %}
@@ -51,5 +22,12 @@
 
 {% block js %}
     {{ block.super }}
+    <script type="text/javascript" src="{% static 'thermometer/bar_example.js' %}"></script>
     <script type="text/javascript" src="{% static 'thermometer/thermometer.js' %}"></script>
+{% endblock %}
+
+{% block js_cdn %}
+    {{ block.super }}
+    {# Load javascript from a CDN here. #}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
 {% endblock %}

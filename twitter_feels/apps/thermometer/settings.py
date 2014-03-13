@@ -22,3 +22,9 @@ HISTORICAL_INTERVAL = getattr(THERMOMETER_SETTINGS, 'HISTORICAL_INTERVAL', timed
 
 # The interval to show in the timeline
 DISPLAY_INTERVAL = getattr(THERMOMETER_SETTINGS, 'DISPLAY_INTERVAL', timedelta(minutes=60))
+
+# The number of feelings to show by default
+DEFAULT_FEELINGS = getattr(THERMOMETER_SETTINGS, 'DEFAULT_FEELINGS', 5)
+
+# The size of the moving average window used to display timelines
+SMOOTHING_WINDOW_SIZE = getattr(THERMOMETER_SETTINGS, 'SMOOTHING_WINDOW_SIZE', 10)

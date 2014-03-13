@@ -205,6 +205,28 @@ class TimeFrame(TweetTimeFrame):
         self.total_tweets = len(stream_data)
         return stream_data
 
+    @classmethod
+    def get_average_rate(cls, start=None, end=None):
+        """
+        Gets the average rates in an interval.
+        """
+        query = cls.get_in_range(start=start, end=end, calculated=True) \
+            .filter(missing_data=False)
+
+        query = query.aggregate(models.Avg('feeling_tweets'), models.Avg('total_tweets')) \
+
+        return {
+            'feeling_tweets': query['feeling_tweets__avg'],
+            'total_tweets': query['total_tweets__avg'],
+        }
+
+    @classmethod
+    def get_frames_in_interval(cls, start=None, end=None):
+        """
+        Gets TimeFrame data over an interval, sorted by time.
+        """
+        return cls.get_in_range(start=start, end=end).order_by('start_time')
+
 
 class FeelingPercent(TimedIntervalMixin, models.Model):
     """
@@ -236,29 +258,65 @@ class FeelingPercent(TimedIntervalMixin, models.Model):
     feeling_tweets = models.PositiveIntegerField(null=True, blank=True, default=None)
 
     @classmethod
-    def get_average_rates(cls, start=None, end=None):
+    def get_average_percents(cls, start=None, end=None, feeling_ids=None):
         """
         Gets the average percentage for each feeling in an interval.
         """
-        query = cls.get_in_range(start=start, end=end) \
+        query = cls.get_in_range(start=start, end=end, feeling_ids=feeling_ids) \
             .filter(missing_data=False)
 
         query = query.values('feeling') \
             .annotate(models.Avg('percent')) \
             .order_by('feeling')
 
-        result = [row['percent__avg'] for row in query]
+        result = {}
+
+        for row in query:
+            result[row['feeling']] = row['percent__avg']
 
         return result
 
     @classmethod
-    def get_percents_in_interval(cls, start=None, end=None):
+    def get_percents_in_interval(cls, start=None, end=None, feeling_ids=None):
         """
         Gets FeelingPercents over an interval.
         Applies sorting etc to generate data useful for the view.
         """
-        query = cls.get_in_range(start=start, end=end)
+        query = cls.get_in_range(start=start, end=end, feeling_ids=feeling_ids)
 
-        query = query.order_by('start_time', 'feeling')
+        query = query.order_by('feeling', 'start_time')
 
         return query
+
+    @classmethod
+    def get_top_feeling_ids(cls, start=None, end=None, limit=5):
+        """
+        Get the feeling ids with the highest average rates in the time interval.
+        """
+
+        query = cls.get_in_range(start=start, end=end)
+
+        query = query.values('feeling') \
+            .annotate(models.Avg('percent')) \
+            .order_by('-percent__avg') \
+
+        if limit:
+            query = query[:limit]
+
+        print query
+        ids = [r['feeling'] for r in query]
+
+        return ids
+
+    @classmethod
+    def get_in_range(cls, start=None, end=None, calculated=None, feeling_ids=None):
+        """
+        Get the FeelingPercents in the interval, optionally filtered by a list of feeling ids.
+        """
+        query = super(FeelingPercent, cls).get_in_range(start, end, calculated)
+
+        if feeling_ids:
+            query = query.filter(feeling_id__in=feeling_ids)
+
+        return query
+

@@ -7,65 +7,55 @@
 
     ThermometerApp.prototype.start = function() {
 
-        var data = window.thermometer_data;
-
-        //Apply successive moving averages
-        var window_sizes = [7, 5, 3];
-//        var window_sizes = [5];
-
-        var table = $('.timeline.table');
-        var header = $('<thead>').appendTo(table);
-
-        var headerRow = $('<tr>').appendTo(header);
-        headerRow.append('<th>');
-        data.recent.frames.forEach(function(frame, i) {
-            if (i > window_sizes[0]) {
-                headerRow.append('<th>' + i + '</th>');
-            }
+        var feelings = window.all_feelings;
+        var feelings_map = {};
+        feelings.forEach(function(feeling, i) {
+            feelings_map[feeling.id] = feeling;
         });
 
-        var body = $('<tbody>').appendTo(table);
-        data.feelings.forEach(function(feeling, i) {
+        var $tray = $('.tray');
+        var render = apps.thermometer.bar_renderer('.tray');
 
-            var normal = data.normal.feeling_percents[i];
+        var $timelines = $('.timelines');
 
-            var row = $('<tr>').appendTo(body);
-            row.append('<td>' + feeling.word + '</td>');
+        var url = $tray.data('data_url');
 
-            window_sizes.forEach(function(window_size) {
-                var queue = [];
-                var current_sum = undefined;
+        var get_recent_percent = function(feeling_data) {
+            return feeling_data.recent_percent;
+        };
 
-                data.recent.frames.forEach(function(frame, j) {
-                    var percent = frame.feeling_percents[i]
-                    if (current_sum === undefined) {
-                        current_sum = percent;
-                    }
+        var get_feeling_label = function(feeling_data) {
+            return feelings_map[feeling_data.feeling_id].word;
+        };
 
-                    queue.push(percent);
-                    current_sum += percent;
+        $.get(url)
+            .done(function(result) {
 
-                    if (queue.length > window_size) {
-                        var first = queue.shift();
-                        current_sum -= first;
-                    }
+                var recent_window = 5;
+                var selected_feelings = result.selected_feelings;
 
-                    if (j > window_size) {
-                        frame.feeling_percents[i] = current_sum / queue.length;
-                    }
+                selected_feelings.sort(function(a, b) {
+                    return b.normal - a.normal;
                 });
+
+                //Precalculate recent averages
+                selected_feelings.forEach(function(feeling_data) {
+                    var recent = 0;
+                    for (var i = 1; i <= recent_window; i++) {
+                        recent += feeling_data.display_series[feeling_data.display_series.length - i].percent;
+                    }
+                    feeling_data.recent_percent = recent / 5;
+                    console.info(feelings_map[feeling_data.feeling_id], feeling_data.recent_percent);
+                });
+
+                render(selected_feelings,
+                    get_feeling_label,
+                    get_recent_percent
+                );
+            })
+            .fail(function(err) {
+                logger.error("Could not get data", err)
             });
-
-            data.recent.frames.forEach(function(frame, j) {
-                if (j > window_sizes[0]) {
-                    var diff = (frame.feeling_percents[i] - normal) / normal;
-                    diff = (100 * diff).toFixed(1);
-                    row.append('<td>' + diff + '%</td>');
-                }
-            });
-
-        });
-
     };
 
     //Get started
