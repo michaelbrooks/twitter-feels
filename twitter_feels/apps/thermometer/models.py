@@ -303,7 +303,6 @@ class FeelingPercent(TimedIntervalMixin, models.Model):
         if limit:
             query = query[:limit]
 
-        print query
         ids = [r['feeling'] for r in query]
 
         return ids

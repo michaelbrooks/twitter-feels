@@ -39,7 +39,7 @@ class project::env {
 
   file { ".env":
     path => "${project_dir}/.env",
-    content => template("${project_dir}/scripts/provision/default.env.erb"),
+    content => template("${scripts_dir}/provision/default.env.erb"),
     owner => $user_name,
     group => $user_name,
   }
@@ -142,6 +142,13 @@ class project::shell () inherits project::params {
       File_line['src virtualenvwrapper.sh']
     ]
   }
+
+  $fab_complete_sh = "${scripts_dir}/provision/fab_complete.sh"
+  file_line { "source fab_complete.sh":
+    path => $bashrc,
+    line => "source ${fab_complete_sh}",
+    match => "fab_complete.sh",
+  }
 }
 
 class project::requirements () inherits project::params {
@@ -221,7 +228,7 @@ class project::supervisor (
 
   file { "supervisor conf header":
     path => "/tmp/supervisor.${app_name}.conf-top",
-    content => template("${project_dir}/scripts/provision/supervisord.conf.erb"),
+    content => template("${scripts_dir}/provision/supervisord.conf.erb"),
     owner => $user_name,
     group => $user_name,
 
@@ -260,7 +267,7 @@ class project::supervisor (
   # Set up the supervisor upstart script
   file { "${app_name} upstart":
     path => "/etc/init/${app_name}.conf",
-    content => template("${project_dir}/scripts/provision/upstart.init.erb"),
+    content => template("${scripts_dir}/provision/upstart.init.erb"),
 
     notify => Service[$app_name],
   }

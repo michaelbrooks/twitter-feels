@@ -140,19 +140,7 @@ def shell():
 
 def generate_supervisor_conf(app='my_app', port=8000, log=None, user=None, **kwargs):
     """
-    honcho export --user ${user_name} \
-                  --port ${web_server_port} \
-                  --log ${log_dir} \
-                  --app ${app_name} \
-                  --concurrency ${concurrency} \
-                  supervisord /tmp &&
-                sed -i 's;^command=;command=${workon_home}/${app_name}/bin/;g' /tmp/${app_name}.conf &&
-                sed -i 's;^\\[program:${app_name}-;\\[program:;g' /tmp/${app_name}.conf &&
-                sed -i 's;${log_dir}/\\([^.]\\+\\)-1;${log_dir}/\\1;g' /tmp/${app_name}.conf &&
-                grep -v '^\\[group:${app_name}' /tmp/${app_name}.conf > /tmp/${app_name}-2.conf &&
-                grep -v '^programs=${app_name}-' /tmp/${app_name}-2.conf > /tmp/${app_name}.conf &&
-                cat /tmp/supervisor.${app_name}.conf-top /tmp/${app_name}.conf > ${supervisor_conf} &&
-                rm /tmp/${app_name}*.conf
+    Generates a new partial supervisor conf file in /tmp/app.conf.
     """
 
     if user is None:

@@ -26,6 +26,10 @@ def get_thermometer_data(selected_feeling_ids=None):
     normal_start = FeelingPercent.get_earliest_start_time()
     normal_end = FeelingPercent.get_latest_end_time()
 
+    if normal_start is None:
+        normal_start = timezone.now()
+        normal_end = timezone.now()
+
     # normal number of tweets per minute over all time
     effective_now = timezone.now().replace(second=0, microsecond=0)
     if normal_end:
@@ -77,8 +81,6 @@ def get_thermometer_data(selected_feeling_ids=None):
 
     if selected_feeling_ids is None:
         selected_feeling_ids = FeelingPercent.get_top_feeling_ids(limit=settings.DEFAULT_FEELINGS)
-
-    print selected_feeling_ids
 
     # Get the data for each selected feeling
 
