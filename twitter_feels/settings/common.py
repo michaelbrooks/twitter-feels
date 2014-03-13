@@ -216,6 +216,9 @@ THIRD_PARTY_APPS = (
     # Hierarchical navigation template tags
     'lineage',
 
+    # Fancy database migrations
+    'south',
+
     # Streaming tweets
     'twitter_stream',
 

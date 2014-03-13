@@ -260,17 +260,41 @@ $ fab pip_refresh
 
 #### Updating the Database Structure
 
-If you add a model, you will need to re-run Django's `syncdb`
-command.
+When you change your model classes, you will need to update
+your database structure to correspond. You can run
+the following command to update the database:
 
 ```bash
-$ fab syncdb
+$ fab updatedb
 ```
 
-> *Note:* Django *does not* support migrations normally. That is,
-> if you change an existing model, it will not automatically update your database.
-> However, `syncdb` works fine for newly-created models.
-> You can manually make changes to your database, or you can drop
-> the altered table manually and then re-add with `syncdb`.
-> Eventually we should use [South](http://south.readthedocs.org/en/latest/index.html)
-> to do migrations.
+This combines Django's builtin `syncdb` command and South's `migrate`
+command. If you have not explicitly enabled South migrations
+on your app, then `syncdb` is the only
+part that will have an effect on your updated model.
+Unfortunatley, the `syncdb` command is only capable of *creating* new tables.
+It will not alter tables when you change anything about your models.
+
+Therefore, it is recommended that you go ahead and enable
+South migrations for your app. Before doing this,
+your database should be up-to-date relative to the model classes:
+
+```bash
+$ fab init_south:my_app_name
+```
+
+This will create a `migrations` directory inside your app folder.
+It will also create an initial migration that just describes your initial
+database schema.
+
+After changing or adding models, run this command to auto-generate
+a new schema migration:
+
+```bash
+$ fab new_migration:my_app_name
+```
+
+You can then look over the migration file
+before running `fab updatedb` to apply it.
+
+A nice tutorial about South is available [here](http://south.readthedocs.org/en/latest/tutorial/part1.html)

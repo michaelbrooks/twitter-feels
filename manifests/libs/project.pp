@@ -178,7 +178,7 @@ class project::requirements () inherits project::params {
   exec { "manage.py syncdb":
     command => "source ${virtualenvwrapper_sh} &&
                 workon ${app_name} &&
-                honcho run ${project_dir}/manage.py syncdb --noinput",
+                fab manage:syncdb,--noinput",
 
     provider => "shell",
     user => $user_name,
@@ -188,11 +188,10 @@ class project::requirements () inherits project::params {
   }
 
   if $django_environment == 'dev' {
-    # Optionally insert a default user
-    exec { "createsuperuser":
+    exec { "load starter data":
       command => "source ${virtualenvwrapper_sh} &&
                   workon ${app_name} &&
-                  honcho run ${project_dir}/manage.py loaddata ${scripts_dir}/provision/django_superuser.json",
+                  fab dev_data",
 
       provider => "shell",
       user => $user_name,
@@ -201,7 +200,7 @@ class project::requirements () inherits project::params {
       require => Exec['manage.py syncdb'],
     }
   } else {
-    notify{ "No superuser created. You'll need to run manage.py createsuperuser.": }
+    notify{ "No initial data loaded. You'll need to run manage.py createsuperuser.": }
   }
 }
 
@@ -232,25 +231,11 @@ class project::supervisor (
   $concurrency = join($processes, ',')
 
   # Generate a supervisor script from the Procfile
-  # The 'sed' replacements are needed to:
-  # - add the virtualenv bin path in front of all commands
-  # - remove the app name from the front of all paths
-  # - remove the number from the logfile names
-  # The grep commands remove the program group
+  $fab_args = "user=${user_name},app=${app_name},port=${web_server_port},log=${log_dir},${concurrency}"
   exec { "supervisor conf":
     command => "source ${virtualenvwrapper_sh} &&
                 workon ${app_name} &&
-                honcho export --user ${user_name} \
-                  --port ${web_server_port} \
-                  --log ${log_dir} \
-                  --app ${app_name} \
-                  --concurrency ${concurrency} \
-                  supervisord /tmp &&
-                sed -i 's;^command=;command=${workon_home}/${app_name}/bin/;g' /tmp/${app_name}.conf &&
-                sed -i 's;^\\[program:${app_name}-;\\[program:;g' /tmp/${app_name}.conf &&
-                sed -i 's;${log_dir}/\\([^.]\\+\\)-1;${log_dir}/\\1;g' /tmp/${app_name}.conf &&
-                grep -v '^\\[group:${app_name}' /tmp/${app_name}.conf > /tmp/${app_name}-2.conf &&
-                grep -v '^programs=${app_name}-' /tmp/${app_name}-2.conf > /tmp/${app_name}.conf &&
+                fab generate_supervisor_conf:${fab_args} &&
                 cat /tmp/supervisor.${app_name}.conf-top /tmp/${app_name}.conf > ${supervisor_conf} &&
                 rm /tmp/${app_name}*.conf",
 
