@@ -6,14 +6,34 @@ from fabric import utils
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
-def _supervisor(command, *args):
+def _supervisor(command, *args, **kwargs):
+    capture = kwargs.get('capture', False)
     with lcd(root_dir):
         if args:
-            local('supervisorctl %s %s' % (command, ' '.join(args)))
+            local('supervisorctl %s %s' % (command, ' '.join(args)), capture=capture)
         elif command == 'status':
-            local('supervisorctl %s' % command)
+            local('supervisorctl %s' % command, capture=capture)
         else:
-            local('supervisorctl %s all' % command)
+            local('supervisorctl %s all' % command, capture=capture)
+
+
+def run(process):
+    """Run a process from the Procfile directly (not through supervisor)."""
+
+    _supervisor('stop', process, capture=True)
+
+    with lcd(root_dir):
+        local('honcho start %s' % process)
+
+
+def dev_web():
+    """Runs the Django development webserver"""
+
+    # Stop the gunicorn process
+    stop('web')
+
+    with lcd(root_dir):
+        local('honcho run ./manage.py runserver')
 
 def stop(*args):
     """Stop one or more supervisor processes"""
@@ -57,15 +77,6 @@ def syncdb():
     """Shortcut for honcho run manage.py syncdb"""
     with lcd(root_dir):
         local('honcho run ./manage.py syncdb')
-
-def dev_web():
-    """Runs the Django development webserver"""
-
-    # Stop the gunicorn process
-    stop('web')
-
-    with lcd(root_dir):
-        local('honcho run ./manage.py runserver')
 
 def dump_key(file='.twitter_api_key.json'):
     """Dump a Twitter API key to a fixture file (defaults to .twitter_api_key.json)"""

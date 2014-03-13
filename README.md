@@ -187,6 +187,10 @@ $ fab restart:worker
 
 # See list of processes and status
 $ fab status
+
+# Run the web process directly through the terminal (not through Supervisor)
+# (this will stop Supervisor's version first)
+$ fab run:web
 ```
 
 You may also work directly with the `supervisorctl` tool (part of Supervisor)
