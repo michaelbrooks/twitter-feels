@@ -1,19 +1,5 @@
 #!/bin/bash
 
-# Script to set up a Django project on Vagrant.
-# https://github.com/torchbox/vagrant-django-template/blob/master/etc/install/install.sh
-
-# Installation settings
-PROJECT_NAME=$1
-
-VIRTUALENV_NAME=$PROJECT_NAME
-
-PROJECT_DIR=/home/vagrant/$PROJECT_NAME
-VIRTUALENV_DIR=/home/vagrant/.virtualenvs/$PROJECT_NAME
-PROVISION_SCRIPTS=$PROJECT_DIR/scripts/provision
-
-# Add /usr/local to PATH so we can find Python and Redis
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH
 
 function loggy {
     # Prints a message in green with lots of space around it.
@@ -72,18 +58,37 @@ function older_than {
     return $?
 }
 
-source $PROVISION_SCRIPTS/system.sh
-source $PROVISION_SCRIPTS/git.sh
-source $PROVISION_SCRIPTS/mysql.sh
-source $PROVISION_SCRIPTS/redis.sh
-source $PROVISION_SCRIPTS/nginx.sh
-source $PROVISION_SCRIPTS/python.sh
 
-if [ "$2" = "base" ]; then
-    echo "Project settings not initialized."
-    echo "Run 'vagrant package --base my-virtual-machine' to package as a vagrant box."
-else
-    source $PROVISION_SCRIPTS/project.sh
-fi
+function puppet_module_exists {
+    # Checks if a puppet module is already installed
+    if [ -z "$PUPPET_MODULE_LIST" ]; then
+        export PUPPTE_MODULE_LIST=`puppet module list`
+    fi
 
-exit 0
+    echo $PUPPET_MODULE_LIST | grep $1 &> /dev/null
+    return $?
+}
+
+function puppet_module_install {
+    # Installs a puppet module if it is not already installed
+    if ! puppet_module_exists $1; then
+        if [ -z "$2" ]; then
+            loggy "Installing Puppet module $1..." "warn"
+            puppet module install $1
+        else
+            if [ -z "$3" ]; then
+                loggy "No filename given for $1. Must be like <module_name>-<version>.tar.gz." "error"
+                exit 1
+            fi
+
+            filename=$3
+            loggy "Installing Puppet module $filename from $2..." "warn"
+            curl -L -o /tmp/$filename $2
+            puppet module install /tmp/$filename
+            rm /tmp/$filename
+        fi
+        loggy "Puppet module $1 installed."
+    else
+        loggy "Puppet module $1 already installed."
+    fi
+}

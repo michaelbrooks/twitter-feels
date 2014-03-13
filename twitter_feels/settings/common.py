@@ -52,7 +52,6 @@ DATABASES = {'default': dj_database_url.config(default='sqlite://default.db')}
 if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
     # enable utf8mb4 on mysql
     DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
-
 ########## END DATABASE CONFIGURATION
 
 
@@ -169,9 +168,6 @@ TEMPLATE_DIRS = (
 ########## MIDDLEWARE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#middleware-classes
 MIDDLEWARE_CLASSES = (
-    # Use GZip compression to reduce bandwidth.
-    'django.middleware.gzip.GZipMiddleware',
-
     # Default Django middleware.
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -259,8 +255,8 @@ LOGGING = {
     },
     "formatters": {
         "time_formatter": {
-            "format": "%(asctime)s %(levelname)s %(name)s %(message)s",
-            "datefmt": "%H:%M:%S",
+            "format": "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
     'handlers': {
@@ -270,37 +266,59 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',
             'formatter': 'time_formatter'
         },
+        'error_console': {
+            'level': 'WARN',
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stderr',
+            'formatter': 'time_formatter'
+        },
+        'web_access_log': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',
+        }
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins', 'console'],
+            'handlers': ['mail_admins', 'web_access_log'],
             'level': 'ERROR',
             'propagate': True,
         },
-        "rq": {
-            "handlers": ["console"],
+        "rq.worker": {
+            "handlers": ["console", 'error_console'],
             "level": "ERROR"
         },
         "twitter_stream": {
-            "handlers": ['console'],
+            "handlers": ["console", 'error_console'],
             "level": "ERROR",
         },
         "twitter_monitor": {
-            "handlers": ['console'],
+            "handlers": ["console", 'error_console'],
             "level": "WARN"
         },
         "thermometer": {
-            "handlers": ['console'],
+            "handlers": ["console", 'error_console'],
             "level": "ERROR"
         },
         "stream_analysis": {
-            "handlers": ['console'],
+            "handlers": ["console", 'error_console'],
             "level": "ERROR",
-        }
+        },
+        'gunicorn.error': {
+            'level': 'ERROR',
+            'handlers': ['error_console'],
+            'propagate': True,
+        },
+        'gunicorn.access': {
+            'level': 'INFO',
+            'handlers': ['web_access_log'],
+            'propagate': False,
+        },
     }
 }
 ########## END LOGGING CONFIGURATION

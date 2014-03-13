@@ -45,7 +45,7 @@ class StatusView(generic.TemplateView):
         return _get_status_response_data()
 
 
-status = StatusView.as_view()
+status = staff_member_required(StatusView.as_view())
 
 
 def _process_task_status(request, task_status):
@@ -62,12 +62,12 @@ def _get_task_status_response_data(request, task):
     Get JSON-ready response data for a single task status.
     """
 
-    status = models.task_status(key=task)
+    stat = models.task_status(key=task)
 
     # add rendered badges
-    status = _process_task_status(request, status)
+    stat = _process_task_status(request, stat)
 
-    return status
+    return stat
 
 
 def _process_streamer_status(request, streamer_status):
@@ -92,6 +92,7 @@ def _process_general_status(request, status):
     return _render_to_string_request(request, 'status/general.html', status)
 
 
+@staff_member_required
 @json_view
 def json_status(request, task=None):
     """

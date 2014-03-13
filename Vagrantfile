@@ -4,17 +4,11 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-# Vagrant.require_plugin "vagrant-librarian-chef"
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "centos65-twitter-feels"
-
-  # The url from where the 'config.vm.box' box will be fetched if it
-  # doesn't already exist on the user's system.
-  # config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.3/centos65-x86_64-20140116.box"
-  config.vm.box_url = "http://sccl.hcde.washington.edu/~mjbrooks/vagrant/centos65-twitter-feels-20140228.box"
+  config.vm.box_url = "http://sccl.hcde.washington.edu/~mjbrooks/vagrant/centos65-twitter-feels-20140311.box"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -53,8 +47,56 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--memory", "1536"]
   end
 
+
+  # Install Puppet
+  config.vm.provision "shell", path: "scripts/provision/puppet.sh", :args => ['/vagrant']
+
+  # A machine that does everything, the default
+  config.vm.define "default", primary: true do |default|
+
+    # Provision with Puppet
+    config.vm.provision "puppet" do |puppet|
+      puppet.options = ""
+      puppet.manifest_file = "default.pp"
+      puppet.facter = {
+          "user_name" => "vagrant",
+          "user_home" => "/home/vagrant",
+          "project_dir" => "/home/vagrant/twitter-feels",
+          "scripts_dir" => "/home/vagrant/twitter-feels/scripts",
+          "django_environment" => 'dev',
+          "app_name" => "twitter-feels"
+      }
+    end
+  end
+
+  # Provisions a base box
+  config.vm.define "base_box" do |base_box|
+
+    # Get the basic centos box
+    config.vm.box = "centos65"
+    config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.5.3/centos65-x86_64-20140116.box"
+
+    # Don't sync to the home folder
+    config.vm.synced_folder ".", "/home/vagrant/twitter-feels", disabled: true
+
+    # Provision with Puppet
+    config.vm.provision "puppet" do |puppet|
+      puppet.options = ""
+      puppet.manifest_file = "base_box.pp"
+      puppet.facter = {
+          "user_name" => "vagrant",
+          "user_home" => "/home/vagrant",
+          "project_dir" => "/home/vagrant/twitter-feels",
+          "scripts_dir" => "/vagrant/scripts",
+          "django_environment" => 'dev',
+          "app_name" => "twitter-feels"
+      }
+    end
+  end
+
+
   # Run the provisioning script
-  config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels"]
+  # config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels"]
 
   # Use this to create a version suitable for packaging
   # config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels", "base"]

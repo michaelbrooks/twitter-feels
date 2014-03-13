@@ -52,7 +52,9 @@
                 {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li class="{% ancestor 'status' %}"><a href="{% url 'status' %}">Status</a></li>
+                {% if request.user.is_staff %}
+                    <li class="{% ancestor 'status' %}"><a href="{% url 'status' %}">Status</a></li>
+                {% endif %}
             </ul>
         </div>
         <!--/.nav-collapse -->

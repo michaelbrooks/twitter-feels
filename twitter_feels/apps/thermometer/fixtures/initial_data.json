@@ -1,0 +1,524 @@
+[
+    {
+        "pk": 1,
+        "model": "thermometer.feelingindicator",
+        "fields": {
+            "phrase": "i feel",
+            "enabled": true
+        }
+    },
+    {
+        "pk": 2,
+        "model": "thermometer.feelingindicator",
+        "fields": {
+            "phrase": "we feel",
+            "enabled": true
+        }
+    },
+
+
+
+
+
+
+    {
+        "pk": 1,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FFA401",
+            "hidden": false,
+            "word": "better"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "07548A",
+            "hidden": false,
+            "word": "bad"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FFF700",
+            "hidden": false,
+            "word": "good"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "E97802",
+            "hidden": false,
+            "word": "right"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "004E6F",
+            "hidden": false,
+            "word": "guilty"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "2E9127",
+            "hidden": false,
+            "word": "sick"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "017E94",
+            "hidden": false,
+            "word": "same"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "00553A",
+            "hidden": false,
+            "word": "shit"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "00696F",
+            "hidden": false,
+            "word": "sorry"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "E6C637",
+            "hidden": false,
+            "word": "well"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "18213E",
+            "hidden": false,
+            "word": "down"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "595884",
+            "hidden": false,
+            "word": "alone"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FF7F00",
+            "hidden": false,
+            "word": "happy"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FFD801",
+            "hidden": false,
+            "word": "great"
+        }
+    },
+    {
+        "pk": 15,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "40B6B8",
+            "hidden": false,
+            "word": "comfortable"
+        }
+    },
+    {
+        "pk": 16,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "043F69",
+            "hidden": false,
+            "word": "sad"
+        }
+    },
+    {
+        "pk": 17,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "7EC31B",
+            "hidden": false,
+            "word": "free"
+        }
+    },
+    {
+        "pk": 18,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "014872",
+            "hidden": false,
+            "word": "lost"
+        }
+    },
+    {
+        "pk": 19,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "027975",
+            "hidden": false,
+            "word": "stupid"
+        }
+    },
+    {
+        "pk": 20,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "273E67",
+            "hidden": false,
+            "word": "tired"
+        }
+    },
+    {
+        "pk": 21,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "F70059",
+            "hidden": false,
+            "word": "weird"
+        }
+    },
+    {
+        "pk": 22,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "08468F",
+            "hidden": false,
+            "word": "lonely"
+        }
+    },
+    {
+        "pk": 23,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "352C65",
+            "hidden": false,
+            "word": "old"
+        }
+    },
+    {
+        "pk": 24,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "263D67",
+            "hidden": false,
+            "word": "home"
+        }
+    },
+    {
+        "pk": 25,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "11581C",
+            "hidden": false,
+            "word": "ill"
+        }
+    },
+    {
+        "pk": 26,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "E4010A",
+            "hidden": false,
+            "word": "horrible"
+        }
+    },
+    {
+        "pk": 27,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "0A3B8A",
+            "hidden": false,
+            "word": "off"
+        }
+    },
+    {
+        "pk": 28,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "EA3137",
+            "hidden": false,
+            "word": "different"
+        }
+    },
+    {
+        "pk": 29,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FE992D",
+            "hidden": false,
+            "word": "whole"
+        }
+    },
+    {
+        "pk": 30,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "F44387",
+            "hidden": false,
+            "word": "pretty"
+        }
+    },
+    {
+        "pk": 31,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "3688BA",
+            "hidden": false,
+            "word": "safe"
+        }
+    },
+    {
+        "pk": 32,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "1B2958",
+            "hidden": false,
+            "word": "done"
+        }
+    },
+    {
+        "pk": 33,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "F30263",
+            "hidden": false,
+            "word": "special"
+        }
+    },
+    {
+        "pk": 34,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "73207C",
+            "hidden": false,
+            "word": "wrong"
+        }
+    },
+    {
+        "pk": 35,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "3A4AA1",
+            "hidden": false,
+            "word": "empty"
+        }
+    },
+    {
+        "pk": 36,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "F30172",
+            "hidden": false,
+            "word": "loved"
+        }
+    },
+    {
+        "pk": 37,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "243C96",
+            "hidden": false,
+            "word": "worse"
+        }
+    },
+    {
+        "pk": 38,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "283152",
+            "hidden": false,
+            "word": "depressed"
+        }
+    },
+    {
+        "pk": 39,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "99D013",
+            "hidden": false,
+            "word": "fine"
+        }
+    },
+    {
+        "pk": 40,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "99CF15",
+            "hidden": false,
+            "word": "new"
+        }
+    },
+    {
+        "pk": 41,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "235C93",
+            "hidden": false,
+            "word": "hurt"
+        }
+    },
+    {
+        "pk": 42,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "99001E",
+            "hidden": false,
+            "word": "terrible"
+        }
+    },
+    {
+        "pk": 43,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FFFF4F",
+            "hidden": false,
+            "word": "best"
+        }
+    },
+    {
+        "pk": 44,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "274784",
+            "hidden": false,
+            "word": "close"
+        }
+    },
+    {
+        "pk": 45,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "41A84D",
+            "hidden": false,
+            "word": "real"
+        }
+    },
+    {
+        "pk": 46,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FF7F00",
+            "hidden": false,
+            "word": "confident"
+        }
+    },
+    {
+        "pk": 47,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "1E3869",
+            "hidden": false,
+            "word": "uncomfortable"
+        }
+    },
+    {
+        "pk": 48,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "FED73C",
+            "hidden": false,
+            "word": "lucky"
+        }
+    },
+    {
+        "pk": 49,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "CB1F13",
+            "hidden": false,
+            "word": "awful"
+        }
+    },
+    {
+        "pk": 50,
+        "model": "thermometer.feelingword",
+        "fields": {
+            "untracked": false,
+            "color": "992F93",
+            "hidden": false,
+            "word": "crying"
+        }
+    }
+]
