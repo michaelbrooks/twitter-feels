@@ -36,4 +36,6 @@
     {{ block.super }}
     {# Load javascript from a CDN here. #}
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
+    <script type="text/javascript" src="{% static 'libs/underscore/underscore.js' %}"></script>
+    <script type="text/javascript" src="{% static 'libs/backbone/backbone.js' %}"></script>
 {% endblock %}
