@@ -20,3 +20,39 @@
 .x.axis path {
     display: none;
 }
+
+/* Generic pane rules */
+.row, .col { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; }
+.scroll-x { overflow-x: auto; }
+.scroll-y { overflow-y: auto; }
+
+.thermometer-app {
+    margin: 0;
+    top: 56px;
+    left: 5px;
+    right: 5px;
+    bottom: 65px;
+}
+
+.row.thermometer-panel {
+    top: 0;
+    height: 200px;
+}
+
+.row.timeline-panel {
+    top: 205px;
+    bottom: 0;
+}
+
+.col.description {
+    background: #EEE;
+    width: 100px;
+    left: 0;
+}
+.col.panel-content {
+    background: #EEE;
+    left: 106px;
+    right: 0;
+}

@@ -2,12 +2,19 @@
 {% load staticfiles humanize %}
 
 {% block title %}Thermometer{% endblock %}
-{% block header %}Thermometer{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-    <div class="tray" data-data_url="{% url 'thermometer_json' %}"></div>
-    <div class="timelines"></div>
-
+    <div class="thermometer-app row col" data-data_url="{% url 'thermometer_json' %}">
+        <div class="row thermometer-panel">
+            <div class="col description"></div>
+            <div class="col panel-content thermometers"></div>
+        </div>
+        <div class="row timeline-panel">
+            <div class="col description"></div>
+            <div class="col panel-content timelines"></div>
+        </div>
+    </div>
     <script>
         (function () {
             window.all_feelings = {{ all_feelings|safe }};

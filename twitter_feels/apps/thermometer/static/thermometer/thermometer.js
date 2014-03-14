@@ -13,12 +13,13 @@
             feelings_map[feeling.id] = feeling;
         });
 
-        var $tray = $('.tray');
-        var render = apps.thermometer.bar_renderer('.tray');
+        var $app = $('.thermometer-app')
+        var $tray = $('.thermometers');
+        var render = apps.thermometer.bar_renderer('.thermometers');
 
         var $timelines = $('.timelines');
 
-        var url = $tray.data('data_url');
+        var url = $app.data('data_url');
 
         var get_recent_percent = function(feeling_data) {
             return feeling_data.recent_percent;

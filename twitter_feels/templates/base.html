@@ -62,9 +62,11 @@
 </div>
 
 <div class="container content">
-    <div class="page-header">
-        <h1>{% block header %}{{ site.name }}{% endblock %}</h1>
-    </div>
+    {% block header %}
+        <div class="page-header">
+            <h1>{{ site.name }}</h1>
+        </div>
+    {% endblock %}
     {% bootstrap_messages %}
 
     {% block content %}

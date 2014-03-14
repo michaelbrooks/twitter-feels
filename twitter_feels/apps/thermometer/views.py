@@ -6,6 +6,7 @@ from jsonview.decorators import json_view
 import json
 from itertools import groupby
 import settings
+import times
 
 def get_all_feelings():
     # Get all of the feelings
@@ -18,6 +19,10 @@ def get_all_feelings():
             'hidden': f.hidden
         })
     return feelings_json
+
+def df(dt):
+    """Format a datetime to something JS likes"""
+    return 1000 * times.to_unix(dt)
 
 def get_thermometer_data(selected_feeling_ids=None):
 
@@ -46,18 +51,18 @@ def get_thermometer_data(selected_feeling_ids=None):
     # Get the time intervals we are dealing with
     intervals = {
         'normal': {
-            'start': str(normal_start),
-            'end': str(normal_end),
+            'start': df(normal_start),
+            'end': df(normal_end),
             'duration': (normal_end - normal_start).total_seconds(),
         },
         'historical': {
-            'start': str(history_start),
-            'end': str(history_end),
+            'start': df(history_start),
+            'end': df(history_end),
             'duration': settings.HISTORICAL_INTERVAL.total_seconds(),
         },
         'display': {
-            'start': str(display_start),
-            'end': str(display_end),
+            'start': df(display_start),
+            'end': df(display_end),
             'duration': settings.DISPLAY_INTERVAL.total_seconds(),
         },
     }
@@ -67,7 +72,7 @@ def get_thermometer_data(selected_feeling_ids=None):
     overall_series = []
     for f in overall_frames:
         overall_series.append({
-            'start_time': str(f.start_time),
+            'start_time': df(f.start_time),
             'feeling_rate': f.feeling_tweets,
             'total_rate': f.total_tweets,
             'missing_data': f.missing_data,
@@ -103,7 +108,7 @@ def get_thermometer_data(selected_feeling_ids=None):
 
         for i, fp in enumerate(feeling_group):
             percents.append({
-                'start_time': str(fp.start_time),
+                'start_time': df(fp.start_time),
                 'percent': fp.percent,
             })
 
