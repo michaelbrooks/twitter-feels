@@ -52,7 +52,7 @@ def _process_task_status(request, task_status):
     task_status['badge'] = _render_to_string_request(request, 'status/badge.html', {
         "running": task_status['running']
     })
-    task_status['enqueued_at'] = naturaltime(task_status['enqueued_at'])
+    task_status['most_recent'] = naturaltime(task_status['most_recent'])
 
     return task_status
 

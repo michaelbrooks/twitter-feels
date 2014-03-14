@@ -28,10 +28,10 @@
                 <th>Task Name</th>
                 <th>Frequency (sec)</th>
                 <th>Completed</th>
+                <th>Up to...</th>
                 <th>Avg. Time (sec)</th>
                 {% if request.user.is_staff %}
                     <th>Turn on or off</th>
-                    <th>Last Enqueued</th>
                 {% endif %}
             </tr>
             </thead>
@@ -44,10 +44,10 @@
                     <td class="name-cell">{{ task.name }}</td>
                     <td class="duration-cell">{{ task.duration|floatformat:0 }}</td>
                     <td class="frame-count-cell">{{ task.frame_count }}</td>
+                    <td class="most-recent-cell">{{ task.most_recent|naturaltime }}</td>
                     <td class="avg-time-cell">{{ task.avg_time|floatformat }}</td>
                     {% if request.user.is_staff %}
                         <td class="switch-cell invisible">{% include 'status/switch.html' with status=task %}</td>
-                        <td class="enqueued-at-cell">{{ task.enqueued_at|naturaltime }}</td>
                     {% endif %}
                 </tr>
             {% endfor %}

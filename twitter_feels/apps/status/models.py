@@ -120,13 +120,12 @@ def _task_status(task):
         "frame_count": frame_class.count_completed(),
         "avg_time": frame_class.get_average_analysis_time(),
         "running": False,
-        "enqueued_at": None
+        "most_recent": frame_class.get_latest_end_time()
     }
 
     job = task.get_rq_job()
     if job:
         result["running"] = True
-        result["enqueued_at"] = job.enqueued_at
 
     return result
 
@@ -137,7 +136,7 @@ def task_status(key=None):
     If no key is given, returns a dictionary containing the status of all tasks.
 
     Status is a dictionary with the task info
-    as well as keys "enqueued_at" (datetime) and "running" (True/False).
+    as well as "running" (True/False).
     """
     if key:
         task = AnalysisTask.get(key=key)
