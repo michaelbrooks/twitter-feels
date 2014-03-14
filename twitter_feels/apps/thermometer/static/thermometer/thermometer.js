@@ -1,7 +1,10 @@
 (function() {
+    var thermometer = window.apps.thermometer;
+    var models = thermometer.models;
+
     var logger = Logger.get("thermometer");
 
-    var ThermometerApp = window.apps.thermometer.ThermometerApp = function () {
+    var ThermometerApp = thermometer.ThermometerApp = function () {
 
     };
 
@@ -61,8 +64,20 @@
 
     //Get started
     $(document).ready(function () {
-        var thermometer = new ThermometerApp();
-        thermometer.start();
+        var app = new ThermometerApp();
+
+        var feelings = new models.FeelingsCollection();
+        feelings.on('reset sync', function() {
+            console.log(feelings);
+        });
+
+        if (window.preload.contains('thermometer.data.feelings')) {
+            feelings.reset(window.preload.get('thermometer.data.feelings'))
+        } else {
+            feelings.fetch();
+        }
+
+//        thermometer.start();
     });
 
     logger.info("ThermometerApp loaded");

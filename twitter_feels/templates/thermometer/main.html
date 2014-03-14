@@ -4,7 +4,8 @@
 {% block title %}Thermometer{% endblock %}
 
 {% block content %}
-    <div class="thermometer-app row col" data-data_url="{% url 'thermometer_json' %}">
+
+    <div class="thermometer-app row col">
         <div class="row thermometer-panel">
             <div class="col description"></div>
             <div class="col panel-content thermometers"></div>
@@ -14,11 +15,7 @@
             <div class="col panel-content timelines"></div>
         </div>
     </div>
-    <script>
-        (function () {
-            window.all_feelings = {{ all_feelings|safe }};
-        })();
-    </script>
+
 {% endblock %}
 
 {% block css %}
@@ -28,7 +25,15 @@
 
 {% block js %}
     {{ block.super }}
+    <script>
+        (function () {
+            window.preload.set('thermometer.urls.feelings', "{% url 'thermometer_feelings_json' %}");
+            window.preload.set('thermometer.urls.update', "{% url 'thermometer_update_json' %}");
+            window.preload.set('thermometer.data.feelings', {{ all_feelings|safe }});
+        })();
+    </script>
     <script type="text/javascript" src="{% static 'thermometer/bar_example.js' %}"></script>
+    <script type="text/javascript" src="{% static 'thermometer/models.js' %}"></script>
     <script type="text/javascript" src="{% static 'thermometer/thermometer.js' %}"></script>
 {% endblock %}
 

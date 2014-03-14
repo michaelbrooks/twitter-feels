@@ -8,6 +8,7 @@ from itertools import groupby
 import settings
 import times
 
+
 def get_all_feelings():
     # Get all of the feelings
     feelings = FeelingWord.get_tracked_list().order_by('id')
@@ -20,13 +21,13 @@ def get_all_feelings():
         })
     return feelings_json
 
+
 def df(dt):
     """Format a datetime to something JS likes"""
     return 1000 * times.to_unix(dt)
 
+
 def get_thermometer_data(selected_feeling_ids=None):
-
-
     # The full range of the data
     normal_start = FeelingPercent.get_earliest_start_time()
     normal_end = FeelingPercent.get_latest_end_time()
@@ -46,7 +47,7 @@ def get_thermometer_data(selected_feeling_ids=None):
     display_end = history_end
     # add a little extra data to assist with smoothing
     display_start = display_end - (
-    settings.DISPLAY_INTERVAL + settings.TIME_FRAME_DURATION * settings.SMOOTHING_WINDOW_SIZE)
+        settings.DISPLAY_INTERVAL + settings.TIME_FRAME_DURATION * settings.SMOOTHING_WINDOW_SIZE)
 
     # Get the time intervals we are dealing with
     intervals = {
@@ -139,12 +140,24 @@ thermometer = ThermometerView.as_view()
 
 
 @json_view
-def thermometer_json(request):
+def update_json(request):
     return get_thermometer_data()
 
 
-def thermometer_data(request):
+def update_html(request):
     data = get_thermometer_data()
+    return render(request, 'thermometer/data.html', {
+        'data_json': json.dumps(data, indent=3)
+    })
+
+
+@json_view
+def feelings_json(request):
+    return get_all_feelings()
+
+
+def feelings_html(request):
+    data = get_all_feelings()
     return render(request, 'thermometer/data.html', {
         'data_json': json.dumps(data, indent=3)
     })
