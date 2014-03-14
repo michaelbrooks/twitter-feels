@@ -28,10 +28,12 @@ def read_env(envFile='.env'):
     os.environ.update(values)
 
 if __name__ == "__main__":
+
+    read_env()
+    
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twitter_feels.settings.dev")
 
     from django.core.management import execute_from_command_line
 
-    read_env()
 
     execute_from_command_line(sys.argv)

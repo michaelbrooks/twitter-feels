@@ -207,7 +207,7 @@ def shell():
 
 def generate_supervisor_conf(user=None, app=None, **kwargs):
     """
-    Generates a new partial supervisor conf file in /tmp/app.conf.
+    Generates a new supervisord.conf file.
     """
 
     if user is None:

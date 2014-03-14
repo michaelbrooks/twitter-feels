@@ -7,11 +7,6 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
-import os
-
-# https://github.com/kennethreitz/dj-static
-from dj_static import Cling
-
 def read_env(envFile='.env'):
     try:
         with open(envFile) as f:
@@ -37,8 +32,14 @@ def read_env(envFile='.env'):
             values[key] = val
     os.environ.update(values)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twitter_feels.settings")
 read_env()
+
+
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twitter_feels.settings")
+
+# https://github.com/kennethreitz/dj-static
+from dj_static import Cling
 
 from django.conf import settings
 
