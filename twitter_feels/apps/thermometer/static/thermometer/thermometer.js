@@ -66,7 +66,7 @@
     $(document).ready(function () {
         var app = new ThermometerApp();
 
-        var feelings = new models.FeelingsCollection();
+        var feelings = new models.FeelingWordCollection();
         feelings.on('reset sync', function() {
             console.log(feelings);
         });
