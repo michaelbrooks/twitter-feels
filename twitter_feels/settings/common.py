@@ -88,6 +88,11 @@ USE_TZ = True
 
 # Path to prepend to the start of urls
 SITE_PREFIX = environ.get('SITE_PREFIX', '/')
+if SITE_PREFIX != '/':
+    if not SITE_PREFIX.endswith('/'):
+        SITE_PREFIX += '/'
+    FORCE_SCRIPT_NAME = SITE_PREFIX
+USE_X_FORWARDED_HOST = True
 ########## END GENERAL CONFIGURATION
 
 

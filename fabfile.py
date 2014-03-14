@@ -51,7 +51,12 @@ def dev_web():
     # Stop the gunicorn process
     stop('web')
 
-    manage('runserver')
+    sys.path.append(root_dir)
+    from twitter_feels import env_file
+
+    env = env_file.read()
+
+    manage('runserver', env.get('PORT', ''))
 
 
 def stop(*args):
