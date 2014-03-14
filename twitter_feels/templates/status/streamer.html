@@ -26,7 +26,7 @@
         <tr>
             <th>Status</th>
             <th>Process</th>
-            <th>API Credentials</th>
+            <th>API Key</th>
             <th>Started</th>
             <th>Last Heartbeat</th>
             <th>Tweet Rate (t/s)</th>
@@ -45,7 +45,7 @@
                 </span>
                 </td>
                 <td>{{ stream.hostname }}:{{ stream.process_id }}</td>
-                <td>{{ stream.credentials }}</td>
+                <td>{{ stream.keys }}</td>
                 <td>{{ stream.created_at|naturaltime }}</td>
                 <td>{{ stream.last_heartbeat|naturaltime }}</td>
                 <td>{{ stream.tweet_rate|floatformat }}</td>
