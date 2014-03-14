@@ -199,10 +199,10 @@ def new_migration(app):
     manage('schemamigration', app, '--auto')
 
 
-def updatedb():
+def updatedb(*args):
     """Runs syncdb and migrate."""
-    manage('syncdb')
-    manage('migrate')
+    manage('syncdb', *args)
+    manage('migrate', *args)
 
 
 def shell():

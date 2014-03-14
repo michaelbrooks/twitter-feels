@@ -132,10 +132,10 @@ class project::requirements () inherits project::params {
   }
 
   # Set up the database schema
-  exec { "manage.py syncdb":
+  exec { "fab updatedb":
     command => "source ${virtualenvwrapper_sh} &&
                 workon ${app_name} &&
-                fab manage:syncdb,--noinput",
+                fab updatedb:--noinput",
 
     provider => "shell",
     user => $user_name,
@@ -154,7 +154,7 @@ class project::requirements () inherits project::params {
       user => $user_name,
       environment => $environment,
 
-      require => Exec['manage.py syncdb'],
+      require => Exec['fab updatedb'],
     }
   } else {
     notify{ "No initial data loaded. You'll need to run manage.py createsuperuser.": }
