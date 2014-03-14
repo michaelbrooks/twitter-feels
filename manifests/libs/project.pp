@@ -39,7 +39,7 @@ class project::env {
 
   file { ".env":
     path => "${project_dir}/.env",
-    content => template("${scripts_dir}/provision/default.env.erb"),
+    content => template("${scripts_dir}/templates/default.env.erb"),
     owner => $user_name,
     group => $user_name,
   }
@@ -238,13 +238,11 @@ class project::supervisor (
   $concurrency = join($processes, ',')
 
   # Generate a supervisor script from the Procfile
-  $fab_args = "user=${user_name},app=${app_name},port=${web_server_port},log=${log_dir},${concurrency}"
+  $fab_args = "user=${user_name},app=${app_name},${concurrency}"
   exec { "supervisor conf":
     command => "source ${virtualenvwrapper_sh} &&
                 workon ${app_name} &&
-                fab generate_supervisor_conf:${fab_args} &&
-                cat /tmp/supervisor.${app_name}.conf-top /tmp/${app_name}.conf > ${supervisor_conf} &&
-                rm /tmp/${app_name}*.conf",
+                fab generate_supervisor_conf:${fab_args}",
 
     provider => "shell",
     user => $user_name,
@@ -267,7 +265,7 @@ class project::supervisor (
   # Set up the supervisor upstart script
   file { "${app_name} upstart":
     path => "/etc/init/${app_name}.conf",
-    content => template("${scripts_dir}/provision/upstart.init.erb"),
+    content => template("${scripts_dir}/templates/upstart.init.erb"),
 
     notify => Service[$app_name],
   }

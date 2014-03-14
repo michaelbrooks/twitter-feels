@@ -1,4 +1,5 @@
 import os
+import sys
 
 from fabric.api import local
 from fabric.context_managers import lcd, hide
@@ -18,6 +19,15 @@ def _supervisor(command, *args, **kwargs):
             local('supervisorctl %s' % command, capture=capture)
         else:
             local('supervisorctl %s all' % command, capture=capture)
+
+
+def _jinja_render(template_path, values):
+    """Render a template. Expects path relative to root_dir."""
+    from jinja2 import Template, Environment, FileSystemLoader
+    environment = Environment(loader=FileSystemLoader(root_dir))
+
+    template = environment.get_template(template_path)
+    return template.render(values)
 
 
 def run(process):
@@ -63,20 +73,24 @@ def status(*args):
     """Get the status of one or more supervisor processes"""
     _supervisor('status', *args)
 
+
 def scale_worker(number):
     """Scale the workers to the given number of processes."""
     with lcd(root_dir):
-        local(r'sed -i -r -e "/^\[program:%(process)s\]/ { n ; s/^numprocs=[[:digit:]]+/numprocs=%(number)s/ }" supervisord.conf' % {
-            'process': 'worker',
-            'number': number
-        })
+        local(
+            r'sed -i -r -e "/^\[program:%(process)s\]/ { n ; s/^numprocs=[[:digit:]]+/numprocs=%(number)s/ }" supervisord.conf' % {
+                'process': 'worker',
+                'number': number
+            })
         _supervisor('update')
+
 
 def refresh_web():
     """Trigger's Gunicorn's 'hot refresh' feature."""
     with lcd(root_dir):
         pid = local('supervisorctl pid web', capture=True)
         local('kill -HUP %s' % pid)
+
 
 def count_web():
     """Get the current gunicorn web worker count"""
@@ -93,6 +107,7 @@ def count_web():
             print ("There are %d gunicorn workers running" % count)
 
         return count
+
 
 def scale_web(direction='up'):
     """Scale up or down the gunicorn web workers"""
@@ -120,6 +135,7 @@ def scale_web(direction='up'):
         count = count_web()
         if count == before:
             print ("Changes may not be immediately reflected. Check 'fab count_web' in a moment.")
+
 
 def clear_logs():
     """Empties the log files"""
@@ -189,7 +205,7 @@ def shell():
     manage('shell')
 
 
-def generate_supervisor_conf(app='my_app', port=8000, log=None, user=None, **kwargs):
+def generate_supervisor_conf(user=None, app=None, **kwargs):
     """
     Generates a new partial supervisor conf file in /tmp/app.conf.
     """
@@ -199,61 +215,32 @@ def generate_supervisor_conf(app='my_app', port=8000, log=None, user=None, **kwa
 
         user = getpass.getuser()
 
-    if log is None:
-        log = os.path.join(root_dir, 'logs')
+    if app is None:
+        app = os.path.split(root_dir)[1]
 
-    if kwargs:
-        concurrency = ','.join(['%s=%s' % (process, count) for process, count in kwargs.iteritems()])
-    else:
-        concurrency = ""
+    processes = {
+        'worker': 1,
+        'web': 1,
+        'stream': 1,
+        'scheduler': 1,
+    }
+    processes.update(kwargs)
 
     with lcd(root_dir):
-        # Generate a partial supervisord conf file
-        tmpconf = "/tmp/%s.conf" % app
+        virtualenv_bin = os.path.dirname(os.path.realpath(sys.executable))
 
-        export_cmd = 'honcho export --user %(user)s --port %(port)s --log %(log)s --app %(app)s '
-        if concurrency:
-            export_cmd += '--concurrency=%(concurrency)s '
-        export_cmd += 'supervisord /tmp'
-
-        local(export_cmd % {
-            'user': user,
-            'app': app,
-            'port': port,
-            'log': log,
-            'concurrency': concurrency,
+        newconf = _jinja_render('scripts/templates/supervisord.conf', {
+            'project_dir': root_dir,
+            'app_name': app,
+            'virtualenv_bin': virtualenv_bin,
+            'user_name': user,
+            'processes': processes,
         })
 
-        # Set absolute paths to commands
-        virtual_env = os.environ['VIRTUAL_ENV']
-        local('sed -i "s;^command=;command=%(virtual_env)s/bin/;g" %(tmpconf)s' % {
-            'virtual_env': virtual_env,
-            'tmpconf': tmpconf,
-        })
+        # Back up first
+        local('mv supervisord.conf supervisord.conf~')
 
-        # Remove app names from stuff
-        local(r'sed -i "s;\[program:%(app)s-;\[program:;g" %(tmpconf)s' % {
-            'app': app,
-            'tmpconf': tmpconf,
-        })
+        with open('supervisord.conf', 'w') as outfile:
+            outfile.write(newconf)
 
-        # Remove number from log filenames
-        local(r'sed -i "s;%(log)s/\([^.]\+\)-1;%(log)s/\1;g" %(tmpconf)s' % {
-            'log': log,
-            'tmpconf': tmpconf,
-        })
-
-        # Remove program group
-        local(r'grep -v "^\[group:%(app)s" %(tmpconf)s > %(tmpconf)s-1' % {
-            'app': app,
-            'tmpconf': tmpconf
-        })
-        local(r'grep -v "^programs=%(app)s-" %(tmpconf)s-1 > %(tmpconf)s' % {
-            'app': app,
-            'tmpconf': tmpconf
-        })
-
-        # Make the worker processes scalable
-        local(r'sed -i "/^\[program:worker\]/a process_name=%(program_name)s_%(process_num)02d" ' + tmpconf)
-        local(r'sed -i "/^\[program:worker\]/a numprocs=1" ' + tmpconf)
-
+        print ("Saved to supervisord.conf (old file backed up to supervisord.conf~)")
