@@ -7,6 +7,8 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
+import os
+
 def read_env(envFile='.env'):
     try:
         with open(envFile) as f:
@@ -34,8 +36,6 @@ def read_env(envFile='.env'):
 
 read_env()
 
-
-import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twitter_feels.settings")
 
 # https://github.com/kennethreitz/dj-static
