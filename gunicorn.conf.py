@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 import os
-import sys
+import multiprocessing
 
 def read_env(envFile='.env'):
     try:
@@ -8,9 +7,9 @@ def read_env(envFile='.env'):
             content = f.read()
     except IOError:
         content = ''
+        print "Env file %s not found!" % envFile
 
     import re
-    values = {}
     for line in content.splitlines():
         m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
         if m1:
@@ -26,11 +25,9 @@ def read_env(envFile='.env'):
 
             os.environ.setdefault(key, val)
 
-if __name__ == "__main__":
+read_env()
 
-    read_env()
+bind = "127.0.0.1:%(port)s" % { 'port': os.environ.get('PORT') }
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "twitter_feels.settings.dev")
-
-    from django.core.management import execute_from_command_line
-    execute_from_command_line(sys.argv)
+# workers = multiprocessing.cpu_count() * 2 + 1
+workers = 1

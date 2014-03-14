@@ -17,7 +17,6 @@ def read_env(envFile='.env'):
         content = ''
 
     import re
-    values = {}
     for line in content.splitlines():
         m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
         if m1:
@@ -31,8 +30,7 @@ def read_env(envFile='.env'):
             if m3:
                 val = re.sub(r'\\(.)', r'\1', m3.group(1))
 
-            values[key] = val
-    os.environ.update(values)
+            os.environ.setdefault(key, val)
 
 read_env()
 

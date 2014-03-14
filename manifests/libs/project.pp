@@ -92,62 +92,12 @@ class project::shell () inherits project::params {
   # Set up the user's bashrc
 
   $bashrc = "${user_home}/.bashrc"
+  $fab_complete_sh = "${scripts_dir}/provision/fab_complete.sh"
 
   file { $bashrc:
     path => $bashrc,
     ensure => "present",
-  }
-
-  file_line { "set VIRTUALENVWRAPPER_PYTHON":
-    path => $bashrc,
-    line => "export VIRTUALENVWRAPPER_PYTHON=${python_exe}",
-    match => "^export VIRTUALENVWRAPPER_PYTHON=",
-  }
-
-  file_line { "set VIRTUALENVWRAPPER_VIRTUALENV":
-    path => $bashrc,
-    line => "export VIRTUALENVWRAPPER_VIRTUALENV=${virtualenv_exe}",
-    match => "^export VIRTUALENVWRAPPER_VIRTUALENV=",
-  }
-
-  file_line { "set WORKON_HOME":
-    path => $bashrc,
-    line => "export WORKON_HOME=${workon_home}",
-    match => "^export WORKON_HOME=",
-  }
-
-  file_line { "set PIP_DOWNLOAD_CACHE":
-    path => $bashrc,
-    line => "export PIP_DOWNLOAD_CACHE=${pip_download_cache}",
-    match => "^export PIP_DOWNLOAD_CACHE=",
-  }
-
-  file_line { "src virtualenvwrapper.sh":
-    path => $bashrc,
-    line => "source ${virtualenvwrapper_sh}",
-    match => "^source .*virtualenvwrapper.sh$",
-    require => [
-      File_line["set VIRTUALENVWRAPPER_PYTHON"],
-      File_line["set VIRTUALENVWRAPPER_VIRTUALENV"],
-      File_line["set WORKON_HOME"],
-      File_line["set PIP_DOWNLOAD_CACHE"]
-    ]
-  }
-
-  file_line { "workon ${app_name}":
-    path => $bashrc,
-    line => "workon ${app_name}",
-    match => "^workon ",
-    require => [
-      File_line['src virtualenvwrapper.sh']
-    ]
-  }
-
-  $fab_complete_sh = "${scripts_dir}/provision/fab_complete.sh"
-  file_line { "source fab_complete.sh":
-    path => $bashrc,
-    line => "source ${fab_complete_sh}",
-    match => "fab_complete.sh",
+    content => template("${scripts_dir}/templates/bashrc.erb"),
   }
 }
 
@@ -226,15 +176,6 @@ class project::supervisor (
     group => $user_name,
   }
 
-  file { "supervisor conf header":
-    path => "/tmp/supervisor.${app_name}.conf-top",
-    content => template("${scripts_dir}/provision/supervisord.conf.erb"),
-    owner => $user_name,
-    group => $user_name,
-
-    notify => Exec['supervisor conf'],
-  }
-
   $concurrency = join($processes, ',')
 
   # Generate a supervisor script from the Procfile
@@ -244,13 +185,13 @@ class project::supervisor (
                 workon ${app_name} &&
                 fab generate_supervisor_conf:${fab_args}",
 
+    creates => $supervisor_conf,
+
     provider => "shell",
     user => $user_name,
     environment => $environment,
 
-    require => File['supervisor conf header'],
     notify => Service[$app_name],
-    subscribe => File[".env"],
   }
 
   # Make sure there's a directory for pids and sockets

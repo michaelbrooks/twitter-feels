@@ -34,4 +34,3 @@ local_settings.py
 /.twitter_api_key.json
 /supervisord.conf
 /logs
-

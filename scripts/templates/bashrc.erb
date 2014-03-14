@@ -1,0 +1,22 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# User specific aliases and functions
+export VIRTUALENVWRAPPER_PYTHON=<%= @python_exe %>
+export VIRTUALENVWRAPPER_VIRTUALENV=<%= @virtualenv_exe %>
+export WORKON_HOME=<%= @workon_home %>
+export PIP_DOWNLOAD_CACHE=<%= @pip_download_cache %>
+
+if [ -e <%= @virtualenvwrapper_sh %> ]; then
+    source <%= @virtualenvwrapper_sh %>
+    workon <%= @app_name %>
+    echo "You have been loaded into <%= @app_name %>. Use 'deactivate' to leave."
+fi
+
+if [ -e <%= @fab_complete_sh %> ]; then
+    source <%= @fab_complete_sh %>
+fi

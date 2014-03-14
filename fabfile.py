@@ -218,6 +218,10 @@ def generate_supervisor_conf(user=None, app=None, **kwargs):
     if app is None:
         app = os.path.split(root_dir)[1]
 
+    path = os.environ.get('PATH', None)
+    if not path:
+        raise Exception("No $PATH set???")
+
     processes = {
         'worker': 1,
         'web': 1,
@@ -235,6 +239,7 @@ def generate_supervisor_conf(user=None, app=None, **kwargs):
             'virtualenv_bin': virtualenv_bin,
             'user_name': user,
             'processes': processes,
+            'path': path
         })
 
         # Back up first
