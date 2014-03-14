@@ -6,9 +6,25 @@
     var preload = window.preload;
     var logger = Logger.get("thermometer.models");
 
+    var debug_date_parse = preload.get('debug');
+
     var urls = {
         feelings: preload.get('thermometer.urls.feelings'),
         update: preload.get('thermometer.urls.update')
+    };
+
+    var date_format = function(d) {
+        return d.getTime();
+    };
+
+    var date_parse = function (str) {
+        var d = new Date(str);
+
+        if (debug_date_parse && (date_format(d) !== str)) {
+            throw ("Date parse failed for " + str)
+        }
+
+        return d
     };
 
     /**
@@ -42,20 +58,23 @@
     var TimeInterval = Backbone.Model.extend({
         parse: function (raw) {
             return {
-                start: new Date(raw.start),
-                end: new Date(raw.end),
+                start: date_parse(raw.start),
+                end: date_parse(raw.end),
                 duration: raw.duration
             };
         }
     });
 
     var TweetGroup = Backbone.Model.extend({
+
+        idAttribute: "feeling_id",
+
         parse: function (raw) {
-            return {
-//                start: new Date(raw.start),
-//                end: new Date(raw.end),
-//                duration: raw.duration
-            };
+            _.each(raw.display_series, function (point) {
+                point.start_time = date_parse(point.start_time);
+            });
+
+            return raw;
         }
     });
 
@@ -80,12 +99,10 @@
                 //Data about totals
                 response.overall = new TweetGroup(response.overall, { parse: true });
 
-                response.selected_feelings = _.map(response.selected_feelings, function(rawGroup, i, list) {
-                    return
-                });
+                //Data about feelings
+                response.selected_feelings = new TweetGroupCollection(response.selected_feelings, {parse: true});
 
-                console.log(response);
-
+                return response;
             },
             function (err) {
                 logger.error('Failed to request update data', err);

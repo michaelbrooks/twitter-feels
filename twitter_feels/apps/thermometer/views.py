@@ -106,8 +106,13 @@ def get_thermometer_data(selected_feeling_ids=None):
 
         # Holds the percent for each time point
         percents = []
+        feeling_word = None
 
         for i, fp in enumerate(feeling_group):
+
+            if not feeling_word:
+                feeling_word = fp.feeling.word
+
             percents.append({
                 'start_time': df(fp.start_time),
                 'percent': fp.percent,
@@ -115,6 +120,7 @@ def get_thermometer_data(selected_feeling_ids=None):
 
         feeling_data.append({
             'feeling_id': feeling_id,
+            'word': feeling_word,
             'normal': normal_percents[feeling_id],
             'historical': history_percents[feeling_id],
             'display_series': percents,
