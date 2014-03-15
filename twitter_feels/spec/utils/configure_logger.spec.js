@@ -35,10 +35,27 @@
 
         it("should set the default Logger level", function() {
 
+            //Restore the logger
+            libs.Logger = Logger;
+
+            spyOn(libs.Logger, 'setLevel');
+            spyOn(libs.Logger, 'setHandler');
+
+            utils.configure_logger();
+
+            expect(libs.Logger.setLevel).toHaveBeenCalledWith(libs.Logger.DEBUG);
         });
 
         it("should allow setting the Logger level", function() {
+            //Restore the logger
+            libs.Logger = Logger;
 
+            spyOn(libs.Logger, 'setLevel');
+            spyOn(libs.Logger, 'setHandler');
+
+            utils.configure_logger(Logger.WARN);
+
+            expect(libs.Logger.setLevel).toHaveBeenCalledWith(libs.Logger.WARN);
         });
 
         it("should set the Logger handler", function() {
