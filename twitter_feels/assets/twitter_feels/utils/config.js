@@ -2,9 +2,9 @@
  * Sets up a global 'preload' object with get/set functions
  * for storing initial data directly from templates.
  */
-(function () {
+(function (ns) {
 
-    var DataStore = function () {
+    ns.Config = function () {
         var _store = {};
 
         /**
@@ -47,6 +47,4 @@
         };
     };
 
-    window.preload = new DataStore()
-
-})();
+})(window.apps.twitter_feels.utils);

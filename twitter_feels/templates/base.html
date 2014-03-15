@@ -83,24 +83,28 @@
 {% block js_cdn %}
     <script src="{% bootstrap_jquery_url %}" type="text/javascript"></script>
     {% bootstrap_javascript %}
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
 {% endblock %}
 
 {% compress js %}
-    <script src="{% static 'twitter_feels/jquery_csrf.js' %}" type="text/javascript"></script>
-    <script src="{% static 'twitter_feels/preload.js' %}" type="text/javascript"></script>
     {% block js %}
+        <script src="{% static 'libs/underscore/underscore.js' %}" type="text/javascript"></script>
+        <script src="{% static 'libs/backbone/backbone.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/console.log-wrapper/consolelog.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/js-logger/src/logger.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/jquery-cookie/jquery.cookie.js' %}" type="text/javascript"></script>
-        <script src="{% static 'twitter_feels/base.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'init_namespaces.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'twitter_feels/app.js' %}" type="text/javascript"></script>
+        <script src="{% static 'twitter_feels/utils/configure_logger.js' %}" type="text/javascript"></script>
+        <script src="{% static 'twitter_feels/utils/jquery_csrf.js' %}" type="text/javascript"></script>
+        <script src="{% static 'twitter_feels/utils/config.js' %}" type="text/javascript"></script>
+
         <script type="text/javascript">
-            {% if debug_mode %}
-                window.preload.set('debug', true);
-                window.apps.configureLogger(Logger.DEBUG);
-            {% else %}
-                window.preload.set('debug', false);
-                window.apps.configureLogger(Logger.WARN);
-            {% endif %}
+            window.apps.twitter_feels.initialize({
+                'debug': {% if debug_mode %}true{% else %}false{% endif %}
+            });
         </script>
         {# Your JS will be added here if you extend this block. #}
     {% endblock %}

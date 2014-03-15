@@ -1,12 +1,15 @@
-(function() {
+/**
+ * Created by mjbrooks on 3/14/14.
+ */
+(function (ns, Logger) {
 
-    window.apps = {
-        status: {},
-        thermometer: {}
-    };
-
-    //Configure a logger
-    window.apps.configureLogger = function(defaultLevel) {
+    /**
+     * Configure the Logger class.
+     * The level should be Logger.DEBUG, Logger.INFO, Logger.WARN, Logger.ERROR, or Logger.OFF
+     *
+     * @param defaultLevel
+     */
+    ns.configure_logger = function(defaultLevel) {
 
         Logger.setLevel(defaultLevel || Logger.DEBUG);
 
@@ -47,6 +50,4 @@
             });
         }
     };
-
-    Logger.info("apps loaded");
-})();
+})(window.apps.twitter_feels.utils, window.Logger);
