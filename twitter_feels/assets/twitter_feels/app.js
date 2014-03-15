@@ -1,11 +1,13 @@
 /**
  * Initialize the twitter_feels common infrastructure.
  */
-(function (ns, Logger) {
+(function (win) {
 
-    ns.utils = {};
+    var tf = win.namespace.get('twitter_feels');
+    var utils = win.namespace.get('twitter_feels.utils');
+    var libs = win.namespace.get('libs');
 
-    ns.TwitterFeels = function(options) {
+    tf.TwitterFeels = function(options) {
         this.debug = options.debug;
     };
 
@@ -15,20 +17,20 @@
         csrf: true
     };
 
-    ns.initialize = function(options) {
+    tf.TwitterFeels.initialize = function(options) {
         _.defaults(options, default_options);
 
-        if (options.debug) {
-            ns.utils.configure_logger(Logger.DEBUG);
+        if (options.debug && libs.Logger) {
+            utils.configure_logger(libs.Logger.DEBUG);
         } else {
-            ns.utils.configure_logger(Logger.WARN);
+            utils.configure_logger(libs.Logger.WARN);
         }
 
         if (options.csrf) {
-            ns.utils.csrf.jquery_install();
+            utils.csrf.jquery_install();
         }
 
-        ns.app = new ns.TwitterFeels(options);
+        tf.app = new tf.TwitterFeels(options);
     };
 
-})(window.apps.twitter_feels, Logger);
+})(window);

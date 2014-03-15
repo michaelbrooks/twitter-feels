@@ -1,9 +1,10 @@
 (function (win) {
 
-    win.apps = {
-        status: {},
-        thermometer: {},
-        twitter_feels: {}
-    };
+    win.namespace = new win.Namespace();
+
+    if (win.Logger) {
+        var libs = win.namespace.get('libs');
+        libs.Logger = win.Logger;
+    }
 
 })(window);

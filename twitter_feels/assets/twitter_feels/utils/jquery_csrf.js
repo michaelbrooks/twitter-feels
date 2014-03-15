@@ -7,7 +7,9 @@
  *  ...
  * </body>
  */
-(function (ns, $) {
+(function (win, $) {
+
+    var utils = win.namespace.get('twitter_feels.utils');
 
     /// Necessary to set the CSRF token for ajax requests.
     /// https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
@@ -16,9 +18,12 @@
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
 
-    ns.csrf = {
+    utils.csrf = {
+
+        selector: '#csrf-token',
+
         get_csrf: function() {
-            return $('body').data('csrf');
+            return $(utils.csrf.selector).data('csrf');
         },
 
         jquery_install: function() {
@@ -28,7 +33,7 @@
 
                 beforeSend: function (xhr, settings) {
 
-                    var csrf = ns.csrf.get_csrf();
+                    var csrf = utils.csrf.get_csrf();
 
                     if (!csrfSafeMethod(settings.type)) {
                         xhr.setRequestHeader("X-CSRFToken", csrf);
@@ -38,4 +43,4 @@
         }
     };
 
-})(window.apps.twitter_feels.utils, jQuery);
+})(window, jQuery);

@@ -30,7 +30,9 @@
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
-<body data-csrf="{{ csrf_token }}">
+<body>
+
+<div id="csrf-token" data-csrf="{{ csrf_token }}" style="display: none"></div>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -92,7 +94,7 @@
         <script src="{% static 'libs/underscore/underscore.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/backbone/backbone.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/console.log-wrapper/consolelog.js' %}" type="text/javascript"></script>
-        <script src="{% static 'libs/js-logger/src/logger.js' %}" type="text/javascript"></script>
+        <script src="{% static 'libs/js-logger/src/../assets/libs/js-logger/logger.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/jquery-cookie/jquery.cookie.js' %}" type="text/javascript"></script>
 
         <script src="{% static 'init_namespaces.js' %}" type="text/javascript"></script>

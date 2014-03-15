@@ -2,7 +2,9 @@
  * Sets up a global 'preload' object with get/set functions
  * for storing initial data directly from templates.
  */
-(function (ns) {
+(function (win) {
+
+    var utils = win.namespace.get('twitter_feels.utils');
 
     ns.Config = function () {
         var _store = {};
@@ -47,4 +49,4 @@
         };
     };
 
-})(window.apps.twitter_feels.utils);
+})(window);

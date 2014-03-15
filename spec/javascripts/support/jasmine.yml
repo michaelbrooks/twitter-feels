@@ -59,6 +59,27 @@ helpers:
 #   - dist/**/*.js
 #
 src_files:
+
+  # CDN Libraries
+  - http://code.jquery.com/jquery.min.js
+  - http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js
+  - http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js
+  - http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js
+  - http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js
+
+  # Local libraries
+  - assets/libs/bootstrap-switch/js/bootstrap-switch.js
+  - assets/libs/console.log-wrapper/consolelog.js
+  - assets/libs/jquery-cookie/jquery.cookie.js
+  - assets/libs/js-logger/logger.js
+  - assets/libs/namespace/namespace.js
+
+  # twitter_feels global app/utilities
+  - assets/init_namespaces.js
+  - assets/twitter_feels/utils/jquery_csrf.js
+  - assets/twitter_feels/utils/configure_logger.js
+
+  # thermometer app
   - apps/thermometer/static/thermometer/models.js
 
 
@@ -73,4 +94,5 @@ src_files:
 #   - **/*[sS]pec.js
 #
 spec_files:
+  - "spec/**/*[Ss]pec.js"
   - "apps/thermometer/spec/**/*[Ss]pec.js"

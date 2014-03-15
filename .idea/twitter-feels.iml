@@ -21,6 +21,7 @@
     <orderEntry type="library" name="d3" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="jasmine" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="myDocStringFormat" value="Plain" />
