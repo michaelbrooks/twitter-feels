@@ -44,9 +44,9 @@ def get_thermometer_data(selected_feeling_ids=None):
     history_end = effective_now
     history_start = history_end - settings.HISTORICAL_INTERVAL
 
-    display_end = history_end
+    recent_end = history_end
     # add a little extra data to assist with smoothing
-    display_start = display_end - (
+    recent_start = recent_end - (
         settings.DISPLAY_INTERVAL + settings.TIME_FRAME_DURATION * settings.SMOOTHING_WINDOW_SIZE)
 
     # Get the time intervals we are dealing with
@@ -61,15 +61,15 @@ def get_thermometer_data(selected_feeling_ids=None):
             'end': df(history_end),
             'duration': settings.HISTORICAL_INTERVAL.total_seconds(),
         },
-        'display': {
-            'start': df(display_start),
-            'end': df(display_end),
+        'recent': {
+            'start': df(recent_start),
+            'end': df(recent_end),
             'duration': settings.DISPLAY_INTERVAL.total_seconds(),
         },
     }
 
     # Get the overall statistics
-    overall_frames = TimeFrame.get_in_range(start=display_start, end=display_end, calculated=True)
+    overall_frames = TimeFrame.get_in_range(start=recent_start, end=recent_end, calculated=True)
     overall_series = []
     for f in overall_frames:
         overall_series.append({
@@ -82,7 +82,7 @@ def get_thermometer_data(selected_feeling_ids=None):
     overall = {
         'normal': TimeFrame.get_average_rate(),
         'historical': TimeFrame.get_average_rate(start=history_start, end=history_end),
-        'display_series': overall_series,
+        'recent_series': overall_series,
     }
 
     if selected_feeling_ids is None:
@@ -97,8 +97,8 @@ def get_thermometer_data(selected_feeling_ids=None):
     history_percents = FeelingPercent.get_average_percents(start=history_start, end=history_end,
                                                            feeling_ids=selected_feeling_ids)
 
-    # Percent per minute for the past display interval, ordered by feeling, time
-    feeling_percents = FeelingPercent.get_percents_in_interval(start=display_start, end=display_end,
+    # Percent per minute for the past recent interval, ordered by feeling, time
+    feeling_percents = FeelingPercent.get_percents_in_interval(start=recent_start, end=recent_end,
                                                                feeling_ids=selected_feeling_ids)
 
     feeling_data = []
@@ -123,7 +123,7 @@ def get_thermometer_data(selected_feeling_ids=None):
             'word': feeling_word,
             'normal': normal_percents[feeling_id],
             'historical': history_percents[feeling_id],
-            'display_series': percents,
+            'recent_series': percents,
         })
 
     return {

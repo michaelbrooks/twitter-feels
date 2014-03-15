@@ -13,7 +13,7 @@
         update: preload.get('thermometer.urls.update')
     };
 
-    var date_format = function(d) {
+    var date_format = function (d) {
         return d.getTime();
     };
 
@@ -56,6 +56,16 @@
      * @type {*|void}
      */
     var TimeInterval = Backbone.Model.extend({
+
+        defaults: function () {
+            var now = new Date();
+            return {
+                start: now,
+                end: now,
+                duration: 0
+            };
+        },
+
         parse: function (raw) {
             return {
                 start: date_parse(raw.start),
@@ -69,8 +79,17 @@
 
         idAttribute: "feeling_id",
 
+        defaults: function () {
+            return {
+                recent_series: [],
+                word: undefined,
+                feeling_id: undefined,
+                normal: undefined
+            };
+        },
+
         parse: function (raw) {
-            _.each(raw.display_series, function (point) {
+            _.each(raw.recent_series, function (point) {
                 point.start_time = date_parse(point.start_time);
             });
 
@@ -82,39 +101,79 @@
         model: TweetGroup
     });
 
+    // The data package which we update over time
+    var UpdateModel = function () {
 
-    var request_update = function () {
+        this.intervals = {
+            normal: new TimeInterval(),
+            historical: new TimeInterval(),
+            recent: new TimeInterval()
+        };
 
-        var request = $.get(urls.update);
+        this.overall = new TweetGroup();
+        this.selected_feelings = new TweetGroupCollection([]);
 
-        //Filter the request results to construct the appropriate models
-        return request.then(
-            function (response) {
+        var proxy = function(ns) {
+            return function(name) {
 
-                //Turn all the intervals into TimeIntervals
-                _.each(response.intervals, function (rawInterval, name, intervals) {
-                    intervals[name] = new TimeInterval(rawInterval, { parse: true });
-                });
+                var args = Array.prototype.slice.call(arguments);
+                args[0] = ns + ':' + name;
 
-                //Data about totals
-                response.overall = new TweetGroup(response.overall, { parse: true });
-
-                //Data about feelings
-                response.selected_feelings = new TweetGroupCollection(response.selected_feelings, {parse: true});
-
-                return response;
-            },
-            function (err) {
-                logger.error('Failed to request update data', err);
+                this.trigger.apply(this, args);
             }
-        );
+        };
+
+        this.listenTo(this.intervals.normal, 'all', proxy('intervals:normal'));
+        this.listenTo(this.intervals.historical, 'all', proxy('intervals:historical'));
+        this.listenTo(this.intervals.recent, 'all', proxy('intervals:recent'));
+        this.listenTo(this.overall, 'all', proxy('overall'));
+        this.listenTo(this.selected_feelings, 'all', proxy('selected_feelings'));
     };
 
+    _.extend(Backbone.Events, {
+
+        /**
+         * Apply an update to this model based on raw data.
+         *
+         * @param raw
+         */
+        apply_update: function (raw) {
+
+            //Update all the time intervals
+            _.each(raw.intervals, function (rawInterval, name, intervals) {
+                intervals[name].set(rawInterval, { parse: true });
+            });
+
+            //Update the overall tweet group
+            raw.overall.set(raw.overall, { parse: true });
+
+            //Update the collection of feelings tweets
+            raw.selected_feelings.set(raw.selected_feelings, { parse: true });
+        },
+
+        /**
+         * Requests new data from the server and updates the model
+         * if the data has changed.
+         *
+         * Returns a promise object -- when done, this
+         */
+        fetch: function () {
+            var self = this;
+
+            return $.get(urls.update)
+                .done(function (response) {
+                    self.apply_update(response);
+                })
+                .fail(function (err) {
+                    logger.error('Failed to update data', err);
+                });
+        }
+
+    });
+
     thermometer.models = {
-        FeelingWord: FeelingWord,
         FeelingWordCollection: FeelingWordCollection,
-        TimeInterval: TimeInterval,
-        request_update: request_update
+        UpdateModel: UpdateModel
     };
 
 })();
