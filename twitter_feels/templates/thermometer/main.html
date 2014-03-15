@@ -2,20 +2,19 @@
 {% load staticfiles humanize %}
 
 {% block title %}Thermometer{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-
-    <div class="thermometer-app row col">
-        <div class="row thermometer-panel">
-            <div class="col description"></div>
-            <div class="col panel-content thermometers"></div>
+    <div class="thermometer-app a-row a-col">
+        <div class="a-row thermometer-panel">
+            <div class="a-col description"></div>
+            <div class="a-col panel-content thermometers"></div>
         </div>
-        <div class="row timeline-panel">
-            <div class="col description"></div>
-            <div class="col panel-content timelines"></div>
+        <div class="a-row timeline-panel">
+            <div class="a-col description"></div>
+            <div class="a-col panel-content timelines"></div>
         </div>
     </div>
-
 {% endblock %}
 
 {% block css %}
