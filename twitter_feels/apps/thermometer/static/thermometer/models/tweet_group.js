@@ -1,33 +1,34 @@
 /**
  * Created by mjbrooks on 3/14/14.
  */
-(function (ns) {
+(function (win) {
 
-    var logger = ns.logger;
+    var models = win.namespace.get('thermometer.models');
+    var utils = win.namespace.get('thermometer.utils');
 
-    ns.models.TweetGroup = Backbone.Model.extend({
+    var libs = win.namespace.get('libs');
+
+    models.TweetGroup = libs.Backbone.Model.extend({
 
         idAttribute: "feeling_id",
 
         defaults: function () {
             return {
-                recent_series: [],
-                word: undefined,
-                feeling_id: undefined,
-                normal: undefined
+                recent_series: []
             };
         },
 
         parse: function (raw) {
             _.each(raw.recent_series, function (point) {
-                point.start_time = ns.utils.date_parse(point.start_time);
+                point.start_time = utils.date_parse(point.start_time);
             });
 
             return raw;
         }
     });
 
-    ns.models.TweetGroupCollection = Backbone.Collection.extend({
-        model: ns.models.TweetGroup
+    models.TweetGroupCollection = libs.Backbone.Collection.extend({
+        model: models.TweetGroup
     });
-})(window.apps.thermometer);
+
+})(window);

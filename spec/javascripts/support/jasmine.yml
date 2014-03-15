@@ -80,7 +80,11 @@ src_files:
   - assets/twitter_feels/utils/configure_logger.js
 
   # thermometer app
-  - apps/thermometer/static/thermometer/models.js
+  - apps/thermometer/static/thermometer/utils.js
+  - apps/thermometer/static/thermometer/models/time_interval.js
+  - apps/thermometer/static/thermometer/models/feeling_word.js
+  - apps/thermometer/static/thermometer/models/tweet_group.js
+  - apps/thermometer/static/thermometer/models/update.js
 
 
 # spec_files

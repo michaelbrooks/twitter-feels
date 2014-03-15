@@ -101,7 +101,7 @@ def get_thermometer_data(selected_feeling_ids=None):
     feeling_percents = FeelingPercent.get_percents_in_interval(start=recent_start, end=recent_end,
                                                                feeling_ids=selected_feeling_ids)
 
-    feeling_data = []
+    selected_feelings = []
     for feeling_id, feeling_group in groupby(feeling_percents, lambda fr: fr.feeling_id):
 
         # Holds the percent for each time point
@@ -118,7 +118,7 @@ def get_thermometer_data(selected_feeling_ids=None):
                 'percent': fp.percent,
             })
 
-        feeling_data.append({
+        selected_feelings.append({
             'feeling_id': feeling_id,
             'word': feeling_word,
             'normal': normal_percents[feeling_id],
@@ -129,7 +129,7 @@ def get_thermometer_data(selected_feeling_ids=None):
     return {
         'intervals': intervals,
         'overall': overall,
-        'selected_feelings': feeling_data,
+        'selected_feelings': selected_feelings,
     }
 
 

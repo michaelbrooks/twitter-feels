@@ -1,23 +1,45 @@
 /**
  * Created by mjbrooks on 3/14/14.
  */
-(function (ns, tf) {
+(function (win) {
 
-    ns.utils = {
+    var utils = win.namespace.get('thermometer.utils');
 
-        date_format: function (d) {
-            return d.getTime();
-        },
+    /**
+     * Convert a date into a json date string
+     * @param d
+     * @returns {number}
+     */
+    utils.date_format = function (d) {
+        return d.getTime();
+    };
 
-        date_parse: function (str) {
-            var d = new Date(str);
+    /**
+     * Convert a json date string into a Date
+     * @param str
+     * @returns {Date}
+     */
+    utils.date_parse = function (str) {
+        return new Date(str);
+    };
 
-            if (tf.app.debug && (this.date_format(d) !== str)) {
-                throw ("Date parse failed for " + str)
-            }
 
-            return d
+    /**
+     * Given an even namespace, returns
+     * an event handler that will re-trigger the event on 'this',
+     * but within the given namespace.
+     *
+     * @param ns
+     * @returns {Function}
+     */
+    utils.proxy = function (ns) {
+        return function (name) {
+
+            var args = Array.prototype.slice.call(arguments);
+            args[0] = ns + ':' + name;
+
+            this.trigger.apply(this, args);
         }
     };
 
-})(window.apps.thermometer, window.apps.twitter_feels);
+})(window);

@@ -13,10 +13,14 @@
         });
 
         it("should add the global Logger to the libs namespace", function() {
-            libs = win.namespace.get('libs');
+            var libs = win.namespace.get('libs');
             expect(libs.Logger).toBe(win.Logger);
-        })
+        });
 
+        it("should add the global Backbone to the libs namespace", function() {
+            var libs = win.namespace.get('libs');
+            expect(libs.Backbone).toBe(win.Backbone);
+        });
     });
 
 })(window);

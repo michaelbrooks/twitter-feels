@@ -1,16 +1,18 @@
 /**
  * Created by mjbrooks on 3/14/14.
  */
-(function (ns, Backbone) {
+(function (win) {
 
-    var logger = ns.logger;
+    var therm = win.namespace.get('thermometer');
+    var models = win.namespace.get('thermometer.models');
+    var libs = win.namespace.get('libs');
 
     /**
      * Represents an individual feeling word.
      *
      * @type {*|void}
      */
-    ns.models.FeelingWord = Backbone.Model.extend({
+    models.FeelingWord = libs.Backbone.Model.extend({
 
         is_hidden: function () {
             return this.get('hidden');
@@ -23,11 +25,11 @@
      *
      * @type {*|void}
      */
-    ns.models.FeelingWordCollection = Backbone.Collection.extend({
-        model: ns.models.FeelingWord,
+    models.FeelingWordCollection = libs.Backbone.Collection.extend({
+        model: models.FeelingWord,
         url: function() {
-            return ns.app.urls.feelings;
+            return therm.app.urls.feelings;
         }
     });
 
-})(window.apps.thermometer, Backbone);
+})(window);

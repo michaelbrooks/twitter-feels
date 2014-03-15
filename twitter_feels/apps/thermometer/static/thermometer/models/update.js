@@ -1,49 +1,39 @@
 /**
  * Created by mjbrooks on 3/14/14.
  */
-(function (ns, $, _, Backbone) {
+(function (win) {
 
-    var m = ns.models;
-    var logger = ns.logger;
+    var therm = win.namespace.get('thermometer');
+    var models = win.namespace.get('thermometer.models');
+    var utils = win.namespace.get('thermometer.utils');
+    var libs = win.namespace.get('libs');
 
-    /**
-     * Given an even namespace, returns
-     * an event handler that will re-trigger the event on 'this',
-     * but within the given namespace.
-     *
-     * @param ns
-     * @returns {Function}
-     */
-    var proxy = function(ns) {
-        return function(name) {
-
-            var args = Array.prototype.slice.call(arguments);
-            args[0] = ns + ':' + name;
-
-            this.trigger.apply(this, args);
-        }
-    };
+    var logger = libs.Logger.get('thermometer.models.update');
 
     // The data package which we update over time
-    m.UpdateModel = function () {
+    models.UpdateModel = function () {
 
         this.intervals = {
-            normal: new m.TimeInterval(),
-            historical: new m.TimeInterval(),
-            recent: new m.TimeInterval()
+            normal: new models.TimeInterval(),
+            historical: new models.TimeInterval(),
+            recent: new models.TimeInterval()
         };
 
-        this.overall = new m.TweetGroup();
-        this.selected_feelings = new m.TweetGroupCollection([]);
+        this.overall = new models.TweetGroup();
+        this.selected_feelings = new models.TweetGroupCollection([]);
 
-        this.listenTo(this.intervals.normal, 'all', proxy('intervals:normal'));
-        this.listenTo(this.intervals.historical, 'all', proxy('intervals:historical'));
-        this.listenTo(this.intervals.recent, 'all', proxy('intervals:recent'));
-        this.listenTo(this.overall, 'all', proxy('overall'));
-        this.listenTo(this.selected_feelings, 'all', proxy('selected_feelings'));
+        this.proxy_events();
     };
 
-    _.extend(m.UpdateModel.prototype, Backbone.Events, {
+    _.extend(models.UpdateModel.prototype, libs.Backbone.Events, {
+
+        proxy_events: function() {
+            this.listenTo(this.intervals.normal, 'all', utils.proxy('intervals:normal'));
+            this.listenTo(this.intervals.historical, 'all', utils.proxy('intervals:historical'));
+            this.listenTo(this.intervals.recent, 'all', utils.proxy('intervals:recent'));
+            this.listenTo(this.overall, 'all', utils.proxy('overall'));
+            this.listenTo(this.selected_feelings, 'all', utils.proxy('selected_feelings'));
+        },
 
         /**
          * Apply an update to this model based on raw data.
@@ -53,8 +43,10 @@
         apply_update: function (raw) {
 
             //Update all the time intervals
-            _.each(this.intervals, function (rawInterval, name, intervals) {
-                intervals[name].set(rawInterval, { parse: true });
+            _.each(this.intervals, function (interval, name) {
+                if (_.has(raw.intervals, name)) {
+                    interval.set(raw.intervals[name], { parse: true });
+                }
             });
 
             //Update the overall tweet group
@@ -73,7 +65,7 @@
         fetch: function () {
             var self = this;
 
-            return $.get(ns.app.urls.update)
+            return $.get(therm.app.urls.update)
                 .done(function (response) {
                     self.apply_update(response);
                 })
@@ -85,4 +77,4 @@
     });
 
 
-})(window.apps.thermometer, jQuery, _, Backbone);
+})(window);

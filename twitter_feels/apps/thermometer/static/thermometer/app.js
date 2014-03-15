@@ -1,19 +1,20 @@
 /**
  * Created by mjbrooks on 3/14/14.
  */
-(function (ns) {
+(function (win) {
 
-    //A namespace for thermometer models
-    ns.models = {};
+    var therm = win.namespace('thermometer');
+    var models = win.namespace('thermometer.models');
+    var libs = win.namespace('libs');
 
-    ns.logger = Logger.get('thermometer');
+    var logger;
 
     // The thermometer app class
-    ns.Thermometer = function(options) {
+    therm.Thermometer = function(options) {
 
         this.urls = options.urls;
 
-        this.feelings = new ns.models.FeelingWordCollection(options.init_feelings);
+        this.feelings = new models.FeelingWordCollection(options.init_feelings);
     };
 
     var default_options = {
@@ -25,9 +26,13 @@
     };
 
     // A static init function
-    ns.initialize = function(options) {
+    therm.Thermometer.initialize = function(options) {
         _.defaults(options, default_options);
-        ns.app = new ns.Thermometer(options);
+
+        logger =  libs.Logger.get('thermometer');
+
+        //Create a global instance of the app
+        therm.app = new therm.Thermometer(options);
     };
 
-})(window.apps.thermometer);
+})(window);
