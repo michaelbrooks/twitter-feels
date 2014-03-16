@@ -17,8 +17,16 @@
         csrf: true
     };
 
+    var initializers = [];
+    tf.TwitterFeels.add_initializer = function(callback) {
+        initializers.push(callback);
+    };
+
     tf.TwitterFeels.initialize = function(options) {
-        _.defaults(options, default_options);
+        options = _.defaults(
+            options || {},
+            win._twitter_feels_config || {},
+            default_options);
 
         if (options.debug && libs.Logger) {
             utils.configure_logger(libs.Logger.DEBUG);
@@ -31,6 +39,11 @@
         }
 
         tf.app = new tf.TwitterFeels(options);
+
+        //Initialize all the other stuff
+        _.each(initializers, function(callback) {
+            callback();
+        })
     };
 
 })(window);

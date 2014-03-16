@@ -147,7 +147,10 @@ thermometer = ThermometerView.as_view()
 
 @json_view
 def update_json(request):
-    return get_thermometer_data()
+
+    feelings = request.GET.get('feelings').split(',')
+
+    return get_thermometer_data(feelings)
 
 
 def update_html(request):

@@ -65,13 +65,28 @@
         fetch: function () {
             var self = this;
 
-            return $.get(therm.app.urls.update)
+            var feelings = this.get_selected_feelings();
+
+            var urlpart = feelings.join(',');
+
+            return $.get(therm.app.urls.update, {
+                'feelings': urlpart
+            })
                 .done(function (response) {
                     self.apply_update(response);
                 })
                 .fail(function (err) {
                     logger.error('Failed to update data', err);
                 });
+        },
+
+        /**
+         * Returns the currently selected list of feelings.
+         *
+         * @returns {Array}
+         */
+        get_selected_feelings: function() {
+            return [];
         }
 
     });

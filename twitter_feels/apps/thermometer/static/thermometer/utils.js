@@ -42,4 +42,22 @@
         }
     };
 
+    /**
+     * Returns a list of feeling IDs from the URL.
+     *
+     * @returns {Array}
+     */
+    utils.feelings_from_url = function() {
+        return [1, 2, 3];
+    };
+
+    /**
+     * Updates the url with a list of feelings
+     *
+     * @param feelings
+     */
+    utils.feelings_to_url = function(feelings) {
+
+    };
+
 })(window);

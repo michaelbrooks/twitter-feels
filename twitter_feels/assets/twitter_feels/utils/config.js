@@ -6,7 +6,7 @@
 
     var utils = win.namespace.get('twitter_feels.utils');
 
-    ns.Config = function () {
+    utils.Config = function () {
         var _store = {};
 
         /**

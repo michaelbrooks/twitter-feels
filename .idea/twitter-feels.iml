@@ -22,6 +22,8 @@
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="jasmine" level="application" />
+    <orderEntry type="library" name="backbone" level="application" />
+    <orderEntry type="library" name="underscore" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="myDocStringFormat" value="Plain" />

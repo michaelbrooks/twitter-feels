@@ -2,7 +2,7 @@
 <project version="4">
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$/twitter_feels/templates/base.html" libraries="{bootstrap, jquery}" />
-    <file url="file://$PROJECT_DIR$/twitter_feels/templates/thermometer/main.html" libraries="{d3, jasmine}" />
+    <file url="file://$PROJECT_DIR$/twitter_feels/templates/thermometer/main.html" libraries="{backbone, d3, jasmine, underscore}" />
   </component>
 </project>
 
