@@ -121,7 +121,7 @@
             this.yScale.range([innerHeight, 0]);
 
             var timedomain = [this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')];
-            console.log(timedomain);
+
             this.xScale.domain(timedomain)
             this.yScale.domain([-1, 1]);
 

@@ -48,7 +48,7 @@
             _.each(raw.recent_series, function (point, i) {
                 point.start_time = utils.date_parse(point.start_time);
 
-                if (point.percent) {
+                if ('percent' in point) {
                     point.percent_change = (point.percent - normal) / normal;
                     point.percent_smoothed = percent_smoothed[i];
                     point.percent_change_smoothed = (point.percent_smoothed - normal) / normal;
