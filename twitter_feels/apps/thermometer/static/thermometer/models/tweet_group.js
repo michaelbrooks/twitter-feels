@@ -8,6 +8,9 @@
 
     var libs = win.namespace.get('libs');
 
+    //For the moving average
+    var window_sizes = [7, 5, 3];
+
     models.TweetGroup = libs.Backbone.Model.extend({
 
         idAttribute: "feeling_id",
@@ -27,25 +30,29 @@
 
             var normal = raw.normal;
 
-            //For the moving average
-            var window_sizes = [7, 5, 3];
+            if (raw.recent_series.length &&
+                _.has(raw.recent_series[0], 'percent')) {
 
-            var percent_smoothed = undefined;
-            _.each(window_sizes, function(window_size) {
-                if (percent_smoothed) {
-                    percent_smoothed = utils.moving_average(window_size, percent_smoothed);
-                } else {
-                    percent_smoothed = utils.moving_average(window_size, raw.recent_series, function(d) {
-                        return d.percent;
-                    });
-                }
-            });
+                var percent_smoothed = undefined;
+                _.each(window_sizes, function(window_size) {
+                    if (percent_smoothed) {
+                        percent_smoothed = utils.moving_average(window_size, percent_smoothed);
+                    } else {
+                        percent_smoothed = utils.moving_average(window_size, raw.recent_series, function(d) {
+                            return d.percent;
+                        });
+                    }
+                });
+            }
 
             _.each(raw.recent_series, function (point, i) {
                 point.start_time = utils.date_parse(point.start_time);
-                point.percent_change = (point.percent - normal) / normal;
-                point.percent_smoothed = percent_smoothed[i];
-                point.percent_change_smoothed = (point.percent_smoothed - normal) / normal;
+
+                if (point.percent) {
+                    point.percent_change = (point.percent - normal) / normal;
+                    point.percent_smoothed = percent_smoothed[i];
+                    point.percent_change_smoothed = (point.percent_smoothed - normal) / normal;
+                }
             });
 
             return raw;

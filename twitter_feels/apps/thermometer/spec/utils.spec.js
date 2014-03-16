@@ -38,6 +38,26 @@
             expect(eventable.trigger).toHaveBeenCalledWith(event_namespace + ':' + event_name, 1, 2, 3);
         });
 
+        it('computes moving averages', function() {
+
+            expect(utils.moving_average(2, [2, 4])).toEqual([2, 3]);
+            expect(utils.moving_average(2, [2, 4, 6])).toEqual([2, 3, 5]);
+            expect(utils.moving_average(3, [3, 5, 1])).toEqual([3, 4, 3]);
+
+        });
+
+        it('computes moving averages over objects', function() {
+            var series = [3, 5, 1];
+            series = _.map(series, function(v) {
+                return {
+                    key: v
+                };
+            });
+
+            var result = utils.moving_average(3, series, function(d) { return d.key });
+
+            expect(result).toEqual([3, 4, 3]);
+        })
     });
 
 })(window);
