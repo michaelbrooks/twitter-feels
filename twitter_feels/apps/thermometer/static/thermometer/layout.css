@@ -1,0 +1,54 @@
+.bar {
+    fill: steelblue;
+}
+
+.bar:hover {
+    fill: brown;
+}
+
+.axis {
+    font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.x.axis path {
+    display: none;
+}
+
+.page-header {
+    display: none;
+}
+
+.thermometer-app {
+    width: 1170px;
+    margin: 0 auto;
+    top: 56px;
+    bottom: 65px;
+}
+
+.a-row.thermometer-panel {
+    top: 0;
+    height: 320px;
+}
+
+.a-row.timeline-panel {
+    top: 325px;
+    height: 300px;
+}
+
+.a-col.description {
+    background: #FEFEFE;
+    width: 200px;
+    left: 0;
+}
+.a-col.panel-content {
+    background: #FEFEFE;
+    left: 206px;
+    right: 0;
+}

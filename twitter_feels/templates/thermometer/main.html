@@ -43,7 +43,9 @@
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/thermometer.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/layout.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/thermometers.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/timelines.css' %}"/>
 {% endblock %}
 
 {% block js %}
