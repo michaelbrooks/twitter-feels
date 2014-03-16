@@ -388,3 +388,9 @@ THERMOMETER_SETTINGS = {
     'DISPLAY_INTERVAL': datetime.timedelta(minutes=60),
 }
 ########## END THERMOMETER SETTINGS
+
+########## TWITTER_STREAM SETTING
+TWITTER_STREAM_SETTINGS = {
+    'DEFAULT_KEYS_NAME': environ.get('TWITTER_API_KEY', None) or None
+}
+########## END TWITTER_STREAM SETTINGS
