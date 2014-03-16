@@ -63,7 +63,11 @@
                     return self.xScale(d.start_time);
                 })
                 .y(function (d) {
-                    return self.yScale(d.percent_change_smoothed);
+                    if (self.init_line) {
+                        return self.yScale(0);
+                    } else {
+                        return self.yScale(d.percent_change_smoothed);
+                    }
                 });
 
             this.color = d3.scale.category10();
@@ -136,11 +140,19 @@
             var group_bind = inner.selectAll("g.timeline-group")
                 .data(data);
 
+            this.init_line = true;
+            var self = this;
             var group_enter = group_bind.enter()
                 .append('g')
                 .attr('class', 'timeline-group')
                 .append('path')
-                .attr('class', 'line');
+                .attr('class', 'line')
+                .style('opacity', 0)
+                .attr("d", function(g) {
+                    return self.line(g.get('recent_series').slice(skip_window_size));
+                });
+            this.init_line = false;
+
 
             var group_exit = group_bind.exit()
                 .remove();
@@ -164,6 +176,7 @@
                 })
                 .transition()
                 .duration(1500)
+                .style('opacity', 1)
                 .attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
                 });
