@@ -1,0 +1,102 @@
+# src_dir
+#
+# Source directory path. Your src_files must be returned relative to this path. Will use root if left blank.
+# Default: project root
+#
+# EXAMPLE:
+#
+# src_dir: public
+#
+src_dir: "twitter_feels"
+
+# spec_dir
+#
+# Spec directory path. Your spec_files must be returned relative to this path.
+# Default: spec/javascripts
+#
+# EXAMPLE:
+#
+# spec_dir: spec/javascripts
+#
+spec_dir: "twitter_feels"
+
+# stylesheets
+#
+# Return an array of stylesheet filepaths relative to src_dir to include before jasmine specs.
+# Default: []
+#
+# EXAMPLE:
+#
+# stylesheets:
+#   - css/style.css
+#   - stylesheets/*.css
+#
+stylesheets:
+
+# helpers
+#
+# Return an array of filepaths relative to spec_dir to include before jasmine specs.
+# Default: ["helpers/**/*.js"]
+#
+# EXAMPLE:
+#
+# helpers:
+#   - helpers/**/*.js
+#
+helpers:
+  - "spec/helpers/**/*.js"
+
+# src_files
+#
+# Return an array of filepaths relative to src_dir to include before jasmine specs.
+# Default: []
+#
+# EXAMPLE:
+#
+# src_files:
+#   - lib/source1.js
+#   - lib/source2.js
+#   - dist/**/*.js
+#
+src_files:
+
+  # CDN Libraries
+  - http://code.jquery.com/jquery.min.js
+  - http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js
+  - http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js
+  - http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js
+  - http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js
+
+  # Local libraries
+  - assets/libs/bootstrap-switch/js/bootstrap-switch.js
+  - assets/libs/console.log-wrapper/consolelog.js
+  - assets/libs/jquery-cookie/jquery.cookie.js
+  - assets/libs/js-logger/logger.js
+  - assets/libs/namespace/namespace.js
+
+  # twitter_feels global app/utilities
+  - assets/init_namespaces.js
+  - assets/twitter_feels/utils/jquery_csrf.js
+  - assets/twitter_feels/utils/configure_logger.js
+
+  # thermometer app
+  - apps/thermometer/static/thermometer/utils.js
+  - apps/thermometer/static/thermometer/models/time_interval.js
+  - apps/thermometer/static/thermometer/models/feeling_word.js
+  - apps/thermometer/static/thermometer/models/tweet_group.js
+  - apps/thermometer/static/thermometer/models/update.js
+
+
+# spec_files
+#
+# Return an array of filepaths relative to spec_dir to include.
+# Default: ["**/*[sS]pec.js"]
+#
+# EXAMPLE:
+#
+# spec_files:
+#   - **/*[sS]pec.js
+#
+spec_files:
+  - "spec/**/*[Ss]pec.js"
+  - "apps/thermometer/spec/**/*[Ss]pec.js"

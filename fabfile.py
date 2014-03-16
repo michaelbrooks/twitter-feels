@@ -58,6 +58,16 @@ def dev_web():
 
     manage('runserver', env.get('PORT', ''))
 
+def jasmine():
+    """Run the jasmine test server. Stops the web process first to open the port."""
+    stop('web')
+
+    sys.path.append(root_dir)
+    from twitter_feels import env_file
+
+    env = env_file.read()
+    with lcd(root_dir):
+        local('jasmine -p %s' % env.get('PORT', ''))
 
 def stop(*args):
     """Stop one or more supervisor processes"""

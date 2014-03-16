@@ -2,38 +2,78 @@
 {% load staticfiles humanize %}
 
 {% block title %}Thermometer{% endblock %}
+{% block header %}{% endblock %}
 
 {% block content %}
-    <div class="thermometer-app row col" data-data_url="{% url 'thermometer_json' %}">
-        <div class="row thermometer-panel">
-            <div class="col description"></div>
-            <div class="col panel-content thermometers"></div>
+    <div class="thermometer-app a-row a-col">
+        <div class="a-row thermometer-panel">
+            <div class="a-col description"></div>
+            <div class="a-col panel-content tray"></div>
         </div>
-        <div class="row timeline-panel">
-            <div class="col description"></div>
-            <div class="col panel-content timelines"></div>
+        <div class="a-row timeline-panel">
+            <div class="a-col description"></div>
+            <div class="a-col panel-content timelines"></div>
         </div>
+
+
+        <script type="text/template" id="thermometer-view-template">
+            <div class="glyph">
+                <div class="tube back">
+                    <div class="tube fill"></div>
+                    <div class="glass"></div>
+                </div>
+                <div class="bulb back fill">
+                    <div class="bulb glass"></div>
+                </div>
+            </div>
+            <div class="feeling-label"><%= word %></div>
+        </script>
+
+        <script type="text/template" id="timeline-view-template">
+            <svg></svg>
+        </script>
+
     </div>
-    <script>
-        (function () {
-            window.all_feelings = {{ all_feelings|safe }};
-        })();
-    </script>
 {% endblock %}
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/thermometer.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/layout.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/thermometers.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'thermometer/timelines.css' %}"/>
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'thermometer/bar_example.js' %}"></script>
-    <script type="text/javascript" src="{% static 'thermometer/thermometer.js' %}"></script>
+
+    <script src="{% static 'thermometer/app.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/utils.js' %}" type="text/javascript"></script>
+
+    <script src="{% static 'thermometer/models/feeling_word.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/models/time_interval.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/models/tweet_group.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/models/update.js' %}" type="text/javascript"></script>
+
+    <script src="{% static 'thermometer/views/common_view.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/views/layout.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/views/tray_view.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/views/thermometer_view.js' %}" type="text/javascript"></script>
+    <script src="{% static 'thermometer/views/timeline_view.js' %}" type="text/javascript"></script>
+
+    <script>
+        window._thermometer_config = {
+            urls: {
+                feelings: "{% url 'thermometer_feelings_json' %}",
+                update: "{% url 'thermometer_update_json' %}"
+            },
+            init_feelings: {{ all_feelings|safe }}
+        };
+    </script>
 {% endblock %}
 
 {% block js_cdn %}
     {{ block.super }}
     {# Load javascript from a CDN here. #}
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js" type="text/javascript"></script>
 {% endblock %}

@@ -32,6 +32,8 @@
 </head>
 <body>
 
+<div id="csrf-token" data-csrf="{{ csrf_token }}" style="display: none"></div>
+
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -62,11 +64,12 @@
 </div>
 
 <div class="container content">
+    <div class="page-header">
     {% block header %}
-        <div class="page-header">
             <h1>{{ site.name }}</h1>
-        </div>
     {% endblock %}
+    </div>
+
     {% bootstrap_messages %}
 
     {% block content %}
@@ -83,45 +86,35 @@
 {% block js_cdn %}
     <script src="{% bootstrap_jquery_url %}" type="text/javascript"></script>
     {% bootstrap_javascript %}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"
+            type="text/javascript"></script>
+
 {% endblock %}
 
 {% compress js %}
-    <script type="text/javascript">
-        (function () {
-            // Generate a token
-            var csrf = '{{ csrf_token }}';
-
-            /// Necessary to set the CSRF token for ajax requests.
-            /// https://docs.djangoproject.com/en/dev/ref/contrib/csrf/
-            function csrfSafeMethod(method) {
-                // these HTTP methods do not require CSRF protection
-                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-            }
-
-            $.ajaxSetup({
-                crossDomain: false, // obviates need for sameOrigin test
-                beforeSend: function (xhr, settings) {
-                    if (!csrfSafeMethod(settings.type)) {
-                        xhr.setRequestHeader("X-CSRFToken", csrf);
-                    }
-                }
-            });
-        })();
-    </script>
     {% block js %}
         <script src="{% static 'libs/console.log-wrapper/consolelog.js' %}" type="text/javascript"></script>
-        <script src="{% static 'libs/js-logger/src/logger.js' %}" type="text/javascript"></script>
+        <script src="{% static 'libs/js-logger/logger.js' %}" type="text/javascript"></script>
         <script src="{% static 'libs/jquery-cookie/jquery.cookie.js' %}" type="text/javascript"></script>
-        <script src="{% static 'twitter_feels/base.js' %}" type="text/javascript"></script>
+        <script src="{% static 'libs/namespace/namespace.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'init_namespaces.js' %}" type="text/javascript"></script>
+
+        <script src="{% static 'twitter_feels/twitter_feels.js' %}" type="text/javascript"></script>
+        <script src="{% static 'twitter_feels/utils/configure_logger.js' %}" type="text/javascript"></script>
+        <script src="{% static 'twitter_feels/utils/jquery_csrf.js' %}" type="text/javascript"></script>
+        <script src="{% static 'twitter_feels/utils/config.js' %}" type="text/javascript"></script>
+
         <script type="text/javascript">
-            {% if debug_mode %}
-                window.apps.configureLogger(Logger.DEBUG);
-            {% else %}
-                window.apps.configureLogger(Logger.WARN);
-            {% endif %}
+            window._twitter_feels_config = {
+                'debug': {% if debug_mode %}true{% else %}false{% endif %}
+            };
         </script>
         {# Your JS will be added here if you extend this block. #}
     {% endblock %}
+
+    <script src="{% static 'main.js' %}" type="text/javascript"></script>
+
 {% endcompress %}
 
 </body>

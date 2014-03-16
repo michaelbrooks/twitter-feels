@@ -1,20 +1,23 @@
-(function () {
+(function (win) {
 
-    var logger = Logger.get("status");
+    var st = win.namespace.get('status');
+    var libs = win.namespace.get('libs');
+
+    var logger = libs.Logger.get("status");
 
     /**
      * A view for task status.
      *
      * @type {TaskView}
      */
-    var TaskView = window.apps.status.TaskView = function (task_row) {
+    var TaskView = st.TaskView = function (task_row) {
         this.task_row = task_row;
         this.task_key = task_row.data('task-key');
 
         this.ui = {
             name_cell: task_row.find('td.name-cell'),
             badge_cell: task_row.find('td.badge-cell'),
-            enqueued_at_cell: task_row.find('td.enqueued-at-cell'),
+            most_recent_cell: task_row.find('td.most-recent-cell'),
             avg_time_cell: task_row.find('td.avg-time-cell'),
             frame_count_cell: task_row.find('td.frame-count-cell'),
             switch_cell: task_row.find('td.switch-cell')
@@ -65,15 +68,15 @@
      *
      * @param status
      */
-    TaskView.prototype.update_enqueued_at = function(status) {
-        if (!this.ui.enqueued_at_cell) {
+    TaskView.prototype.update_most_recent = function(status) {
+        if (!this.ui.most_recent_cell) {
             return;
         }
 
         if (status) {
-            this.ui.enqueued_at_cell.text(status.enqueued_at || "None");
+            this.ui.most_recent_cell.text(status.most_recent || "None");
         } else {
-            this.ui.enqueued_at_cell.text('?');
+            this.ui.most_recent_cell.text('?');
         }
     };
 
@@ -121,7 +124,7 @@
             this.ui.badge = this.ui.badge_cell.find('.status-badge');
 
             this.update_switch(status);
-            this.update_enqueued_at(status);
+            this.update_most_recent(status);
             this.update_avg_time(status);
             this.update_frame_count(status);
         } else {
@@ -133,7 +136,7 @@
             this.ui.badge.removeClass('label-success label-warning')
             this.ui.badge.addClass('label-danger');
             this.update_switch(undefined);
-            this.update_enqueued_at(undefined);
+            this.update_most_recent(undefined);
             this.update_avg_time(undefined);
             this.update_frame_count(undefined);
         }
@@ -166,4 +169,4 @@
     };
 
     logger.info("TaskView loaded");
-})();
+})(window);

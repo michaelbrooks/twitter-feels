@@ -1,0 +1,6 @@
+/* Generic pane rules */
+.a-row, .a-col { overflow: hidden; position: absolute; }
+.a-row { left: 0; right: 0; }
+.a-col { top: 0; bottom: 0; }
+.a-scroll-x { overflow-x: auto; }
+.a-scroll-y { overflow-y: auto; }

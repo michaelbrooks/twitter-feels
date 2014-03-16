@@ -4,3 +4,4 @@
 
 django-debug-toolbar==1.0.1
 rq-dashboard==0.3.3
+jasmine==2.0.0

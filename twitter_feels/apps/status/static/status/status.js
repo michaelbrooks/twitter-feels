@@ -1,11 +1,14 @@
-(function () {
+(function (win) {
 
-    var logger = Logger.get("status");
+    var st = win.namespace.get('status');
+    var libs = win.namespace.get('libs');
+
+    var logger = libs.Logger.get("status");
 
     //Milliseconds between status checks
     var POLLING_INTERVAL = 15000;
 
-    var StatusApp = window.apps.status.StatusApp = function () {
+    var StatusApp = st.StatusApp = function () {
 
         this.ui = {
             refresh_button: $('#refresh-status'),
@@ -168,7 +171,7 @@
         this.ui.task_table.find('tr.task-row').each(function () {
             var row = $(this),
                 key = row.data('task-key');
-            self.task_views[key] = new window.apps.status.TaskView(row);
+            self.task_views[key] = new st.TaskView(row);
         });
     };
 
@@ -265,4 +268,4 @@
 
     logger.info("StatusApp loaded");
 
-})();
+})(window);

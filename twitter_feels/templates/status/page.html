@@ -3,14 +3,12 @@
 
 {% block title %}Status{% endblock %}
 {% block header %}
-    <div class="page-header">
-        <h1>Status
-            <button class="btn" title="Reload" id="refresh-status"
-                    data-status-url="{% url 'get_status' %}">
-                <span class="glyphicon glyphicon-refresh"></span>
-            </button>
-        </h1>
-    </div>
+    <h1>Status
+        <button class="btn" title="Reload" id="refresh-status"
+                data-status-url="{% url 'get_status' %}">
+            <span class="glyphicon glyphicon-refresh"></span>
+        </button>
+    </h1>
 {% endblock %}
 
 {% block content %}
@@ -28,10 +26,10 @@
                 <th>Task Name</th>
                 <th>Frequency (sec)</th>
                 <th>Completed</th>
+                <th>Up to...</th>
                 <th>Avg. Time (sec)</th>
                 {% if request.user.is_staff %}
                     <th>Turn on or off</th>
-                    <th>Last Enqueued</th>
                 {% endif %}
             </tr>
             </thead>
@@ -44,10 +42,10 @@
                     <td class="name-cell">{{ task.name }}</td>
                     <td class="duration-cell">{{ task.duration|floatformat:0 }}</td>
                     <td class="frame-count-cell">{{ task.frame_count }}</td>
+                    <td class="most-recent-cell">{{ task.most_recent|naturaltime }}</td>
                     <td class="avg-time-cell">{{ task.avg_time|floatformat }}</td>
                     {% if request.user.is_staff %}
                         <td class="switch-cell invisible">{% include 'status/switch.html' with status=task %}</td>
-                        <td class="enqueued-at-cell">{{ task.enqueued_at|naturaltime }}</td>
                     {% endif %}
                 </tr>
             {% endfor %}
@@ -76,13 +74,14 @@
 {% block css %}
     {{ block.super }}
     <link rel="stylesheet" type=text/css"
-          href="{% static 'libs/bootstrap-switch/build/css/bootstrap3/bootstrap-switch.css' %}"/>
+          href="{% static 'libs/bootstrap-switch/css/bootstrap3/bootstrap-switch.css' %}"/>
     <link rel="stylesheet" type=text/css" href="{% static 'status/status.css' %}"/>
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
-    <script src="{% static 'libs/bootstrap-switch/build/js/bootstrap-switch.js' %}" type="text/javascript"></script>
+    <script src="{% static 'libs/bootstrap-switch/js/bootstrap-switch.js' %}"
+            type="text/javascript"></script>
     <script src="{% static 'status/task_view.js' %}" type="text/javascript"></script>
     <script src="{% static 'status/status.js' %}" type="text/javascript"></script>
 {% endblock %}

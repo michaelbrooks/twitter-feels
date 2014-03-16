@@ -1,17 +1,29 @@
-(function() {
+/**
+ * Created by mjbrooks on 3/14/14.
+ */
+(function (win, Logger) {
 
-    window.apps = {
-        status: {},
-        thermometer: {}
-    };
+    var utils = win.namespace.get('twitter_feels.utils');
+    var libs = win.namespace.get('libs');
 
-    //Configure a logger
-    window.apps.configureLogger = function(defaultLevel) {
+    /**
+     * Configure the Logger class.
+     * The level should be Logger.DEBUG, Logger.INFO, Logger.WARN, Logger.ERROR, or Logger.OFF
+     *
+     * @param [defaultLevel]
+     */
+    utils.configure_logger = function(defaultLevel) {
+
+        var Logger = libs.Logger;
+
+        if (!Logger) {
+            throw "No logger to configure";
+        }
 
         Logger.setLevel(defaultLevel || Logger.DEBUG);
 
         // Check for the presence of a logger.
-        if (!("console" in window)) {
+        if (!("console" in win) || !(win.console)) {
 
             //Use 'log'
             Logger.setHandler(function(messages, context) {
@@ -20,13 +32,14 @@
                     messages[0] = (new Date()).toLocaleTimeString() + " [" + context.name + "] " + messages[0];
                 }
 
-                log.call(this, messages);
+                win.log.apply(this, messages);
             });
+
         } else {
 
             //Use window.console
             Logger.setHandler(function(messages, context) {
-                var console = window.console;
+                var console = win.console;
                 var hdlr = console.log;
 
                 // Prepend the logger's name to the log message for easy identification.
@@ -47,6 +60,4 @@
             });
         }
     };
-
-    Logger.info("apps loaded");
-})();
+})(window);
