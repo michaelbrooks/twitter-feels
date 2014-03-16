@@ -71,17 +71,19 @@
     width: 12px;
     height: 261px;
 
-    left: 8px;
-    bottom: 14px;
-
     border-radius: 6px;
 }
 
 .glyph .tube.fill {
     height: 14px;
+    left: 0;
+    bottom: 0;
 }
 
 .glyph .tube.back {
+    left: 8px;
+    bottom: 14px;
+
     background: #EEE;
 }
 .thermometer-view:hover .glyph .tube.back {
