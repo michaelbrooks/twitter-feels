@@ -46,6 +46,10 @@
             label: '.label'
         },
 
+        events: {
+            'click': 'clicked'
+        },
+
         initialize: function(options) {
             //Expects the model to be a TweetGroup with a feeling
             this.color = options.color || "red";
@@ -61,6 +65,10 @@
                 this.color = color;
                 this.render();
             }
+        },
+
+        clicked: function() {
+            this.model.toggle_selected();
         },
 
         /**
@@ -100,6 +108,8 @@
             var color = this.color || '#' + this.model.get('color');
             this.ui.bulb.css('background', color);
             this.ui.fill.css('background', color);
+
+            this.$el.toggleClass('selected', this.model.is_selected());
 
             //Delay the final rendering to make sure the elements are in the document
             var self = this;

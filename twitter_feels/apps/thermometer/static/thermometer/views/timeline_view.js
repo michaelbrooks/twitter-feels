@@ -94,6 +94,9 @@
                 inner.append("g")
                     .attr("class", "y axis");
 
+                inner.append('svg')
+                    .attr('class', 'chart');
+
                 this.has_rendered = true;
             }
 
@@ -126,7 +129,7 @@
 
             var timedomain = [this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')];
 
-            this.xScale.domain(timedomain)
+            this.xScale.domain(timedomain);
             this.yScale.domain([-1, 1]);
 
             var data = this.collection.models;
@@ -137,7 +140,22 @@
 
             var inner = svg.select('g.inner');
 
-            var group_bind = inner.selectAll("g.timeline-group")
+            inner.select('g.y.axis')
+                .transition()
+                .duration(1500)
+                .call(this.yAxis);
+
+            inner.select('g.x.axis')
+                .attr("transform", "translate(0," + innerHeight + ")")
+                .transition()
+                .duration(1500)
+                .call(this.xAxis);
+
+            var chart = inner.select('svg')
+                .attr('width', innerWidth)
+                .attr('height', innerHeight);
+
+            var group_bind = chart.selectAll("g.timeline-group")
                 .data(data);
 
             this.init_line = true;
@@ -153,34 +171,25 @@
                 });
             this.init_line = false;
 
-
             var group_exit = group_bind.exit()
                 .remove();
 
-            var self = this;
-
-            inner.select('g.y.axis')
-                .transition()
-                .duration(1500)
-                .call(this.yAxis);
-
-            inner.select('g.x.axis')
-                .attr("transform", "translate(0," + innerHeight + ")")
-                .transition()
-                .duration(1500)
-                .call(this.xAxis);
-
-            group_bind.select('path.line')
+            var lines = group_bind.select('path.line')
                 .style("stroke", function(g) {
                     return self.color(g.get('word'));
                 })
-                .transition()
-                .duration(1500)
-                .style('opacity', 1)
                 .attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
                 });
 
+            lines.transition()
+                .style('opacity', function(d) {
+                    if (d.is_selected() || !d.collection.selected_group) {
+                        return 1;
+                    } else {
+                        return 0.2
+                    }
+                });
         }
     });
 

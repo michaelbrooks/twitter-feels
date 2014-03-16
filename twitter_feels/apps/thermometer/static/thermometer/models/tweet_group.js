@@ -56,6 +56,30 @@
             });
 
             return raw;
+        },
+
+        toggle_selected: function() {
+            if (this.collection) {
+                if (this.is_selected()) {
+                    this.collection.selected_group = undefined
+                } else {
+                    if (this.collection.selected_group) {
+                        var old_selection = this.collection.selected_group;
+                        this.collection.selected_group = this;
+                        old_selection.trigger('change');
+                    } else {
+                        this.collection.selected_group = this;
+                    }
+                }
+                this.trigger('change');
+            }
+        },
+
+        is_selected: function() {
+            if (this.collection) {
+                return this.collection.selected_group == this;
+            }
+            return false;
         }
     });
 
