@@ -60,4 +60,47 @@
 
     };
 
+    /**
+     * Calculates a simple moving average of the given series, with the given window size.
+     * Returns the smoothed series.
+     *
+     * @param window_size
+     * @param series
+     * @param [accessor]
+     * @returns {Array}
+     */
+    utils.moving_average = function(window_size, series, accessor) {
+
+        if (window_size < 2) {
+            throw "Window size of " + window_size + " makes no sense";
+        }
+
+        var window = [],
+            window_sum = 0,
+            val = undefined,
+            first = undefined;
+
+        var result = [];
+
+        for (var i = 0; i < series.length; i++) {
+            if (accessor) {
+                val = accessor(series[i], i);
+            } else {
+                val = series[i];
+            }
+
+            window_sum += val;
+            window.push(val);
+
+            if (window.length > window_size) {
+                first = window.shift();
+                window_sum -= first;
+            }
+
+            result.push(window_sum / window.length);
+        }
+
+        return result;
+    };
+
 })(window);

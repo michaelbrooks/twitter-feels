@@ -35,7 +35,8 @@
         this.layout.show('tray', this.views.tray);
 
         this.views.timelines = new views.TimelineView({
-            collection: this.update.selected_feelings
+            collection: this.update.selected_feelings,
+            update: this.update
         });
         this.layout.show('timelines', this.views.timelines);
 
