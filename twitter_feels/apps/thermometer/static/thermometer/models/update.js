@@ -69,6 +69,7 @@
 
             var urlpart = feelings.join(',');
 
+            logger.debug('Fetching updated data...');
             return $.get(therm.app.urls.update, {
                 'feelings': urlpart
             })

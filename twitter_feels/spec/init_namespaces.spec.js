@@ -21,6 +21,11 @@
             var libs = win.namespace.get('libs');
             expect(libs.Backbone).toBe(win.Backbone);
         });
+
+        it("should add the global d3 to the libs namespace", function() {
+            var libs = win.namespace.get('libs');
+            expect(libs.d3).toBe(win.d3);
+        });
     });
 
 })(window);

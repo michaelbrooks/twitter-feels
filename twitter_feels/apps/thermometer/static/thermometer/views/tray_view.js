@@ -10,6 +10,9 @@
 
     var logger = libs.Logger.get('thermometer.views.tray_view');
 
+    var max_thermometer = 10;
+    var colorScale = libs.d3.scale.category10();
+
     views.TrayView = views.CommonView.extend({
 
         className: 'tray-view',
@@ -33,6 +36,9 @@
 
             this.views.push(view);
             this.view_lookup[model.id] = view;
+
+            var index = this.views.length - 1;
+            view.set_color(colorScale(index));
 
             this.$el.append(view.render().el);
 

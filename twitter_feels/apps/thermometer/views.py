@@ -27,7 +27,7 @@ def df(dt):
     return 1000 * times.to_unix(dt)
 
 
-def get_thermometer_data(selected_feeling_ids=None):
+def get_thermometer_data(selected_feeling_ids=[]):
     # The full range of the data
     normal_start = FeelingPercent.get_earliest_start_time()
     normal_end = FeelingPercent.get_latest_end_time()
@@ -85,7 +85,7 @@ def get_thermometer_data(selected_feeling_ids=None):
         'recent_series': overall_series,
     }
 
-    if selected_feeling_ids is None:
+    if not selected_feeling_ids:
         selected_feeling_ids = FeelingPercent.get_top_feeling_ids(limit=settings.DEFAULT_FEELINGS)
 
     # Get the data for each selected feeling
@@ -107,11 +107,13 @@ def get_thermometer_data(selected_feeling_ids=None):
         # Holds the percent for each time point
         percents = []
         feeling_word = None
+        feeling_color = None
 
         for i, fp in enumerate(feeling_group):
 
             if not feeling_word:
                 feeling_word = fp.feeling.word
+                feeling_color = fp.feeling.color
 
             percents.append({
                 'start_time': df(fp.start_time),
@@ -121,6 +123,7 @@ def get_thermometer_data(selected_feeling_ids=None):
         selected_feelings.append({
             'feeling_id': feeling_id,
             'word': feeling_word,
+            'color': feeling_color,
             'normal': normal_percents[feeling_id],
             'historical': history_percents[feeling_id],
             'recent_series': percents,
@@ -149,6 +152,7 @@ thermometer = ThermometerView.as_view()
 def update_json(request):
 
     feelings = request.GET.get('feelings').split(',')
+    feelings = [f for f in feelings if len(f)]
 
     return get_thermometer_data(feelings)
 

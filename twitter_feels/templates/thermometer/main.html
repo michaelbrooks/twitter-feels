@@ -17,8 +17,21 @@
 
 
         <script type="text/template" id="thermometer-view-template">
-            <svg></svg>
-            <div class="label"><%= word %></div>
+{#            <svg></svg>#}
+            <div class="glyph">
+                <div class="tube back">
+                    <div class="glass"></div>
+                </div>
+
+                <div class="tube fill">
+                    <div class="tube glass"></div>
+                </div>
+
+                <div class="bulb back fill">
+                    <div class="bulb glass"></div>
+                </div>
+            </div>
+            <div class="feeling-label"><%= word %></div>
         </script>
 
         <script type="text/template" id="timeline-view-template">
