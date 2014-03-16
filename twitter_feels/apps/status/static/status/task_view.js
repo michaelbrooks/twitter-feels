@@ -1,13 +1,16 @@
-(function () {
+(function (win) {
 
-    var logger = Logger.get("status");
+    var st = win.namespace.get('status');
+    var libs = win.namespace.get('libs');
+
+    var logger = libs.Logger.get("status");
 
     /**
      * A view for task status.
      *
      * @type {TaskView}
      */
-    var TaskView = window.apps.status.TaskView = function (task_row) {
+    var TaskView = st.TaskView = function (task_row) {
         this.task_row = task_row;
         this.task_key = task_row.data('task-key');
 
@@ -166,4 +169,4 @@
     };
 
     logger.info("TaskView loaded");
-})();
+})(window);
