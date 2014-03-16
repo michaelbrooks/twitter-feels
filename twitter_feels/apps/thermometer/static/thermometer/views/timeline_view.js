@@ -12,8 +12,12 @@
 
     var margin = {
         top: 20,
-        left: 20
+        right: 10,
+        bottom: 30,
+        left: 50
     };
+
+    var skip_window_size = 9;
 
     views.TimelineView = views.CommonView.extend({
 
@@ -31,19 +35,23 @@
 
             this.has_rendered = false;
 
-            this.listenTo(this.collection, 'add remove change', this.render);
-
+            this.listenTo(this.collection, 'change', this.render);
 
             this.xScale = d3.time.scale();
             this.yScale = d3.scale.linear();
 
             this.xAxis = d3.svg.axis()
                 .scale(this.xScale)
+                .ticks(4)
                 .orient("bottom");
 
+            var formatPercent = d3.format(".0%");
             this.yAxis = d3.svg.axis()
-                .scale(this.xScale)
-                .orient("left");
+                .scale(this.yScale)
+                .orient("left")
+                .ticks(4)
+                .tickFormat(formatPercent);
+
 
             var self = this;
 
@@ -64,7 +72,6 @@
         },
 
         render: function () {
-
             if (!this.has_rendered) {
                 logger.debug('running template...');
 
@@ -73,13 +80,14 @@
 
                 this.bindUIElements();
 
-                var top = d3.select(this.ui.svg[0]).append("g")
+                var inner = d3.select(this.ui.svg[0]).append("g")
+                    .attr('class', 'inner')
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-                top.append("g")
+                inner.append("g")
                     .attr("class", "x axis");
 
-                top.append("g")
+                inner.append("g")
                     .attr("class", "y axis");
 
                 this.has_rendered = true;
@@ -100,32 +108,30 @@
         delayed_render: function () {
 
             var width = this.$el.width();
-            var height = this.$el.height();
+            var height = this.$el.height() - 5;
 
             var svg = d3.select(this.ui.svg[0])
                 .attr('width', width)
                 .attr('height', height);
 
-            svg.select('g.y.axis')
-                .call(this.yAxis);
+            var innerWidth = width - margin.left - margin.right;
+            var innerHeight = height - margin.top - margin.bottom;
 
-            svg.select('g.x.axis')
-                .attr("transform", "translate(0," + height + ")")
-                .call(this.xAxis);
+            this.xScale.range([0, innerWidth]);
+            this.yScale.range([innerHeight, 0]);
 
-            this.xScale.range([0, width]);
-            this.yScale.range([height, 0]);
+            this.xScale.domain([this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')])
+            this.yScale.domain([-1, 1]);
 
-            var data = this.collection.models;
+            var data = this.collection.models.slice(skip_window_size);
 
             this.color.domain(data.map(function(d) {
                 return d.get('word');
             }));
 
-            this.xScale.domain([this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')])
-            this.yScale.domain([-1, 1]);
+            var inner = svg.select('g.inner');
 
-            var group_bind = svg.selectAll("g.timeline-group")
+            var group_bind = inner.selectAll("g.timeline-group")
                 .data(data);
 
             var group_enter = group_bind.enter()
@@ -139,12 +145,25 @@
 
             var self = this;
 
+            inner.select('g.y.axis')
+                .transition()
+                .duration(1500)
+                .call(this.yAxis);
+
+            inner.select('g.x.axis')
+                .attr("transform", "translate(0," + innerHeight + ")")
+                .transition()
+                .duration(1500)
+                .call(this.xAxis);
+
             group_bind.select('path.line')
-                .attr("d", function(g) {
-                    return self.line(g.get('recent_series'));
-                })
                 .style("stroke", function(g) {
                     return self.color(g.get('word'));
+                })
+                .transition()
+                .duration(1500)
+                .attr("d", function(g) {
+                    return self.line(g.get('recent_series'));
                 });
 
         }

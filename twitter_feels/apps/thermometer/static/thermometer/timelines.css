@@ -1,7 +1,12 @@
+.axis {
+    font-size: 12px;
+    fill: #666;
+}
+
 .axis path,
 .axis line {
     fill: none;
-    stroke: #000;
+    stroke: #666;
     shape-rendering: crispEdges;
 }
 

@@ -60,7 +60,17 @@
     });
 
     models.TweetGroupCollection = libs.Backbone.Collection.extend({
-        model: models.TweetGroup
+        model: models.TweetGroup,
+
+        initialize: function(options) {
+
+            var self = this;
+            this.on('add remove', function() {
+                var args = Array.prototype.slice.call(arguments);
+                args.unshift('change');
+                self.trigger.apply(self, args);
+            });
+        }
     });
 
 })(window);
