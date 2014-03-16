@@ -46,8 +46,8 @@ def get_thermometer_data(selected_feeling_ids=[]):
 
     recent_end = history_end
     # add a little extra data to assist with smoothing
-    recent_start = recent_end - (
-        settings.DISPLAY_INTERVAL + settings.TIME_FRAME_DURATION * settings.SMOOTHING_WINDOW_SIZE)
+    recent_start = recent_end - settings.DISPLAY_INTERVAL
+    print recent_start, '-', recent_end
 
     # Get the time intervals we are dealing with
     intervals = {
@@ -98,7 +98,9 @@ def get_thermometer_data(selected_feeling_ids=[]):
                                                            feeling_ids=selected_feeling_ids)
 
     # Percent per minute for the past recent interval, ordered by feeling, time
-    feeling_percents = FeelingPercent.get_percents_in_interval(start=recent_start, end=recent_end,
+    # This recent_start_smoothed compensates for eventual smoothing
+    recent_start_smoothed = recent_start - settings.TIME_FRAME_DURATION * settings.SMOOTHING_WINDOW_SIZE
+    feeling_percents = FeelingPercent.get_percents_in_interval(start=recent_start_smoothed, end=recent_end,
                                                                feeling_ids=selected_feeling_ids)
 
     selected_feelings = []

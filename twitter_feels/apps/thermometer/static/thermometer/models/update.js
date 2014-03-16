@@ -13,10 +13,20 @@
     // The data package which we update over time
     models.UpdateModel = function () {
 
+        //A good guess about recent interval we're going to get from the server
+        var recent_end = new Date();
+        recent_end.setMinutes(recent_end.getMinutes() - 1, 0, 0);
+        var duration = 60 * 60;
+        var recent_start = new Date(recent_end.getTime() - duration * 1000);
+
         this.intervals = {
             normal: new models.TimeInterval(),
             historical: new models.TimeInterval(),
-            recent: new models.TimeInterval()
+            recent: new models.TimeInterval({
+                duration: duration,
+                start: recent_start,
+                end: recent_end
+            })
         };
 
         this.overall = new models.TweetGroup();

@@ -120,10 +120,12 @@
             this.xScale.range([0, innerWidth]);
             this.yScale.range([innerHeight, 0]);
 
-            this.xScale.domain([this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')])
+            var timedomain = [this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')];
+            console.log(timedomain);
+            this.xScale.domain(timedomain)
             this.yScale.domain([-1, 1]);
 
-            var data = this.collection.models.slice(skip_window_size);
+            var data = this.collection.models;
 
             this.color.domain(data.map(function(d) {
                 return d.get('word');
@@ -163,7 +165,7 @@
                 .transition()
                 .duration(1500)
                 .attr("d", function(g) {
-                    return self.line(g.get('recent_series'));
+                    return self.line(g.get('recent_series').slice(skip_window_size));
                 });
 
         }
