@@ -59,6 +59,7 @@ def get_thermometer_data(selected_feeling_ids=[]):
             'start': df(recent_start),
             'end': df(recent_end),
             'duration': settings.DISPLAY_INTERVAL.total_seconds(),
+            'frame_width': TimeFrame.DURATION.total_seconds(),
         },
     }
 

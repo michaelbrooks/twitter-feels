@@ -1,20 +1,31 @@
-.axis {
+
+.axis text {
     font-size: 12px;
-    fill: #666;
+    fill: #444;
 }
 
 .axis path,
 .axis line {
+    stroke: #999;
     fill: none;
-    stroke: #666;
     shape-rendering: crispEdges;
+}
+
+.axis.right path {
+    stroke-dasharray: 5, 5;
 }
 
 .x.axis path {
     display: none;
 }
 
-.line {
+.timeline-group .line {
     fill: none;
     stroke-width: 1.5px;
+}
+
+.baseline {
+    stroke: #999;
+    shape-rendering: crispEdges;
+    /*stroke-dasharray: 5, 5;*/
 }

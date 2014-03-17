@@ -12,10 +12,11 @@
 
     var margin = {
         top: 20,
-        right: 10,
-        bottom: 30,
+        right: 50,
+        bottom: 50,
         left: 50
     };
+    //<rect width="964" ,="" height="300" stroke="red"></rect>
 
     var skip_window_size = 9;
 
@@ -46,16 +47,26 @@
                 .orient("bottom");
 
             var formatPercent = d3.format(".0%");
+            var normPercent = function(value) {
+                if (value == 0) {
+                    return 'Norm';
+                } else {
+                    return formatPercent(value);
+                }
+            };
             this.yAxis = d3.svg.axis()
                 .scale(this.yScale)
                 .orient("left")
-                .ticks(4)
-                .tickFormat(formatPercent);
+                .ticks(3)
+                .tickFormat(normPercent);
 
+            this.yAxisRight = d3.svg.axis()
+                .scale(this.yScale)
+                .orient("right")
+                .ticks(3)
+                .tickFormat(normPercent);
 
             var self = this;
-
-            var _movingSum;
 
             this.line = d3.svg.line()
                 .interpolate("basis")
@@ -76,6 +87,10 @@
         },
 
         render: function () {
+
+
+            var self = this;
+
             if (!this.has_rendered) {
                 logger.debug('running template...');
 
@@ -94,19 +109,21 @@
                 inner.append("g")
                     .attr("class", "y axis");
 
-                inner.append('svg')
+                inner.append("g")
+                    .attr("class", "y axis right");
+
+                var chart = inner.append('svg')
                     .attr('class', 'chart');
+
+                chart.append('line')
+                    .attr('class', 'baseline');
 
                 this.has_rendered = true;
             }
 
-            var self = this;
-
             //Delay rendering
             setTimeout(function () {
                 self.delayed_render();
-
-                logger.debug('rendered');
             }, 1);
 
             return this;
@@ -127,12 +144,18 @@
             this.xScale.range([0, innerWidth]);
             this.yScale.range([innerHeight, 0]);
 
-            var timedomain = [this.update.intervals.recent.get('start'), this.update.intervals.recent.get('end')];
+            var end_time = this.update.intervals.recent.get_last_start_time();
+            var timedomain = [this.update.intervals.recent.get('start'), end_time];
 
             this.xScale.domain(timedomain);
-            this.yScale.domain([-1, 1]);
+            this.yScale.domain([-0.5, 0.5]);
 
             var data = this.collection.models;
+
+            var duration = 250;
+            if (!this.has_rendered_data) {
+                duration = 1500;
+            }
 
             this.color.domain(data.map(function(d) {
                 return d.get('word');
@@ -141,19 +164,27 @@
             var inner = svg.select('g.inner');
 
             inner.select('g.y.axis')
-                .transition()
-                .duration(1500)
                 .call(this.yAxis);
+
+            inner.select('g.y.axis.right')
+                .attr('transform', 'translate(' + innerWidth + ', 0)')
+                .call(this.yAxisRight);
 
             inner.select('g.x.axis')
                 .attr("transform", "translate(0," + innerHeight + ")")
                 .transition()
-                .duration(1500)
+                .duration(duration)
                 .call(this.xAxis);
 
             var chart = inner.select('svg')
                 .attr('width', innerWidth)
                 .attr('height', innerHeight);
+
+            chart.select('line.baseline')
+                .attr('x1', 0)
+                .attr('x2', innerWidth)
+                .attr('y1', this.yScale(0))
+                .attr('y2', this.yScale(0));
 
             var group_bind = chart.selectAll("g.timeline-group")
                 .data(data);
@@ -178,18 +209,26 @@
                 .style("stroke", function(g) {
                     return self.color(g.get('word'));
                 })
+                .transition()
+                .duration(duration)
                 .attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
-                });
-
-            lines.transition()
+                })
                 .style('opacity', function(d) {
                     if (d.is_selected() || !d.collection.selected_group) {
                         return 1;
                     } else {
-                        return 0.2
+                        return 0.15
                     }
                 });
+
+            if (!this.has_rendered_data && data.length) {
+                this.has_rendered_data = true;
+                logger.debug('rendered first data');
+            }
+
+
+            logger.debug('rendered');
         }
     });
 

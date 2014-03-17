@@ -10,22 +10,27 @@
     padding: 0;
 
     cursor: pointer;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .thermometer-view:hover {
-    background: #F2F2F2;
+    background: #F5F5F5;
 }
 .thermometer-view:active {
     background: #EEE;
 }
 
 .thermometer-view.selected {
-    background: #e6f5f5;
+    background: #EEE;
 }
 .thermometer-view.selected:hover {
-    background: #f0f7f5;
+    background: #EEE;
 }
 .thermometer-view.selected:active {
-    background: #f0f7f5;
+    background: #EEE;
 }
 
 .thermometer-view .feeling-label {
@@ -84,12 +89,6 @@
     left: 8px;
     bottom: 14px;
 
-    background: #EEE;
-}
-.thermometer-view:hover .glyph .tube.back {
-    background: #DDD;
-}
-.thermometer-view.selected:hover .glyph .tube.back {
     background: #EEE;
 }
 
