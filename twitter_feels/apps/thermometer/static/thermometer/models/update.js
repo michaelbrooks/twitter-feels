@@ -55,7 +55,7 @@
             //Update all the time intervals
             _.each(this.intervals, function (interval, name) {
                 if (_.has(raw.intervals, name)) {
-                    interval.set(raw.intervals[name], { parse: true });
+                    interval.set(interval.parse(raw.intervals[name]));
                 }
             });
 

@@ -75,14 +75,32 @@
             spyOn(instance.intervals.historical, 'set');
             spyOn(instance.intervals.recent, 'set');
 
+            //Somebody had better call parse on those time intervals
+            //We'll just return the name of the time interval from our input data
+            spyOn(models.TimeInterval.prototype, 'parse').and.callFake(function(rawInterval) {
+                var match = undefined;
+                _.each(raw.intervals, function(input, intervalName) {
+                    if (input == rawInterval) {
+                        match = intervalName;
+                    }
+                });
+                return match;
+            });
+
             instance.apply_update(raw);
 
             expect(instance.overall.set).toHaveBeenCalledWith(raw.overall, { parse: true });
             expect(instance.selected_feelings.set).toHaveBeenCalledWith(raw.selected_feelings, { parse: true });
 
-            expect(instance.intervals.normal.set).toHaveBeenCalledWith(raw.intervals.normal, { parse: true });
-            expect(instance.intervals.historical.set).toHaveBeenCalledWith(raw.intervals.historical, { parse: true });
-            expect(instance.intervals.recent.set).toHaveBeenCalledWith(raw.intervals.recent, { parse: true });
+            // interval.set(interval.parse(raw.intervals[name]));
+
+            expect(models.TimeInterval.prototype.parse).toHaveBeenCalledWith(raw.intervals.normal);
+            expect(models.TimeInterval.prototype.parse).toHaveBeenCalledWith(raw.intervals.historical);
+            expect(models.TimeInterval.prototype.parse).toHaveBeenCalledWith(raw.intervals.recent);
+
+            expect(instance.intervals.normal.set).toHaveBeenCalledWith('normal');
+            expect(instance.intervals.historical.set).toHaveBeenCalledWith('historical');
+            expect(instance.intervals.recent.set).toHaveBeenCalledWith('recent');
 
         });
 

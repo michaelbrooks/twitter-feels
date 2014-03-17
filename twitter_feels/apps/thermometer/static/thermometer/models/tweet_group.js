@@ -9,7 +9,7 @@
     var libs = win.namespace.get('libs');
 
     //For the moving average
-    var window_sizes = [7, 5, 3];
+    var window_sizes = [9];
 
     models.TweetGroup = libs.Backbone.Model.extend({
 
@@ -86,14 +86,11 @@
     models.TweetGroupCollection = libs.Backbone.Collection.extend({
         model: models.TweetGroup,
 
-        initialize: function(options) {
-
-            var self = this;
-            this.on('add remove', function() {
-                var args = Array.prototype.slice.call(arguments);
-                args.unshift('change');
-                self.trigger.apply(self, args);
-            });
+        set: function() {
+            //Call through to parent
+            libs.Backbone.Collection.prototype.set.apply(this, arguments);
+            //Just send one change event
+            this.trigger('change');
         }
     });
 
