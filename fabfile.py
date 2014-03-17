@@ -30,6 +30,12 @@ def _jinja_render(template_path, values):
     return template.render(values)
 
 
+def _read_env():
+    sys.path.append(root_dir)
+    from twitter_feels import env_file
+    return env_file.read()
+
+
 def run(process):
     """Run a process from the Procfile directly (not through supervisor)."""
 
@@ -51,21 +57,27 @@ def dev_web():
     # Stop the gunicorn process
     stop('web')
 
-    sys.path.append(root_dir)
-    from twitter_feels import env_file
-
-    env = env_file.read()
+    env = _read_env()
 
     manage('runserver', env.get('PORT', ''))
+
+def rq_dashboard():
+    """Starts the RQ Dashboard webserver"""
+
+    # Stop the web process
+    stop('web')
+
+    env = _read_env()
+
+    with lcd(root_dir):
+        local('rq-dashboard -p %s -u %s' % (env.get('PORT', '9181'), env.get('REDIS_URL', 'redis://localhost:6379')))
 
 def jasmine():
     """Run the jasmine test server. Stops the web process first to open the port."""
     stop('web')
 
-    sys.path.append(root_dir)
-    from twitter_feels import env_file
+    env = _read_env()
 
-    env = env_file.read()
     with lcd(root_dir):
         local('jasmine -p %s' % env.get('PORT', ''))
 
