@@ -33,21 +33,15 @@ def get_thermometer_data(selected_feeling_ids=[]):
     normal_end = FeelingPercent.get_latest_end_time()
 
     if normal_start is None:
-        normal_start = timezone.now()
-        normal_end = timezone.now()
+        normal_start = timezone.now().replace(second=0, microsecond=0)
+        normal_end = normal_start
 
-    # normal number of tweets per minute over all time
-    effective_now = timezone.now().replace(second=0, microsecond=0)
-    if normal_end:
-        effective_now = normal_end
-
-    history_end = effective_now
+    history_end = normal_end
     history_start = history_end - settings.HISTORICAL_INTERVAL
 
-    recent_end = history_end
+    recent_end = normal_end
     # add a little extra data to assist with smoothing
     recent_start = recent_end - settings.DISPLAY_INTERVAL
-    print recent_start, '-', recent_end
 
     # Get the time intervals we are dealing with
     intervals = {
