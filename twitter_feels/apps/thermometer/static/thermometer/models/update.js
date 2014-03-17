@@ -11,7 +11,9 @@
     var logger = libs.Logger.get('thermometer.models.update');
 
     // The data package which we update over time
-    models.UpdateModel = function () {
+    models.UpdateModel = function (options) {
+
+        this.feelings_list = options.feelings_list;
 
         //A good guess about recent interval we're going to get from the server
         var recent_end = new Date();
@@ -64,6 +66,12 @@
 
             //Update the collection of feelings tweets
             this.selected_feelings.set(raw.selected_feelings, { parse: true });
+
+            var self = this;
+            self.feelings_list.each(function(feeling) {
+                var not_contains = !self.selected_feelings.get(feeling.id)
+                feeling.set('selected', !not_contains);
+            });
         },
 
         /**

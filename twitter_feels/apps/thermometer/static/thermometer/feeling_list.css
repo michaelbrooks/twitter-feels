@@ -1,0 +1,35 @@
+ul.feeling-list {
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+
+    max-height: 340px;
+    overflow-y: auto;
+
+    
+    background: #F8F8F8;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+ul.feeling-list li {
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+ul.feeling-list li:hover {
+    background: #eee;
+}
+
+ul.feeling-list li.selected,
+ul.feeling-list li.selected:hover {
+    color: #999;
+    background: #F8F8F8;
+    cursor: default;
+}

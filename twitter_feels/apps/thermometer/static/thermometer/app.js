@@ -17,14 +17,18 @@
 
         this.urls = options.urls;
         this.feelings = new models.FeelingWordCollection(options.init_feelings);
-        this.update = new models.UpdateModel();
+        this.update = new models.UpdateModel({
+            feelings_list: this.feelings
+        });
 
     };
 
     therm.Thermometer.prototype.start = function() {
 
         //Get the major dom elements
-        this.layout = new views.ThermometerLayout();
+        this.layout = new views.ThermometerLayout({
+            update: this.update
+        });
 
         //Initialize the views
         this.views = {};
@@ -39,6 +43,12 @@
             update: this.update
         });
         this.layout.show('timelines', this.views.timelines);
+
+        this.views.feeling_list = new views.FeelingListView({
+            collection: this.feelings,
+            update: this.update
+        });
+        this.views.feeling_list.render();
 
         //Request some data
         this.update.fetch();

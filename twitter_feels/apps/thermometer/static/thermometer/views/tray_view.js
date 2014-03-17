@@ -18,6 +18,8 @@
         className: 'tray-view',
 
         initialize: function(options) {
+            this.update = options.update;
+
             //All the thermometer views
             this.views = [];
             //Views by model id

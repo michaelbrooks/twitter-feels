@@ -15,10 +15,17 @@
             tray: '.tray',
             tray_description: '.thermometer-panel .description',
             timelines: '.timelines',
-            timelines_description: '.timeline-panel .description'
+            timelines_description: '.timeline-panel .description',
+            adder: '.adder .plus'
+        },
+
+        events: {
+            'click .adder .plus': 'adder_clicked'
         },
 
         initialize: function(options) {
+            this.update = options.update;
+
             this.bindUIElements();
         },
 
@@ -41,6 +48,10 @@
 
             region.html(view.render().el);
             region.view = view;
+        },
+
+        adder_clicked: function() {
+            this.update.trigger('show-feeling-list');
         }
 
     });
