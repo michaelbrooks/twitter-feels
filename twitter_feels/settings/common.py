@@ -380,7 +380,7 @@ ANALYSIS_TIME_FRAME_TASKS = {
 
 ########## THERMOMETER SETTINGS
 THERMOMETER_SETTINGS = {
-    'TIME_FRAME_DURATION': datetime.timedelta(60),
+    'TIME_FRAME_DURATION': datetime.timedelta(seconds=60),
     # the number of words before and after the indicators to examine
     'WINDOW_AFTER': 5,
     'WINDOW_BEFORE': 2,
