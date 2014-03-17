@@ -28,3 +28,6 @@ DEFAULT_FEELINGS = THERMOMETER_SETTINGS.get('DEFAULT_FEELINGS', 5)
 
 # The size of the moving average window used to display timelines
 SMOOTHING_WINDOW_SIZE = THERMOMETER_SETTINGS.get('SMOOTHING_WINDOW_SIZE', 10)
+
+# How often to grab examples
+EXAMPLE_INTERVAL = THERMOMETER_SETTINGS.get('EXAMPLE_INTERVAL', timedelta(minutes=7))
