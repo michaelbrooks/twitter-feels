@@ -1,13 +1,13 @@
 from django.views import generic
 from django.shortcuts import render
-from models import TimeFrame, FeelingWord, FeelingPercent
+from models import TimeFrame, FeelingWord, FeelingPercent, ExampleTweet
 from django.utils import timezone
 from jsonview.decorators import json_view
 import json
 from itertools import groupby
 import settings
 import times
-
+from collections import defaultdict
 
 def get_all_feelings():
     # Get all of the feelings
@@ -92,6 +92,28 @@ def get_thermometer_data(selected_feeling_ids=[]):
     history_percents = FeelingPercent.get_average_percents(start=history_start, end=history_end,
                                                            feeling_ids=selected_feeling_ids)
 
+
+    # Get a dictionary from feeling id -> list of examples for that feeling
+    example_tweets = ExampleTweet.get_in_range(start=recent_start, end=recent_end, feeling_ids=selected_feeling_ids)
+    examples_by_feeling = defaultdict(list)
+    for feeling_id, feeling_group in groupby(example_tweets, lambda fr: fr.feeling_id):
+
+        examples_for_feeling = []
+        for i, ex in enumerate(feeling_group):
+            examples_for_feeling.append({
+                'tweet_id': ex.tweet_id,
+                'text': ex.text,
+                'user_id': ex.user_id,
+                'user_screen_name': ex.user_screen_name,
+                'user_name': ex.user_name,
+                'created_at': df(ex.created_at),
+                'frame_id': ex.frame_id
+            })
+
+        examples_by_feeling[feeling_id] = examples_for_feeling
+
+
+
     # Percent per minute for the past recent interval, ordered by feeling, time
     # This recent_start_smoothed compensates for eventual smoothing
     recent_start_smoothed = recent_start - settings.TIME_FRAME_DURATION * settings.SMOOTHING_WINDOW_SIZE
@@ -114,6 +136,7 @@ def get_thermometer_data(selected_feeling_ids=[]):
                 feeling_color = fp.feeling.color
 
             percents.append({
+                'frame_id': fp.frame_id,
                 'start_time': df(fp.start_time),
                 'percent': fp.percent,
             })
@@ -126,6 +149,7 @@ def get_thermometer_data(selected_feeling_ids=[]):
             'normal': normal_percents[feeling_id],
             'historical': history_percents[feeling_id],
             'recent_series': percents,
+            'examples': examples_by_feeling[feeling_id]
         }
 
     return {

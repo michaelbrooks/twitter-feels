@@ -212,7 +212,7 @@ class TimeFrame(TweetTimeFrame):
             # Choose an example if there are any
             if examples is not None and examples[feeling.word]:
                 example = random.choice(examples[feeling.word])
-                example_tweets.append(ExampleTweet.from_tweet(example, feeling_percent))
+                example_tweets.append(ExampleTweet.from_tweet(tweet=example, feeling=feeling, frame=self))
 
             feeling_counters.append(feeling_percent)
 
@@ -258,6 +258,9 @@ class FeelingPercent(TimedIntervalMixin, models.Model):
     class Meta:
         index_together = [
             ["missing_data", "feeling"],
+            # TODO: figure out if feeling -> start_time would be faster
+            # since we order by feeling, start_time in one of the queries
+            # are other queries using this?
             ["start_time", "missing_data", "feeling"]
         ]
 
@@ -347,7 +350,7 @@ class ExampleTweet(models.Model):
 
     class Meta:
         index_together = [
-            ["created_at", "feeling"]
+            ["feeling", "created_at"]
         ]
 
     tweet_id = models.BigIntegerField()
@@ -359,13 +362,14 @@ class ExampleTweet(models.Model):
 
     created_at = models.DateTimeField()
 
-    # The start_time of the frame this is an example for
-    start_time = models.DateTimeField()
-    # The feeling this is an example of
+    # The time frame this is an example for, for easier rendering
+    frame = models.ForeignKey(TimeFrame)
+
+    # The feeling this is an example of for faster queries
     feeling = models.ForeignKey(FeelingWord)
 
     @classmethod
-    def from_tweet(cls, tweet, feeling_percent):
+    def from_tweet(cls, tweet, feeling, frame):
         """Construct an ExampleTweet from a Tweet model"""
 
         return ExampleTweet(
@@ -375,6 +379,29 @@ class ExampleTweet(models.Model):
             user_screen_name=tweet.user_screen_name,
             user_name=tweet.user_name,
             created_at=tweet.created_at,
-            start_time=feeling_percent.start_time,
-            feeling=feeling_percent.feeling
+            frame=frame,
+            feeling=feeling
         )
+
+
+    @classmethod
+    def get_in_range(cls, start=None, end=None, feeling_ids=None):
+        """
+        Gets FeelingPercents over an interval.
+        Applies sorting etc to generate data useful for the view.
+        """
+
+        query = cls.objects.all()
+
+        if end:
+            query = query.filter(created_at__lt=end)
+
+        if start:
+            query = query.filter(created_at__gte=start)
+
+        if feeling_ids:
+            query = query.filter(feeling_id__in=feeling_ids)
+
+        query = query.order_by('feeling', 'created_at')
+
+        return query

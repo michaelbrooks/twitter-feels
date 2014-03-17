@@ -17,18 +17,18 @@ class Migration(SchemaMigration):
             ('user_screen_name', self.gf('django.db.models.fields.CharField')(max_length=50)),
             ('user_name', self.gf('django.db.models.fields.CharField')(max_length=150)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')()),
-            ('start_time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('frame', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['thermometer.TimeFrame'])),
             ('feeling', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['thermometer.FeelingWord'])),
         ))
         db.send_create_signal(u'thermometer', ['ExampleTweet'])
 
-        # Adding index on 'ExampleTweet', fields ['created_at', 'feeling']
-        db.create_index(u'thermometer_exampletweet', ['created_at', 'feeling_id'])
+        # Adding index on 'ExampleTweet', fields ['feeling', 'created_at']
+        db.create_index(u'thermometer_exampletweet', ['feeling_id', 'created_at'])
 
 
     def backwards(self, orm):
-        # Removing index on 'ExampleTweet', fields ['created_at', 'feeling']
-        db.delete_index(u'thermometer_exampletweet', ['created_at', 'feeling_id'])
+        # Removing index on 'ExampleTweet', fields ['feeling', 'created_at']
+        db.delete_index(u'thermometer_exampletweet', ['feeling_id', 'created_at'])
 
         # Deleting model 'ExampleTweet'
         db.delete_table(u'thermometer_exampletweet')
@@ -36,11 +36,11 @@ class Migration(SchemaMigration):
 
     models = {
         u'thermometer.exampletweet': {
-            'Meta': {'object_name': 'ExampleTweet', 'index_together': "[['created_at', 'feeling']]"},
+            'Meta': {'object_name': 'ExampleTweet', 'index_together': "[['feeling', 'created_at']]"},
             'created_at': ('django.db.models.fields.DateTimeField', [], {}),
             'feeling': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['thermometer.FeelingWord']"}),
+            'frame': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['thermometer.TimeFrame']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'start_time': ('django.db.models.fields.DateTimeField', [], {}),
             'text': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
             'tweet_id': ('django.db.models.fields.BigIntegerField', [], {}),
             'user_id': ('django.db.models.fields.BigIntegerField', [], {}),
