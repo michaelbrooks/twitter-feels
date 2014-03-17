@@ -66,15 +66,18 @@ class MapTimeFrame(TweetTimeFrame):
         user_tz_map[None] = None
 
         new_tweet_chunks = []
-
         for tweet in tweets:
             root = self.check_prefix(tweet, roots)
             if not root:
                 continue
             rh = tweet.text.split(root.word, 1)[1]
             chunks = rh.split(' ')
+            parent = root;
+            depth = 0
             for chunk in chunks:
-                node, created = TreeNode.objects.get_or_create(parent=root, word=chunk)
+                if depth > 20:
+                    break
+                node, created = TreeNode.objects.get_or_create(parent=parent, word=chunk)
                 country = user_tz_map[tweet.user_time_zone]
                 if country is None: 
                     country = ''
@@ -85,6 +88,8 @@ class MapTimeFrame(TweetTimeFrame):
                     tweet=tweet, 
                     created_at=tweet.created_at, 
                     tz_country=country))
+                parent=node
+                depth += 1
 
         TweetChunk.objects.bulk_create(new_tweet_chunks)
 
