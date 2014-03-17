@@ -27,7 +27,7 @@ class TweetStream(stream_analysis.AbstractStream):
 
     def count_analyzed(self, num_analyses=None):
         analyzed = Tweet.objects.filter(analyzed_by__gte=num_analyses)
-        return len(analyzed)
+        return analyzed.count()
 
     def mark_analyzed(self, stream_data, analysis_task):
         # Increase the analyzed_by count on the tweets
