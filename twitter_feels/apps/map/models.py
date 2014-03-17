@@ -5,6 +5,7 @@ from datetime import timedelta
 from twitter_feels.libs.twitter_analysis import TweetTimeFrame
 from twitter_stream.models import Tweet
 
+import re
 
 class TreeNode(models.Model):
     
@@ -71,11 +72,14 @@ class MapTimeFrame(TweetTimeFrame):
             if not root:
                 continue
             rh = tweet.text.split(root.word, 1)[1]
-            chunks = rh.split(' ')
+            rh = rh.lower()
+            chunks = re.split('[*,.!:"\s;()/@#]+|\'[\W]|\?+', rh)
             parent = root;
             depth = 0
             for chunk in chunks:
-                if depth > 20:
+                if chunk == "":
+                    continue
+                if depth > 30:
                     break
                 node, created = TreeNode.objects.get_or_create(parent=parent, word=chunk)
                 country = user_tz_map[tweet.user_time_zone]
