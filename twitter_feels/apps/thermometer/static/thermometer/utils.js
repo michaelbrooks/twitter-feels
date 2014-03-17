@@ -103,4 +103,17 @@
         return result;
     };
 
+    /**
+     * Given a list of percentages (0.0 - 1.0),
+     * returns the subset that are unique when rounded to 0 decimal points.
+     *
+     * @param values
+     * @returns {*}
+     */
+    utils.unique_percents = function(values) {
+        return _.uniq(_.map(values, function(v) {
+            return Math.round(100.0 * v) / 100.0;
+        }));
+    }
+
 })(window);

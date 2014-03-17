@@ -61,11 +61,11 @@ helpers:
 src_files:
 
   # CDN Libraries
-  - http://code.jquery.com/jquery.min.js
-  - http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js
-  - http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js
-  - http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js
-  - http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js
+  - http://code.jquery.com/jquery.js
+  - http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js
+  - http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.js
+  - http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js
+  - http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js
 
   # Local libraries
   - assets/libs/bootstrap-switch/js/bootstrap-switch.js

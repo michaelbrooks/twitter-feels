@@ -6,6 +6,7 @@
 (function (win) {
 
     var views = win.namespace.get('thermometer.views');
+    var utils = win.namespace.get('thermometer.utils');
     var libs = win.namespace.get('libs');
 
     var d3 = libs.d3;
@@ -49,9 +50,7 @@
             feeling: '.label',
             normal: '.normal-indicator',
             historical: '.historical-indicator',
-            recent_label: '.recent-label',
-            normal_label: '.normal-label',
-            historical_label: '.historical-label'
+            label_group: '.label-group'
         },
 
         events: {
@@ -122,9 +121,17 @@
 
             this.$el.toggleClass('selected', this.model.is_selected());
 
-            this.ui.normal_label.text(this.percent(data.normal));
-            this.ui.historical_label.text(this.percent(data.historical));
-            this.ui.recent_label.text(this.percent(data.recent));
+            var percents = utils.unique_percents([data.normal, data.historical, data.recent]);
+
+            var label_bind = d3.select(this.ui.label_group[0])
+                .selectAll('div')
+                .data(percents);
+
+            label_bind.enter()
+                .append('div');
+
+            label_bind.exit()
+                .remove();
 
             //Delay the final rendering to make sure the elements are in the document
             var self = this;
@@ -156,16 +163,24 @@
 
                     });
 
+                label_bind.text(self.percent);
+
                 if (self.has_rendered_data) {
                     //Animate if we've rendered before
                     norm = norm.transition()
                         .duration(duration);
                     hist = hist.transition()
                         .duration(duration);
+
+                    label_bind = label_bind.transition()
+                        .duration(duration)
                 }
 
                 norm.style('bottom', yScale(data.normal) + bulb_radius + "px");
                 hist.style('bottom', yScale(data.historical) + bulb_radius + "px");
+                label_bind.style('bottom', function(v) {
+                    return (yScale(v) + bulb_radius) + "px";
+                });
 
                 self.has_rendered_data = true;
 

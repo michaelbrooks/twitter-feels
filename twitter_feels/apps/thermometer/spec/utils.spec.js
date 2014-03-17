@@ -57,7 +57,25 @@
             var result = utils.moving_average(3, series, function(d) { return d.key });
 
             expect(result).toEqual([3, 4, 3]);
-        })
+        });
+
+        it('calculates unique percents', function() {
+
+            var percents = [0, 0, 0];
+            expect(utils.unique_percents(percents)).toEqual([0]);
+
+            percents = [0, 0.5, 1];
+            expect(utils.unique_percents(percents)).toEqual(percents);
+
+            percents = [0.1, 0.11, 0.09];
+            expect(utils.unique_percents(percents)).toEqual(percents);
+
+            percents = [0.1, 0.101];
+            expect(utils.unique_percents(percents)).toEqual([0.1]);
+
+            percents = [0.09, 0.091, 0.099, 0.1];
+            expect(utils.unique_percents(percents)).toEqual([0.09, 0.1]);
+        });
     });
 
 })(window);
