@@ -384,6 +384,7 @@ THERMOMETER_SETTINGS = {
     # the number of words before and after the indicators to examine
     'WINDOW_AFTER': 5,
     'WINDOW_BEFORE': 2,
+    'EXAMPLE_INTERVAL': datetime.timedelta(minutes=7),
     'HISTORICAL_INTERVAL': datetime.timedelta(hours=24),
     'DISPLAY_INTERVAL': datetime.timedelta(minutes=60),
 }

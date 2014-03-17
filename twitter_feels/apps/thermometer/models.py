@@ -1,11 +1,13 @@
 from collections import defaultdict
 from datetime import timedelta
+import random
 import re
 import logging
 
 from django.db import models
 
 import nltk
+import times
 import settings
 from twitter_feels.libs.twitter_analysis import TweetTimeFrame
 from stream_analysis import TimedIntervalMixin
@@ -141,6 +143,11 @@ class TimeFrame(TweetTimeFrame):
         # For example: tweet_counts_by_feeling['fine'] += 1
         tweet_counts_by_feeling = defaultdict(float)
 
+        # Check if this is on an example collection interval
+        examples = None
+        if times.to_unix(self.start_time) % settings.EXAMPLE_INTERVAL.total_seconds() == 0:
+            examples = defaultdict(list)
+
         # The number of tweets that matched an indicator but did NOT contain a recognized feeling.
         indicator_matches = 0
         largest_gap = timedelta(seconds=0)
@@ -166,6 +173,10 @@ class TimeFrame(TweetTimeFrame):
                         tweet_counts_by_feeling[feeling_word] += 1
                         indicator_matches += 1
 
+                        # If we're collecting examples, do so
+                        if examples is not None:
+                            examples[feeling_word].append(tweet)
+
                         break  # only one indicator per tweet, please
 
                     elif indicator_phrase:
@@ -181,6 +192,7 @@ class TimeFrame(TweetTimeFrame):
 
         # Create a bunch of new FeelingCount objects to store the per-feeling data.
         feeling_counters = []
+        example_tweets = []
 
         for feeling in feelings:
             if indicator_matches > 0:
@@ -188,17 +200,27 @@ class TimeFrame(TweetTimeFrame):
             else:
                 percent = 0
 
-            feeling_counters.append(FeelingPercent(
+            feeling_percent = FeelingPercent(
                 frame=self,
                 feeling=feeling,
                 percent=percent,
                 start_time=self.start_time,
                 feeling_tweets=indicator_matches,
                 missing_data=self.missing_data
-            ))
+            )
+
+            # Choose an example if there are any
+            if examples is not None and examples[feeling.word]:
+                example = random.choice(examples[feeling.word])
+                example_tweets.append(ExampleTweet.from_tweet(example, feeling_percent))
+
+            feeling_counters.append(feeling_percent)
 
         # Save all the new frames
         FeelingPercent.objects.bulk_create(feeling_counters)
+
+        if example_tweets:
+            ExampleTweet.objects.bulk_create(example_tweets)
 
         # This global frame is now done
         self.feeling_tweets = indicator_matches
@@ -319,3 +341,40 @@ class FeelingPercent(TimedIntervalMixin, models.Model):
 
         return query
 
+
+class ExampleTweet(models.Model):
+    """A subset of tweet fields"""
+
+    class Meta:
+        index_together = [
+            ["created_at", "feeling"]
+        ]
+
+    tweet_id = models.BigIntegerField()
+    text = models.CharField(max_length=250)
+
+    user_id = models.BigIntegerField()
+    user_screen_name = models.CharField(max_length=50)
+    user_name = models.CharField(max_length=150)
+
+    created_at = models.DateTimeField()
+
+    # The start_time of the frame this is an example for
+    start_time = models.DateTimeField()
+    # The feeling this is an example of
+    feeling = models.ForeignKey(FeelingWord)
+
+    @classmethod
+    def from_tweet(cls, tweet, feeling_percent):
+        """Construct an ExampleTweet from a Tweet model"""
+
+        return ExampleTweet(
+            tweet_id=tweet.tweet_id,
+            text=tweet.text,
+            user_id=tweet.user_id,
+            user_screen_name=tweet.user_screen_name,
+            user_name=tweet.user_name,
+            created_at=tweet.created_at,
+            start_time=feeling_percent.start_time,
+            feeling=feeling_percent.feeling
+        )
