@@ -42,6 +42,24 @@
     font-size: 14px;
 }
 
+.normal-indicator .bar {
+    display: inline-block;
+    height: 3px;
+    width: 40px;
+    background: #666;
+}
+
+.historical-indicator span {
+    color: #666;
+    font-size: 12px;
+}
+.historical-indicator span:first-child {
+    margin-right: 6px;
+}
+.historical-indicator span:last-child {
+    margin-left: 6px;
+}
+
 .glyph {
     position: absolute;
     width: 28px;

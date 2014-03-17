@@ -22,11 +22,40 @@
 
 .a-col.description {
     background: #FEFEFE;
-    width: 200px;
+    width: 190px;
     left: 0;
 }
 .a-col.panel-content {
     background: #FEFEFE;
     left: 206px;
     right: 0;
+}
+
+.description {
+    text-align: right;
+}
+
+.description h3 {
+    margin-bottom: 20px;
+}
+
+.description h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.description p {
+    font-size: 12px;
+    padding-left: 40px;
+}
+
+.description .normal-indicator {
+    position: relative;
+    top: 10px;
+}
+
+.description .historical-indicator {
+    position: relative;
+    top: 10px;
 }
