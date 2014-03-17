@@ -17,8 +17,8 @@
         total_height: 320
     };
 
-    var TUBE_RADIUS = 6;
-    var TUBE_BUFFER_TOP = 14 - TUBE_RADIUS * 0.5;
+    var TUBE_RADIUS = 3;
+    var TUBE_BUFFER_TOP = 14;
 
     dimensions.middle_x = dimensions.total_width * 0.5;
     dimensions.bulb_y = dimensions.total_height - dimensions.total_width * 0.5;
@@ -46,7 +46,9 @@
             fill: '.tube.fill',
             tube: '.tube.back',
             bulb: '.bulb.fill',
-            label: '.label'
+            label: '.label',
+            normal: '.normal-indicator',
+            historical: '.historical-indicator'
         },
 
         events: {
@@ -122,11 +124,40 @@
                 var tube_height = self.ui.tube.height();
                 yScale.range([bulb_radius, tube_height - TUBE_BUFFER_TOP]);
 
+                var duration = 1500;
+
+                var norm = d3.select(self.ui.normal[0]);
+                var hist = d3.select(self.ui.historical[0]);
+
                 //Animate the fill
                 d3.select(self.ui.fill[0])
                     .transition()
-                    .duration(1500)
-                    .style('height', yScale(data.recent) + "px");
+                    .duration(duration)
+                    .style('height', yScale(data.recent) + TUBE_RADIUS + "px")
+                    .each('end', function() {
+
+                        norm.transition()
+                            .duration(duration)
+                            .style('opacity', 1);
+
+                        hist.transition()
+                            .duration(duration)
+                            .style('opacity', 1);
+
+                    });
+
+                if (self.has_rendered_data) {
+                    //Animate if we've rendered before
+                    norm = norm.transition()
+                        .duration(duration);
+                    hist = hist.transition()
+                        .duration(duration);
+                }
+
+                norm.style('bottom', yScale(data.normal) + bulb_radius + "px");
+                hist.style('bottom', yScale(data.historical) + bulb_radius + "px");
+
+                self.has_rendered_data = true;
 
                 logger.debug('rendered');
             }, 1);

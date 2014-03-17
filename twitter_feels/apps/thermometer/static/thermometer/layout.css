@@ -51,11 +51,11 @@
 }
 
 .description .normal-indicator {
+    display: inline-block;
     position: relative;
-    top: 10px;
+    top: 6px;
 }
 
 .description .historical-indicator {
-    position: relative;
-    top: 10px;
+    margin-top: 20px;
 }

@@ -95,23 +95,54 @@
     color: #444;
 }
 
+.normal-indicator {
+    height: 0;
+}
 
 .normal-indicator .bar {
-    display: inline-block;
-    height: 3px;
-    width: 40px;
+    display: block;
+    position: relative;
+    top: -1px;
+    height: 2px;
+    width: 28px;
     background: #666;
 }
 
+.thermometer-view .normal-indicator {
+    position: absolute;
+    left: 0;
+    bottom: 28px;
+    opacity: 0;
+}
+
+.historical-indicator {
+    height: 0;
+}
+
 .historical-indicator span {
-    color: #666;
-    font-size: 12px;
+    position: relative;
+    top: -9px;
+    color: #999;
+    font-size: 11px;
 }
 .historical-indicator span:first-child {
-    margin-right: 6px;
+    margin-right: 0;
 }
 .historical-indicator span:last-child {
-    margin-left: 6px;
+    margin-left: 7px;
+}
+
+.thermometer-view .historical-indicator {
+    position: absolute;
+    width: 34px;
+    left: -3px;
+    white-space: nowrap;
+    bottom: 18px;
+    opacity: 0;
+}
+
+.thermometer-view .historical-indicator span {
+
 }
 
 .glyph {
