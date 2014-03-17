@@ -13,7 +13,7 @@ class TreeNode(models.Model):
             ['parent', 'word']
                 ]
 
-    parent = models.ForeignKey('self')
+    parent = models.ForeignKey('self', null=True, blank=True)
     word = models.CharField(max_length=150)
 
 class Tz_Country(models.Model):
@@ -60,7 +60,7 @@ class MapTimeFrame(TweetTimeFrame):
     def calculate(self, tweets):
         self.tweet_count = len(tweets)
         tzcountries = Tz_Country.objects.all()
-        roots = TreeNode.objects.filter(parent=-1)
+        roots = TreeNode.objects.filter(parent=1)
         
         user_tz_map = dict((r.user_time_zone, r) for r in tzcountries)
         user_tz_map[None] = None

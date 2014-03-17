@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'TreeNode'
         db.create_table(u'map_treenode', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['map.TreeNode'])),
+            ('parent', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['map.TreeNode'], null=True, blank=True)),
             ('word', self.gf('django.db.models.fields.CharField')(max_length=150)),
         ))
         db.send_create_signal(u'map', ['TreeNode'])
@@ -79,7 +79,7 @@ class Migration(SchemaMigration):
         u'map.treenode': {
             'Meta': {'object_name': 'TreeNode', 'index_together': "[['parent', 'word']]"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['map.TreeNode']"}),
+            'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['map.TreeNode']", 'null': 'True', 'blank': 'True'}),
             'word': ('django.db.models.fields.CharField', [], {'max_length': '150'})
         },
         u'map.tweetchunk': {
