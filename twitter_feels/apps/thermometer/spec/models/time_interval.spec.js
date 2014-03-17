@@ -47,6 +47,28 @@
             expect(interval.get('duration')).toEqual(duration);
         });
 
+        it('can calculate the final start_time in this interval', function() {
+            var end = new Date();
+            var duration = 1434; //seconds
+            var start = new Date(end.getTime() - duration * 1000);
+            var frame_width = 45;
+            var final_start_time = new Date(end.getTime() - frame_width * 1000);
+
+            var utils = therm.utils;
+
+            //This is the json structure expected
+            var attributes = {
+                duration: duration,
+                start: utils.date_format(start),
+                end: utils.date_format(end),
+                frame_width: frame_width
+            };
+
+            var interval = new models.TimeInterval(attributes, { parse: true });
+
+            expect(interval.get_last_start_time()).toEqual(final_start_time);
+        });
+
     });
 
 })(window);

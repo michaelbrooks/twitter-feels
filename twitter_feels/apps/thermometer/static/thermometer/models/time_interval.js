@@ -19,16 +19,24 @@
             return {
                 start: now,
                 end: now,
-                duration: 0
+                duration: 0,
+                frame_width: 60
             };
         },
 
         parse: function (raw) {
-            return {
-                start: utils.date_parse(raw.start),
-                end: utils.date_parse(raw.end),
-                duration: raw.duration
-            };
+            raw.start = utils.date_parse(raw.start);
+            raw.end = utils.date_parse(raw.end);
+            return raw;
+        },
+
+        /**
+         * Return the latest start_time expected in this interval.
+         *
+         * @returns {Date}
+         */
+        get_last_start_time: function() {
+            return new Date(this.get('end') - this.get('frame_width') * 1000);
         }
     });
 
