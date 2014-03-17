@@ -46,9 +46,12 @@
             fill: '.tube.fill',
             tube: '.tube.back',
             bulb: '.bulb.fill',
-            label: '.label',
+            feeling: '.label',
             normal: '.normal-indicator',
-            historical: '.historical-indicator'
+            historical: '.historical-indicator',
+            recent_label: '.recent-label',
+            normal_label: '.normal-label',
+            historical_label: '.historical-label'
         },
 
         events: {
@@ -58,6 +61,8 @@
         initialize: function(options) {
             //Expects the model to be a TweetGroup with a feeling
             this.color = options.color || "red";
+
+            this.percent = d3.format(".0%");
 
             this.has_rendered = false;
             this.listenTo(this.model, 'change', this.render);
@@ -79,7 +84,7 @@
         /**
          * Prepare the packet of data needed by d3
          */
-        get_d3_data: function() {
+        get_data: function() {
             var historical = this.model.get('historical');
             var normal = this.model.get('normal');
 
@@ -91,30 +96,35 @@
             return {
                 recent: recent_percent,
                 historical: historical,
-                normal: normal
+                normal: normal,
+                word: this.model.get('word')
             }
         },
 
         render: function() {
 
+            var data = this.get_data();
+
             if (!this.has_rendered) {
                 logger.debug('running template...');
 
                 //Make some skeleton HTMl with an underscore template
-                this.$el.html(this.template(this.model.toJSON()));
+                this.$el.html(this.template(data));
 
                 this.bindUIElements();
 
                 this.has_rendered = true;
             }
 
-            var data = this.get_d3_data();
-
             var color = this.color || '#' + this.model.get('color');
             this.ui.bulb.css('background', color);
             this.ui.fill.css('background', color);
 
             this.$el.toggleClass('selected', this.model.is_selected());
+
+            this.ui.normal_label.text(this.percent(data.normal));
+            this.ui.historical_label.text(this.percent(data.historical));
+            this.ui.recent_label.text(this.percent(data.recent));
 
             //Delay the final rendering to make sure the elements are in the document
             var self = this;

@@ -23,7 +23,7 @@
                 <div class="normal-indicator">
                     <span class="bar"></span>
                 </div>
-                <h4>Normal Level</h4>
+                <h4>Normal level</h4>
                 <p>historical average level (from start date)</p>
             </div>
             <div class="a-col panel-content">
@@ -42,12 +42,12 @@
             <div class="a-col description">
                 <h3>Recent Feelings</h3>
 
-                <h4>Feeling Lines</h4>
+                <h4>Feeling lines</h4>
                 <p><em>percent change</em>
                     from normal level
                     over one hour</p>
 
-                <h4>Normal Level</h4>
+                <h4>Normal level</h4>
                 <p>historical average level over all available data</p>
             </div>
             <div class="a-col panel-content timelines"></div>
@@ -56,13 +56,6 @@
 
         <script type="text/template" id="thermometer-view-template">
             <div class="glyph">
-                <div class="tube back">
-                    <div class="tube fill"></div>
-                    <div class="glass"></div>
-                </div>
-                <div class="bulb back fill">
-                    <div class="bulb glass"></div>
-                </div>
                 <div class="historical-indicator">
                     <span class="glyphicon glyphicon-chevron-right"></span>
                     <span class="glyphicon glyphicon-chevron-left"></span>
@@ -70,6 +63,18 @@
                 <div class="normal-indicator">
                     <span class="bar"></span>
                 </div>
+                <div class="tube back">
+                    <div class="tube fill"></div>
+                    <div class="glass"></div>
+                </div>
+                <div class="bulb back fill">
+                    <div class="bulb glass"></div>
+                </div>
+            </div>
+            <div class="label-group">
+                <div class="normal-label" title="Normal percentage"></div>
+                <div class="historical-label" title="Last 24 hours"></div>
+                <div class="recent-label" title="Current percentage"></div>
             </div>
             <div class="feeling-label"><%= word %></div>
         </script>
