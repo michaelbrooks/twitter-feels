@@ -33,7 +33,7 @@ class Migration(SchemaMigration):
             ('node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['map.TreeNode'])),
             ('tweet', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['twitter_stream.Tweet'])),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')()),
-            ('tz_country', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['map.Tz_Country'], null=True, blank=True)),
+            ('tz_country', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
         ))
         db.send_create_signal(u'map', ['TweetChunk'])
 
@@ -88,7 +88,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'node': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['map.TreeNode']"}),
             'tweet': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['twitter_stream.Tweet']"}),
-            'tz_country': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['map.Tz_Country']", 'null': 'True', 'blank': 'True'})
+            'tz_country': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'})
         },
         u'map.tz_country': {
             'Meta': {'object_name': 'Tz_Country'},
