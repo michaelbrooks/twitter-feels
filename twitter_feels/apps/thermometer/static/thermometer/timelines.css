@@ -1,12 +1,12 @@
 
 .axis text {
-    font-size: 12px;
-    fill: #444;
+    font-size: 11px;
+    fill: #999;
 }
 
 .axis path,
 .axis line {
-    stroke: #999;
+    stroke: #DDD;
     fill: none;
     shape-rendering: crispEdges;
 }
@@ -24,8 +24,8 @@
     stroke-width: 1.5px;
 }
 
-.baseline {
-    stroke: #999;
+.timelines .baseline {
+    stroke: #DDD;
     shape-rendering: crispEdges;
     /*stroke-dasharray: 5, 5;*/
 }

@@ -17,6 +17,9 @@
         total_height: 320
     };
 
+    var TUBE_RADIUS = 6;
+    var TUBE_BUFFER_TOP = 14 - TUBE_RADIUS * 0.5;
+
     dimensions.middle_x = dimensions.total_width * 0.5;
     dimensions.bulb_y = dimensions.total_height - dimensions.total_width * 0.5;
     dimensions.bulb_x = dimensions.middle_x
@@ -117,7 +120,7 @@
                 //Get the actual current dimensions of the bulb and the tube
                 var bulb_radius = self.ui.bulb.height() * 0.5;
                 var tube_height = self.ui.tube.height();
-                yScale.range([bulb_radius, tube_height]);
+                yScale.range([bulb_radius, tube_height - TUBE_BUFFER_TOP]);
 
                 //Animate the fill
                 d3.select(self.ui.fill[0])

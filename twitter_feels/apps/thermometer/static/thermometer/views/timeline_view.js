@@ -46,7 +46,7 @@
                 .ticks(4)
                 .orient("bottom");
 
-            var formatPercent = d3.format(".0%");
+            var formatPercent = d3.format("+.0%");
             var normPercent = function(value) {
                 if (value == 0) {
                     return 'Norm';

@@ -1,3 +1,49 @@
+.thermometer-panel .labels {
+    z-index: 2;
+}
+
+.thermometer-panel .labels hr {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+    border-color: #DDD;
+}
+
+.thermometer-panel .labels hr.baseline {
+    bottom: 57px;
+}
+.thermometer-panel .labels hr.maxline {
+    top: 29px;
+}
+
+.thermometer-panel .labels .axis-label {
+    font-size: 11px;
+    color: #999;
+
+    position: absolute;
+    left: 4px;
+
+    z-index: 2;
+}
+
+.thermometer-panel .labels .axis-label.baseline {
+    bottom: 59px;
+}
+
+.thermometer-panel .labels .axis-label.maxline {
+    top: 31px;
+}
+
+.thermometer-panel .labels.right .axis-label {
+    right: 4px;
+    left: auto;
+}
+
+.thermometer-panel .tray {
+    margin-left: 40px;
+}
 
 .thermometer-view {
     position: relative;
@@ -35,12 +81,20 @@
 
 .thermometer-view .feeling-label {
     position: absolute;
-    bottom: 10px;
+    bottom: 6px;
     width: 100%;
     text-align: center;
-    color: black;
+    color: #666;
     font-size: 14px;
+    font-weight: bold;
 }
+
+.thermometer-view:hover .feeling-label,
+.thermometer-view:active .feeling-label,
+.thermometer-view.selected .feeling-label {
+    color: #444;
+}
+
 
 .normal-indicator .bar {
     display: inline-block;
@@ -66,6 +120,7 @@
     height: 275px;
     top: 15px;
     left: 36px;
+    z-index: 3;
 }
 
 .glyph .back {
