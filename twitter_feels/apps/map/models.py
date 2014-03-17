@@ -13,7 +13,7 @@ class TreeNode(models.Model):
             ['parent', 'word']
                 ]
 
-    parent = models.ForeignKey('self', null=True, blank=True)
+    parent = models.ForeignKey('self')
     word = models.CharField(max_length=150)
 
 class Tz_Country(models.Model):
@@ -26,7 +26,7 @@ class TweetChunk(models.Model):
     node = models.ForeignKey(TreeNode)
     tweet = models.ForeignKey(Tweet)
     created_at = models.DateTimeField()
-    tz_country = models.ForeignKey(Tz_Country, null=True, blank=True)
+    tz_country = models.CharField(max_length=32, null=True, blank=True)
 
 class MapTimeFrame(TweetTimeFrame):
     """
@@ -60,7 +60,7 @@ class MapTimeFrame(TweetTimeFrame):
     def calculate(self, tweets):
         self.tweet_count = len(tweets)
         tzcountries = Tz_Country.objects.all()
-        roots = TreeNode.objects.filter(parent__isnull=True)
+        roots = TreeNode.objects.filter(parent=-1)
         
         user_tz_map = dict((r.user_time_zone, r) for r in tzcountries)
         user_tz_map[None] = None
@@ -75,11 +75,16 @@ class MapTimeFrame(TweetTimeFrame):
             chunks = rh.split(' ')
             for chunk in chunks:
                 node, created = TreeNode.objects.get_or_create(parent=root, word=chunk)
+                country = user_tz_map[tweet.user_time_zone]
+                if country is None: 
+                    country = ''
+                else:
+                    country = country.country
                 new_tweet_chunks.append(TweetChunk(
                     node=node, 
                     tweet=tweet, 
                     created_at=tweet.created_at, 
-                    tz_country=user_tz_map[tweet.user_time_zone]))
+                    tz_country=country))
 
         TweetChunk.objects.bulk_create(new_tweet_chunks)
 
