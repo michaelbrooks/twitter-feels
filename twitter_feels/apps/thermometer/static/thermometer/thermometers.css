@@ -92,17 +92,33 @@
     margin-left: -16px;
 
     color: #AAA;
-
+    -webkit-transition: color 150ms;
+    -moz-transition: color 150ms;
+    -ms-transition: color 150ms;
+    -o-transition: color 150ms;
+    transition: color 150ms;
     cursor: pointer;
 }
 
 .adder .plus.in:hover {
-    color: #999;
+    color: #888;
 }
 
 .adder .plus.in:active {
-    color: #888;
+    color: #777;
 }
+
+.thermometer-panel .tooltip-inner {
+    background: #FFF;
+    color: #444;
+    border: 1px solid #ddd;
+}
+
+.thermometer-panel .tooltip .tooltip-arrow {
+    display: none;
+}
+
+
 
 .thermometer-view {
     cursor: pointer;

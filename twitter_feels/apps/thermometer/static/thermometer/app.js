@@ -34,7 +34,8 @@
         this.views = {};
 
         this.views.tray = new views.TrayView({
-            collection: this.update.selected_feelings
+            collection: this.update.selected_feelings,
+            update: this.update
         });
         this.layout.show('tray', this.views.tray);
 

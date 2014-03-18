@@ -27,14 +27,21 @@ def df(dt):
     return 1000 * times.to_unix(dt)
 
 
-def get_thermometer_data(selected_feeling_ids=[]):
-    # The full range of the data
+def get_normal_interval():
+    """Returns the first and last start_times in the database, or now"""
     normal_start = FeelingPercent.get_earliest_start_time()
     normal_end = FeelingPercent.get_latest_end_time()
 
     if normal_start is None:
         normal_start = timezone.now().replace(second=0, microsecond=0)
         normal_end = normal_start
+
+    return normal_start, normal_end
+
+def get_thermometer_data(selected_feeling_ids=[]):
+    # The full range of the data
+
+    normal_start, normal_end = get_normal_interval()
 
     history_end = normal_end
     history_start = history_end - settings.HISTORICAL_INTERVAL
@@ -164,8 +171,11 @@ class ThermometerView(generic.TemplateView):
     template_name = 'thermometer/main.html'
 
     def get_context_data(self, **kwargs):
+        normal_start, normal_end = get_normal_interval()
         return {
             'all_feelings': json.dumps(get_all_feelings()),
+            'normal_start': normal_start,
+            'normal_end': normal_start
         }
 
 

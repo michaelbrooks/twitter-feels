@@ -46,6 +46,10 @@
             this.$el.html(this.template());
             this.bindUIElements();
 
+            this.ui.plus.tooltip({
+                placement: 'top'
+            });
+
             return this;
         },
 

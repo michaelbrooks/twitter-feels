@@ -24,7 +24,7 @@
                     <span class="bar"></span>
                 </div>
                 <h4>Normal level</h4>
-                <p>historical average level (from start date)</p>
+                <p>historical average level (since {{ normal_start|naturaltime }})</p>
             </div>
             <div class="a-col panel-content">
             </div>
@@ -55,7 +55,8 @@
                 </div>
                 <div class="tray"></div>
                 <div class="adder">
-                    <div class="plus fade glyphicon glyphicon-plus-sign"></div>
+                    <div class="plus fade glyphicon glyphicon-plus-sign"
+                        title="Add a feeling"></div>
                 </div>
         </script>
 
@@ -101,7 +102,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add a feeling</h4>
+                        <h4 class="modal-title">Select a feeling to add</h4>
                     </div>
                     <div class="modal-body">
                         <ul class="feeling-list">
