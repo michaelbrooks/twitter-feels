@@ -144,7 +144,28 @@
                     return self.tooltip_template(d);
                 });
 
+            $(document)
+                .on('click.thermometer.timeline', '.d3-tip', function(e) {
+                    e.stopPropagation();
+                })
+                .on('click.thermometer.timeline', function(e) {
+                    //Don't do anything on circles, let d3 handle it
+                    if ($(e.target).is('.examples circle')) {
+                        return;
+                    }
+
+                    if (self.selected_circle) {
+                        self.hide_tip();
+                    }
+                });
+
             this.svg.call(this.tip);
+        },
+
+        remove: function() {
+            $(document).off('click.thermometer.timeline');
+            this.hide_tip();
+            return views.CommonView.prototype.remove.apply(this, arguments);
         },
 
         delayed_render: function () {
@@ -163,14 +184,7 @@
             this.update_scales(inner_size);
             this.update_axes(inner_size);
             this.update_baseline(inner_size);
-
             this.update_feeling_groups();
-
-//            group_bind
-//                .data(function(timeline_group) {
-//                    return timeline_group.examples;
-//                });
-
 
             if (!this.has_rendered_data && this.collection.size()) {
                 this.has_rendered_data = true;
@@ -264,14 +278,36 @@
             enter.append('circle')
                 .attr('r', 10)
                 .on("click", function(d) {
-                    self.tip.show(d);
-                })
-                .on("mouseover", function(d) {
-                    self.tip.show(d);
-                })
-                .on("mouseout", function(d) {
-                    self.tip.hide(d);
+                    var already_selected = d3.event.target === self.selected_circle;
+
+                    if (already_selected) {
+                        self.hide_tip();
+                    } else {
+                        self.show_tip(d3.event.target, d);
+                    }
                 });
+        },
+
+        show_tip: function(circle, data) {
+            if (this.selected_circle) {
+                this.hide_tip();
+            }
+
+            this.selected_circle = circle;
+            data = data || circle.__data__;
+
+            d3.select(this.selected_circle).classed('selected', true);
+            this.tip.show(data);
+        },
+
+        hide_tip: function() {
+            if (!this.selected_circle) {
+                return;
+            }
+
+            d3.select(this.selected_circle).classed('selected', false);
+            this.selected_circle = undefined;
+            this.tip.hide();
         },
 
         update_feeling_groups: function() {
