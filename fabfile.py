@@ -1,9 +1,10 @@
 import os
 import sys
 
-from fabric.api import local
+from fabric.api import local, abort
 from fabric.context_managers import lcd, hide
 from fabric.state import env
+from fabric.contrib.console import confirm
 from fabric import utils
 import time
 
@@ -83,6 +84,10 @@ def jasmine():
 
 def stop(*args):
     """Stop one or more supervisor processes"""
+    if len(args) == 0:
+        if not confirm("Are you sure you want to stop ALL processes?", False):
+            abort("Nevermind then.")
+
     _supervisor('stop', *args)
 
 
