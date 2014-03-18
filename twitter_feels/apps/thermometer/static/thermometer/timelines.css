@@ -22,6 +22,7 @@
 .timeline-group .line {
     fill: none;
     stroke-width: 1.5px;
+    pointer-events: none;
 }
 
 .timelines .baseline {
@@ -32,8 +33,49 @@
 
 .timeline-group .examples {
     opacity: 0;
+    pointer-events: none;
+}
+
+.timeline-group.selected .examples {
+    pointer-events: all;
 }
 
 .timeline-group .examples circle {
     fill-opacity: 0.3;
+    stroke-width: 1px;
+
+    -webkit-transition: stroke-width 250ms, fill-opacity 250ms;
+    -moz-transition: stroke-width 250ms, fill-opacity 250ms;
+    -ms-transition: stroke-width 250ms, fill-opacity 250ms;
+    -o-transition: stroke-width 250ms, fill-opacity 250ms;
+    transition: stroke-width 250ms, fill-opacity 250ms;
+}
+.timeline-group .examples circle:hover {
+    fill-opacity: 0.6;
+    stroke-width: 2px;
+}
+
+.d3-tip .tweet {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 9px 12px;
+    border-radius: 4px;
+    max-width: 250px;
+
+    font-size: 12px;
+
+    -webkit-box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.d3-tip .tweet .text {
+    margin-bottom: 4px;
+}
+
+.d3-tip .tweet .runner {
+    font-size: 11px;
+}
+
+.d3-tip .tweet .runner .date {
+    color: #999;
 }

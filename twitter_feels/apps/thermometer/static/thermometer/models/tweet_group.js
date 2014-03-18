@@ -62,6 +62,7 @@
                     var point = point_index[example.frame_id];
                     example.percent_change_smoothed = point.percent_change_smoothed;
                     example.start_time = point.start_time;
+                    example.created_at = utils.date_parse(example.created_at);
                     example.word = raw.word;
                 });
             }

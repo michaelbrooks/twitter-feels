@@ -6,6 +6,7 @@
 (function (win) {
 
     var views = win.namespace.get('thermometer.views');
+    var utils = win.namespace.get('thermometer.utils');
     var libs = win.namespace.get('libs');
 
     var logger = libs.Logger.get('thermometer.views.timeline_view');
@@ -26,6 +27,7 @@
         className: 'timeline-view',
 
         template: _.template($('#timeline-view-template').html()),
+        tooltip_template: _.template($('#tweet-tooltip-template').html()),
 
         ui: {
             svg: 'svg'
@@ -133,6 +135,16 @@
 
             this.chart.append('line')
                 .attr('class', 'baseline');
+
+            var self = this;
+            this.tip = d3.tip()
+                .attr('class', 'd3-tip')
+                .html(function(d) {
+                    d.time_ago = utils.time_ago(d.created_at);
+                    return self.tooltip_template(d);
+                });
+
+            this.svg.call(this.tip);
         },
 
         delayed_render: function () {
@@ -250,7 +262,16 @@
             var self = this;
 
             enter.append('circle')
-                .attr('r', 10);
+                .attr('r', 10)
+                .on("click", function(d) {
+                    self.tip.show(d);
+                })
+                .on("mouseover", function(d) {
+                    self.tip.show(d);
+                })
+                .on("mouseout", function(d) {
+                    self.tip.hide(d);
+                });
         },
 
         update_feeling_groups: function() {
@@ -266,6 +287,11 @@
 
             //Now update
             var self = this;
+
+            group_bind.classed('selected', function(g) {
+                    return g.is_selected();
+                });
+
             var lines = group_bind.select('path.line')
                 .style("stroke", function(g) {
                     return self.color(g.get('word'));
