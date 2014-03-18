@@ -117,7 +117,7 @@
                 } else {
                     logger.debug('Skipping regular fetch');
                 }
-            }, 5 * 1000);
+            }, 30 * 1000);
 
             this.fetch();
         },
