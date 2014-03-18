@@ -29,7 +29,8 @@
         model: models.FeelingWord,
         url: function() {
             return therm.app.urls.feelings;
-        }
+        },
+        comparator: 'word'
     });
 
 })(window);

@@ -102,14 +102,14 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Select a feeling to add</h4>
+                        <h4 class="modal-title">Select another feeling</h4>
                     </div>
                     <div class="modal-body">
                         <ul class="feeling-list">
                             <% _.each(feelings, function(feeling) { %>
                                 <li data-id="<%= feeling.id %>"
                                     class="<%= (feeling.selected ? 'selected' : '') %>">
-                                    <%= feeling.word %> <%= (feeling.selected ? '<i>[selected]</i>' : '') %>
+                                    <%= feeling.word %>
                                 </li>
                             <% }); %>
                         </ul>

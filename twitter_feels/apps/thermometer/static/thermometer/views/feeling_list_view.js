@@ -40,7 +40,8 @@
             }));
 
             this.$el.modal({
-                show: false
+                show: false,
+                backdrop: true
             })
         }
 
