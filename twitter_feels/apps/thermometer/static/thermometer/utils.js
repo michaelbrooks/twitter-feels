@@ -154,4 +154,24 @@
         }
     };
 
+    utils.fade = function($selection, toggle, callback) {
+        if ($.support.transition) {
+            $selection.off($.support.transition.end);
+
+            callback && $selection.one($.support.transition.end, function() {
+                callback($selection, $selection.hasClass('in'));
+            });
+        }
+
+        //Force reflow before making it visible
+        $selection[0].offsetWidth;
+
+        //Fade in
+        $selection.toggleClass('in', toggle);
+
+        if (!$.support.transition) {
+            callback && callback($selection, toggle);
+        }
+    };
+
 })(window);

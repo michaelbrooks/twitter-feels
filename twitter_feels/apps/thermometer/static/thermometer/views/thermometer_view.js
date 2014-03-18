@@ -38,7 +38,7 @@
 
     views.ThermometerView = views.CommonView.extend({
 
-        className: 'thermometer-view',
+        className: 'thermometer-view fade',
 
         template: _.template($('#thermometer-view-template').html()),
 
@@ -151,17 +151,18 @@
                     .transition()
                     .duration(duration)
                     .style('height', yScale(data.recent) + TUBE_RADIUS + "px")
-                    .each('end', function() {
+//                    .each('end', function() {
+//                        norm.transition()
+//                            .duration(duration)
+//                            .style('opacity', 1);
+//
+//                        hist.transition()
+//                            .duration(duration)
+//                            .style('opacity', 1);
+//                    });
 
-                        norm.transition()
-                            .duration(duration)
-                            .style('opacity', 1);
-
-                        hist.transition()
-                            .duration(duration)
-                            .style('opacity', 1);
-
-                    });
+                norm.classed('in', true);
+                hist.classed('in', true);
 
                 label_bind.text(self.percent);
 
@@ -184,10 +185,17 @@
 
                 self.has_rendered_data = true;
 
+                //Fade it in
+                utils.fade(self.$el, true);
+
                 logger.debug('rendered');
             }, 1);
 
             return this;
+        },
+
+        show_norm_hist: function() {
+
         },
 
         render_svg: function(data) {

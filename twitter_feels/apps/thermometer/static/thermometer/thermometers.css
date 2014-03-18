@@ -7,7 +7,7 @@
 }
 
 .thermometer-panel .labels {
-    z-index: 2;
+
 }
 
 .thermometer-panel .labels hr {
@@ -15,8 +15,10 @@
     padding: 0;
     position: absolute;
     width: 100%;
-    z-index: 2;
+
     border-color: #DDD;
+
+    z-index: 1;
 }
 
 .thermometer-panel .labels hr.baseline {
@@ -32,8 +34,6 @@
 
     position: absolute;
     left: 4px;
-
-    z-index: 2;
 }
 
 .thermometer-panel .labels .axis-label.baseline {
@@ -79,7 +79,7 @@
 
 .adder .plus {
 
-    z-index:3;
+    z-index: 2;
 
     font-size: 28px;
 
@@ -96,31 +96,25 @@
     cursor: pointer;
 }
 
-.adder .plus:hover {
+.adder .plus.in:hover {
     color: #999;
 }
 
-.adder .plus:active {
+.adder .plus.in:active {
     color: #888;
 }
 
 .thermometer-view {
     cursor: pointer;
 }
-.thermometer-view:hover {
+
+.thermometer-view.in:hover {
     background: #F5F5F5;
 }
-.thermometer-view:active {
-    background: #EEE;
-}
-
-.thermometer-view.selected {
-    background: #EEE;
-}
-.thermometer-view.selected:hover {
-    background: #EEE;
-}
-.thermometer-view.selected:active {
+.thermometer-view.in:active,
+.thermometer-view.in.selected,
+.thermometer-view.in.selected:hover,
+.thermometer-view.in.selected:active{
     background: #EEE;
 }
 
@@ -132,7 +126,10 @@
     color: #666;
     font-size: 14px;
     font-weight: bold;
+
+    z-index: 2;
 }
+
 
 .thermometer-view:hover .feeling-label,
 .thermometer-view:active .feeling-label,
@@ -142,6 +139,7 @@
 
 .thermometer-view .label-group {
     opacity: 0;
+
     font-size: 11px;
     color: #999;
     position: absolute;
@@ -180,7 +178,12 @@
     position: absolute;
     left: 0;
     bottom: 28px;
-    opacity: 0;
+
+    -webkit-transition: opacity 500ms ease 1.5s;
+    -moz-transition: opacity 500ms ease 1.5s;
+    -ms-transition: opacity 500ms ease 1.5s;
+    -o-transition: opacity 500ms ease 1.5s;
+    transition: opacity 500ms ease 1.5s;
 }
 
 .historical-indicator {
@@ -206,21 +209,32 @@
     left: -5px;
     white-space: nowrap;
     bottom: 18px;
-    opacity: 0;
+
+    -webkit-transition: opacity 500ms ease 1.5s;
+    -moz-transition: opacity 500ms ease 1.5s;
+    -ms-transition: opacity 500ms ease 1.5s;
+    -o-transition: opacity 500ms ease 1.5s;
+    transition: opacity 500ms ease 1.5s;
 }
 
 .thermometer-view .historical-indicator span {
 
 }
 
-.glyph {
+.thermometer-view .glyph {
     position: absolute;
     width: 28px;
     height: 275px;
     top: 15px;
     left: 36px;
-    z-index: 3;
+
+    z-index: 2;
 }
+
+.thermometer-view.in .glyph {
+    opacity: 1;
+}
+
 
 .glyph .back {
     box-shadow: 2px 2px 8px rgba(100, 100, 100, 0.4)

@@ -40,8 +40,22 @@
 }
 
 .timeline-group .examples {
-    opacity: 0;
     pointer-events: none;
+
+
+    -webkit-transition: opacity 250ms ease;
+    -moz-transition: opacity 250ms ease;
+    -ms-transition: opacity 250ms ease;
+    -o-transition: opacity 250ms ease;
+    transition: opacity 250ms ease;
+}
+
+.timeline-group .examples.in {
+    -webkit-transition: opacity 500ms ease 250ms;
+    -moz-transition: opacity 500ms ease 250ms;
+    -ms-transition: opacity 500ms ease 250ms;
+    -o-transition: opacity 500ms ease 250ms;
+    transition: opacity 500ms ease 250ms;
 }
 
 .timeline-group.selected .examples {
@@ -66,6 +80,16 @@
 
 .timeline-group .examples circle.selected {
     fill-opacity: 0.7;
+}
+
+.d3-tip {
+    opacity: 0;
+
+    -webkit-transition: opacity 250ms ease;
+    -moz-transition: opacity 250ms ease;
+    -ms-transition: opacity 250ms ease;
+    -o-transition: opacity 250ms ease;
+    transition: opacity 250ms ease;
 }
 
 .d3-tip .tweet {

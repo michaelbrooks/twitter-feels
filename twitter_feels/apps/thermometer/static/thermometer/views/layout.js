@@ -12,15 +12,10 @@
         el: '.thermometer-app',
 
         ui: {
-            tray: '.tray',
+            tray: '.thermometer-panel .panel-content',
             tray_description: '.thermometer-panel .description',
             timelines: '.timelines',
-            timelines_description: '.timeline-panel .description',
-            adder: '.adder .plus'
-        },
-
-        events: {
-            'click .adder .plus': 'adder_clicked'
+            timelines_description: '.timeline-panel .description'
         },
 
         initialize: function(options) {
@@ -48,12 +43,7 @@
 
             region.html(view.render().el);
             region.view = view;
-        },
-
-        adder_clicked: function() {
-            this.update.trigger('show-feeling-list');
         }
-
     });
 
 })(window);

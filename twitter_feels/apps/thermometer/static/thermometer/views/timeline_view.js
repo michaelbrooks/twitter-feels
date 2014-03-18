@@ -138,6 +138,7 @@
 
             var self = this;
             this.tip = d3.tip()
+                .offset([-10, 0])
                 .attr('class', 'd3-tip')
                 .html(function(d) {
                     d.time_ago = utils.time_ago(d.created_at);
@@ -268,7 +269,7 @@
             this.init_line = false;
 
             group_enter.append('g')
-                .attr('class', 'examples');
+                .attr('class', 'examples fade');
 
         },
 
@@ -374,15 +375,9 @@
                 });
 
             example_group
-                .transition()
-                .duration(this.transition_duration())
-                .style('opacity', function(g) {
-                if (g.is_selected()) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            });
+                .classed('in', function(g) {
+                    return g.is_selected();
+                });
         }
     });
 

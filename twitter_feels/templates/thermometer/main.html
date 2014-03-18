@@ -27,18 +27,6 @@
                 <p>historical average level (from start date)</p>
             </div>
             <div class="a-col panel-content">
-                <div class="labels">
-                    <hr class="maxline"/><span class="axis-label maxline">10%</span>
-                    <hr class="baseline"/><span class="axis-label baseline">0%</span>
-                </div>
-                <div class="labels right">
-                    <span class="axis-label maxline">10%</span>
-                    <span class="axis-label baseline">0%</span>
-                </div>
-                <div class="tray"></div>
-                <div class="adder">
-                    <div class="plus glyphicon glyphicon-plus-sign"></div>
-                </div>
             </div>
         </div>
         <div class="a-row timeline-panel">
@@ -56,14 +44,29 @@
             <div class="a-col panel-content timelines"></div>
         </div>
 
+        <script type="text/template" id="tray-view-template">
+                <div class="labels">
+                    <hr class="maxline"/><span class="axis-label maxline">10%</span>
+                    <hr class="baseline"/><span class="axis-label baseline">0%</span>
+                </div>
+                <div class="labels right">
+                    <span class="axis-label maxline">10%</span>
+                    <span class="axis-label baseline">0%</span>
+                </div>
+                <div class="tray"></div>
+                <div class="adder">
+                    <div class="plus fade glyphicon glyphicon-plus-sign"></div>
+                </div>
+        </script>
 
         <script type="text/template" id="thermometer-view-template">
+            <div class="background"></div>
             <div class="glyph">
-                <div class="historical-indicator">
+                <div class="historical-indicator fade">
                     <span class="glyphicon glyphicon-chevron-right"></span>
                     <span class="glyphicon glyphicon-chevron-left"></span>
                 </div>
-                <div class="normal-indicator">
+                <div class="normal-indicator fade">
                     <span class="bar"></span>
                 </div>
                 <div class="tube back">

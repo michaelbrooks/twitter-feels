@@ -6,6 +6,7 @@
 (function (win) {
 
     var views = win.namespace.get('thermometer.views');
+    var utils = win.namespace.get('thermometer.utils');
     var libs = win.namespace.get('libs');
 
     var logger = libs.Logger.get('thermometer.views.tray_view');
@@ -16,6 +17,16 @@
     views.TrayView = views.CommonView.extend({
 
         className: 'tray-view',
+        template: _.template($('#tray-view-template').html()),
+
+        ui: {
+            tray: '.tray',
+            plus: '.plus'
+        },
+
+        events: {
+            'click .adder .plus': 'adder_clicked'
+        },
 
         initialize: function(options) {
             this.update = options.update;
@@ -31,6 +42,17 @@
             logger.debug('initialized', options);
         },
 
+        render: function() {
+            this.$el.html(this.template());
+            this.bindUIElements();
+
+            return this;
+        },
+
+        adder_clicked: function() {
+            this.update.trigger('show-feeling-list');
+        },
+
         feeling_added: function(model) {
             var view = new views.ThermometerView({
                 model: model
@@ -42,7 +64,10 @@
             var index = this.views.length - 1;
             view.set_color(colorScale(index));
 
-            this.$el.append(view.render().el);
+            this.ui.tray.append(view.render().el);
+
+            utils.fade(this.ui.plus, this.views.length < 10, function(plus, visible) {
+            });
 
             logger.debug('feeling added', model.id);
         },
@@ -58,6 +83,9 @@
 
             //Remove from the map
             delete this.view_lookup[model.id];
+
+            utils.fade(this.ui.plus, this.views.length < 10, function(plus, visible) {
+            });
 
             logger.debug('feeling removed', model.id);
         }
