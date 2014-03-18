@@ -139,6 +139,7 @@ def get_thermometer_data(selected_feeling_ids=[]):
                 'frame_id': fp.frame_id,
                 'start_time': df(fp.start_time),
                 'percent': fp.percent,
+                'missing_data': fp.missing_data,
             })
 
         position = selected_feeling_ids.index(feeling_id)

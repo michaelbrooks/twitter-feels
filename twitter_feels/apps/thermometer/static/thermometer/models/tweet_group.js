@@ -34,6 +34,11 @@
             if (raw.recent_series.length &&
                 _.has(raw.recent_series[0], 'percent')) {
 
+                //Toss all the incomplete points
+                raw.recent_series = _.filter(raw.recent_series, function(point) {
+                    return !point.missing_data
+                });
+
                 var percent_smoothed = undefined;
                 _.each(window_sizes, function(window_size) {
                     if (percent_smoothed) {
@@ -44,27 +49,27 @@
                         });
                     }
                 });
-            }
 
-            _.each(raw.recent_series, function (point, i) {
-                point.start_time = utils.date_parse(point.start_time);
+                _.each(raw.recent_series, function (point, i) {
+                    point.start_time = utils.date_parse(point.start_time);
 
-                if ('percent' in point) {
-                    point.percent_change = (point.percent - normal) / normal;
-                    point.percent_smoothed = percent_smoothed[i];
-                    point.percent_change_smoothed = (point.percent_smoothed - normal) / normal;
-                }
-            });
-
-            if (raw.examples) {
-                var point_index = _.indexBy(raw.recent_series, 'frame_id');
-                _.each(raw.examples, function(example) {
-                    var point = point_index[example.frame_id];
-                    example.percent_change_smoothed = point.percent_change_smoothed;
-                    example.start_time = point.start_time;
-                    example.created_at = utils.date_parse(example.created_at);
-                    example.word = raw.word;
+                    if ('percent' in point) {
+                        point.percent_change = (point.percent - normal) / normal;
+                        point.percent_smoothed = percent_smoothed[i];
+                        point.percent_change_smoothed = (point.percent_smoothed - normal) / normal;
+                    }
                 });
+
+                if (raw.examples) {
+                    var point_index = _.indexBy(raw.recent_series, 'frame_id');
+                    _.each(raw.examples, function(example) {
+                        var point = point_index[example.frame_id];
+                        example.percent_change_smoothed = point.percent_change_smoothed;
+                        example.start_time = point.start_time;
+                        example.created_at = utils.date_parse(example.created_at);
+                        example.word = raw.word;
+                    });
+                }
             }
 
             return raw;
