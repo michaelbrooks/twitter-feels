@@ -80,23 +80,46 @@
          *
          * Returns a promise object -- when done, this
          */
-        fetch: function () {
+        fetch: function (feeling_ids) {
             var self = this;
 
-            var feelings = this.get_selected_feelings();
+            feeling_ids = feeling_ids || this.get_selected_feelings() || [];
 
-            var urlpart = feelings.join(',');
+            this.fetching = feeling_ids;
 
-            logger.debug('Fetching updated data...');
+            var urlpart = feeling_ids.join(',');
+
+            logger.debug('Fetching updated data for feelings', feeling_ids);
             return $.get(therm.app.urls.update, {
                 'feelings': urlpart
             })
                 .done(function (response) {
-                    self.apply_update(response);
+                    if (self.fetching == feeling_ids) {
+                        //Only use this data if it is the most recent request
+                        self.apply_update(response);
+                    } else {
+                        logger.debug('Stale update received for feelings', feeling_ids);
+                    }
                 })
                 .fail(function (err) {
                     logger.error('Failed to update data', err);
+                })
+                .always(function() {
+                    self.fetching = false;
                 });
+        },
+
+        start_fetching: function() {
+            var self = this;
+            this.interval = setInterval(function() {
+                if (!self.fetching) {
+                    self.fetch()
+                } else {
+                    logger.debug('Skipping regular fetch');
+                }
+            }, 5 * 1000);
+
+            this.fetch();
         },
 
         /**
@@ -105,7 +128,7 @@
          * @returns {Array}
          */
         get_selected_feelings: function() {
-            return [];
+            return this.selected_feelings.pluck('feeling_id');
         }
 
     });

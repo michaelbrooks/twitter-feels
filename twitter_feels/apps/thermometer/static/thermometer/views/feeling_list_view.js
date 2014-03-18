@@ -6,6 +6,8 @@
     var views = win.namespace.get('thermometer.views');
     var libs = win.namespace.get('libs');
 
+    var logger = libs.Logger.get('thermometer.views.feeling_list_view');
+
     views.FeelingListView = views.CommonView.extend({
 
         className: 'feeling-list-view modal fade',
@@ -31,7 +33,14 @@
             this.$el.modal('hide');
 
             var feeling_id = $(e.target).data('id');
-            console.log(feeling_id);
+
+            var feeling = this.collection.get(feeling_id);
+            logger.debug('Adding feeling "' + feeling.get('word') + '"');
+
+            var selected_feeling_ids = this.update.get_selected_feelings();
+            selected_feeling_ids.push(feeling_id);
+
+            this.update.fetch(selected_feeling_ids);
         },
 
         render: function() {

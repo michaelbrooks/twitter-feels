@@ -52,12 +52,7 @@
         this.views.feeling_list.render();
 
         //Request some data
-        this.update.fetch();
-
-        var self = this;
-        this.interval = setInterval(function() {
-            self.update.fetch()
-        }, 60 * 1000);
+        this.update.start_fetching();
     };
 
 

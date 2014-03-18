@@ -11,7 +11,7 @@
 
     var logger = libs.Logger.get('thermometer.views.tray_view');
 
-    var max_thermometer = 10;
+    var FEELINGS_LIMIT = 9;
     var colorScale = libs.d3.scale.category10();
 
     views.TrayView = views.CommonView.extend({
@@ -70,7 +70,7 @@
 
             this.ui.tray.append(view.render().el);
 
-            utils.fade(this.ui.plus, this.views.length < 10, function(plus, visible) {
+            utils.fade(this.ui.plus, this.views.length < FEELINGS_LIMIT, function(plus, visible) {
             });
 
             logger.debug('feeling added', model.id);
@@ -88,7 +88,7 @@
             //Remove from the map
             delete this.view_lookup[model.id];
 
-            utils.fade(this.ui.plus, this.views.length < 10, function(plus, visible) {
+            utils.fade(this.ui.plus, this.views.length < FEELINGS_LIMIT, function(plus, visible) {
             });
 
             logger.debug('feeling removed', model.id);
