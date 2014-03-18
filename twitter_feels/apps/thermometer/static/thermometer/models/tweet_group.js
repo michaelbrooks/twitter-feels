@@ -17,7 +17,8 @@
 
         defaults: function () {
             return {
-                recent_series: []
+                recent_series: [],
+                examples: []
             };
         },
 
@@ -27,7 +28,7 @@
             // Compute percent change
             // Convert to Date
             // Calculate a smoothed value
-
+            // If there are examples, copy the smoothed percent change onto them
             var normal = raw.normal;
 
             if (raw.recent_series.length &&
@@ -54,6 +55,16 @@
                     point.percent_change_smoothed = (point.percent_smoothed - normal) / normal;
                 }
             });
+
+            if (raw.examples) {
+                var point_index = _.indexBy(raw.recent_series, 'frame_id');
+                _.each(raw.examples, function(example) {
+                    var point = point_index[example.frame_id];
+                    example.percent_change_smoothed = point.percent_change_smoothed;
+                    example.start_time = point.start_time;
+                    example.word = raw.word;
+                });
+            }
 
             return raw;
         },

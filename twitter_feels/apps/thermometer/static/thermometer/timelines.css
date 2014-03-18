@@ -29,3 +29,11 @@
     shape-rendering: crispEdges;
     /*stroke-dasharray: 5, 5;*/
 }
+
+.timeline-group .examples {
+    opacity: 0;
+}
+
+.timeline-group .examples circle {
+    fill-opacity: 0.3;
+}

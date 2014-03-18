@@ -246,6 +246,13 @@
 
         },
 
+        example_enter: function(enter) {
+            var self = this;
+
+            enter.append('circle')
+                .attr('r', 10);
+        },
+
         update_feeling_groups: function() {
 
             var group_bind = this.chart.selectAll("g.timeline-group")
@@ -253,9 +260,9 @@
 
             //Do enter and exit
             this.feeling_group_enter(group_bind.enter());
-            var group_exit = group_bind.exit()
-                .remove();
 
+            group_bind.exit()
+                .remove();
 
             //Now update
             var self = this;
@@ -268,13 +275,52 @@
                 .attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
                 })
-                .style('opacity', function(d) {
-                    if (d.is_selected() || !d.collection.selected_group) {
+                .style('opacity', function(g) {
+                    if (g.is_selected() || !g.collection.selected_group) {
                         return 1;
                     } else {
                         return 0.15
                     }
                 });
+
+            var example_group = group_bind.select('g.examples');
+
+            var example_bind = example_group.selectAll('circle')
+                .data(function(g) {
+                    return g.get('examples');
+                });
+
+            this.example_enter(example_bind.enter());
+
+            example_bind.exit()
+                .remove();
+
+            example_bind
+                .transition()
+                .duration(this.transition_duration())
+                .attr('cx', function(d) {
+                    return self.xScale(d.start_time);
+                })
+                .attr('cy', function(d) {
+                    return self.yScale(d.percent_change_smoothed);
+                })
+                .style("stroke", function(d) {
+                    return self.color(d.word);
+                })
+                .style("fill", function(d) {
+                    return self.color(d.word);
+                });
+
+            example_group
+                .transition()
+                .duration(this.transition_duration())
+                .style('opacity', function(g) {
+                if (g.is_selected()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
         }
     });
 
