@@ -8,12 +8,11 @@
 }
 
 .feeling-list-view .modal-header {
-    padding-bottom: 0px;
+    padding-bottom: 0;
     border-bottom: none;
 }
 
 .feeling-list-view .modal-body {
-    padding-bottom: 0;
     padding: 10px;
 }
 

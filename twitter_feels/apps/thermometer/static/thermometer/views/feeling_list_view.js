@@ -39,10 +39,28 @@
                 feelings: this.collection.toJSON()
             }));
 
-            this.$el.modal({
-                show: false,
-                backdrop: true
-            })
+            this.activate_modal();
+        },
+
+        activate_modal: function() {
+            if (!this.modal_activated) {
+                var self = this;
+                this.$el.modal({
+                    show: false,
+                    backdrop: true
+                })
+                    .on('shown.bs.modal', function() {
+                        $(document).on('keydown.thermometer.feeling_list', function(e) {
+                            if (e.which == 27) { //escape
+                                self.$el.modal('hide');
+                            }
+                        });
+                    })
+                    .on('hidden.bs.modal', function() {
+                        $(document).off('keydown.thermometer.feeling_list');
+                    });
+                this.modal_activated = true;
+            }
         }
 
     });
