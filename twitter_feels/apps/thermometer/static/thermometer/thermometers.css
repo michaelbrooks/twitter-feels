@@ -294,10 +294,12 @@
     transition: opacity 250ms, text-shadow 250ms;
 
     opacity: 0;
+    visibility: hidden;
 }
 
 .thermometer-view.selected .minus {
     opacity: 1;
+    visibility: visible;
 }
 
 .thermometer-view.selected .minus:hover,
