@@ -70,8 +70,8 @@
 
             this.ui.tray.append(view.render().el);
 
-            utils.fade(this.ui.plus, this.views.length < FEELINGS_LIMIT, function(plus, visible) {
-            });
+//            utils.fade(this.ui.plus, this.views.length < FEELINGS_LIMIT, function(plus, visible) {
+//            });
 
             logger.debug('feeling added', model.id);
         },
@@ -88,8 +88,8 @@
             //Remove from the map
             delete this.view_lookup[model.id];
 
-            utils.fade(this.ui.plus, this.views.length < FEELINGS_LIMIT, function(plus, visible) {
-            });
+//            utils.fade(this.ui.plus, this.views.length < FEELINGS_LIMIT, function(plus, visible) {
+//            });
 
             logger.debug('feeling removed', model.id);
         }
