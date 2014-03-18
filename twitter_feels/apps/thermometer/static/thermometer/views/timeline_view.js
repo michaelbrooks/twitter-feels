@@ -16,7 +16,8 @@
         bottom: 50,
         left: 50
     };
-    //<rect width="964" ,="" height="300" stroke="red"></rect>
+
+    var percent_range = [-0.5, 0.5];
 
     var skip_window_size = 9;
 
@@ -92,32 +93,7 @@
             var self = this;
 
             if (!this.has_rendered) {
-                logger.debug('running template...');
-
-                //Make some skeleton HTMl with an underscore template
-                this.$el.html(this.template(this.collection.toJSON()));
-
-                this.bindUIElements();
-
-                var inner = d3.select(this.ui.svg[0]).append("g")
-                    .attr('class', 'inner')
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                inner.append("g")
-                    .attr("class", "x axis");
-
-                inner.append("g")
-                    .attr("class", "y axis");
-
-                inner.append("g")
-                    .attr("class", "y axis right");
-
-                var chart = inner.append('svg')
-                    .attr('class', 'chart');
-
-                chart.append('line')
-                    .attr('class', 'baseline');
-
+                this.initial_render();
                 this.has_rendered = true;
             }
 
@@ -129,88 +105,166 @@
             return this;
         },
 
+        initial_render: function() {
+            logger.debug('initial render...');
+
+            //Make some skeleton HTMl with an underscore template
+            this.$el.html(this.template(this.collection.toJSON()));
+
+            this.bindUIElements();
+
+            this.svg = d3.select(this.ui.svg[0]);
+
+            this.inner = this.svg.append("g")
+                .attr('class', 'inner')
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            this.inner.append("g")
+                .attr("class", "x axis");
+
+            this.inner.append("g")
+                .attr("class", "y axis");
+
+            this.inner.append("g")
+                .attr("class", "y axis right");
+
+            this.chart = this.inner.append('svg')
+                .attr('class', 'chart');
+
+            this.chart.append('line')
+                .attr('class', 'baseline');
+        },
+
         delayed_render: function () {
 
-            var width = this.$el.width();
-            var height = this.$el.height() - 5;
+            var size = {
+                width: this.$el.width(),
+                height: this.$el.height() - 5
+            };
 
-            var svg = d3.select(this.ui.svg[0])
-                .attr('width', width)
-                .attr('height', height);
+            var inner_size = {
+                width: size.width - margin.left - margin.right,
+                height: size.height - margin.top - margin.bottom
+            };
 
-            var innerWidth = width - margin.left - margin.right;
-            var innerHeight = height - margin.top - margin.bottom;
+            this.resize_svg(size, inner_size);
+            this.update_scales(inner_size);
+            this.update_axes(inner_size);
+            this.update_baseline(inner_size);
 
-            this.xScale.range([0, innerWidth]);
-            this.yScale.range([innerHeight, 0]);
+            this.update_feeling_groups();
+
+//            group_bind
+//                .data(function(timeline_group) {
+//                    return timeline_group.examples;
+//                });
+
+
+            if (!this.has_rendered_data && this.collection.size()) {
+                this.has_rendered_data = true;
+                logger.debug('rendered first data');
+            }
+
+            logger.debug('rendered');
+        },
+
+        update_scales: function(inner_size) {
+            this.xScale.range([0, inner_size.width]);
+            this.yScale.range([inner_size.height, 0]);
 
             var end_time = this.update.intervals.recent.get_last_start_time();
             var timedomain = [this.update.intervals.recent.get('start'), end_time];
 
             this.xScale.domain(timedomain);
-            this.yScale.domain([-0.5, 0.5]);
+            this.yScale.domain(percent_range);
 
-            var data = this.collection.models;
-
-            var duration = 250;
-            if (!this.has_rendered_data) {
-                duration = 1500;
-            }
-
-            this.color.domain(data.map(function(d) {
+            this.color.domain(this.collection.models.map(function(d) {
                 return d.get('word');
             }));
+        },
 
-            var inner = svg.select('g.inner');
+        resize_svg: function(size, inner_size) {
+            this.svg.attr('width', size.width)
+                .attr('height', size.height);
 
-            inner.select('g.y.axis')
+
+            this.chart.attr('width', inner_size.width)
+                .attr('height', inner_size.height)
+        },
+
+        transition_duration: function() {
+            if (!this.has_rendered_data) {
+                return 1500;
+            }
+            return 250;
+        },
+
+        update_axes: function(inner_size) {
+
+            this.inner.select('g.y.axis')
                 .call(this.yAxis);
 
-            inner.select('g.y.axis.right')
-                .attr('transform', 'translate(' + innerWidth + ', 0)')
+            this.inner.select('g.y.axis.right')
+                .attr('transform', 'translate(' + inner_size.width + ', 0)')
                 .call(this.yAxisRight);
 
-            inner.select('g.x.axis')
-                .attr("transform", "translate(0," + innerHeight + ")")
+            this.inner.select('g.x.axis')
+                .attr("transform", "translate(0," + inner_size.height + ")")
                 .transition()
-                .duration(duration)
+                .duration(this.transition_duration())
                 .call(this.xAxis);
+        },
 
-            var chart = inner.select('svg')
-                .attr('width', innerWidth)
-                .attr('height', innerHeight);
-
-            chart.select('line.baseline')
+        update_baseline: function(inner_size) {
+            this.chart.select('line.baseline')
                 .attr('x1', 0)
-                .attr('x2', innerWidth)
+                .attr('x2', inner_size.width)
                 .attr('y1', this.yScale(0))
                 .attr('y2', this.yScale(0));
+        },
 
-            var group_bind = chart.selectAll("g.timeline-group")
-                .data(data);
-
-            this.init_line = true;
+        feeling_group_enter: function(enter) {
             var self = this;
-            var group_enter = group_bind.enter()
-                .append('g')
-                .attr('class', 'timeline-group')
-                .append('path')
+
+            var group_enter = enter.append('g')
+                .attr('class', 'timeline-group');
+
+            //Make lines get initialized to 0
+            this.init_line = true;
+
+            group_enter.append('path')
                 .attr('class', 'line')
                 .style('opacity', 0)
                 .attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
                 });
+
             this.init_line = false;
 
+            group_enter.append('g')
+                .attr('class', 'examples');
+
+        },
+
+        update_feeling_groups: function() {
+
+            var group_bind = this.chart.selectAll("g.timeline-group")
+                .data(this.collection.models);
+
+            //Do enter and exit
+            this.feeling_group_enter(group_bind.enter());
             var group_exit = group_bind.exit()
                 .remove();
 
+
+            //Now update
+            var self = this;
             var lines = group_bind.select('path.line')
                 .style("stroke", function(g) {
                     return self.color(g.get('word'));
                 })
                 .transition()
-                .duration(duration)
+                .duration(this.transition_duration())
                 .attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
                 })
@@ -221,14 +275,6 @@
                         return 0.15
                     }
                 });
-
-            if (!this.has_rendered_data && data.length) {
-                this.has_rendered_data = true;
-                logger.debug('rendered first data');
-            }
-
-
-            logger.debug('rendered');
         }
     });
 
