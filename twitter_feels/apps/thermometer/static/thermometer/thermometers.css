@@ -4,6 +4,9 @@
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;
     cursor: default;
+
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .thermometer-panel .labels {
@@ -22,7 +25,7 @@
 }
 
 .thermometer-panel .labels hr.baseline {
-    bottom: 57px;
+    top: 263px;
 }
 .thermometer-panel .labels hr.maxline {
     top: 29px;
@@ -37,7 +40,7 @@
 }
 
 .thermometer-panel .labels .axis-label.baseline {
-    bottom: 59px;
+    top: 265px;
 }
 
 .thermometer-panel .labels .axis-label.maxline {
@@ -49,8 +52,13 @@
     left: auto;
 }
 
+.thermometer-panel .tray-view {
+    white-space: nowrap;
+}
+
 .thermometer-panel .tray {
     margin-left: 33px;
+    display: inline-block;
 }
 
 
@@ -63,7 +71,7 @@
 
 .adder, .thermometer-view {
     position: relative;
-    float: left;
+    display: inline-block;
 
     width: 100px;
     height: 320px;
@@ -86,7 +94,7 @@
     position: absolute;
     text-align: center;
 
-    top: 263px;
+    top: 265px;
 
     left: 50%;
     margin-left: -16px;

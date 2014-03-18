@@ -4,32 +4,31 @@
 }
 
 .thermometer-app {
-    width: 1170px;
+    width: 100%;
     margin: 0 auto;
     top: 56px;
     bottom: 65px;
 }
 
-.a-row.thermometer-panel {
-    top: 0;
-    height: 320px;
-    z-index: 0; /* since we are using z-index inside this, we need to set overall */
+.thermometer-panel {
+    height: 340px;
+    z-index: 0;
+    position: relative;
 }
 
-.a-row.timeline-panel {
-    top: 325px;
+.timeline-panel {
     height: 300px;
+    position: relative;
 }
 
-.a-col.description {
-    background: #FEFEFE;
+.description {
     width: 190px;
-    left: 0;
+    float: left;
 }
-.a-col.panel-content {
-    background: #FEFEFE;
-    left: 206px;
-    right: 0;
+.panel-content {
+    margin-left: 206px;
+    position: relative;
+    height: 100%;
 }
 
 .description {

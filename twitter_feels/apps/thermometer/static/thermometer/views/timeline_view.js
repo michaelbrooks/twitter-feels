@@ -101,7 +101,7 @@
 
             //Delay rendering
             setTimeout(function () {
-                self.delayed_render();
+                self.delayed_render(true);
             }, 1);
 
             return this;
@@ -160,6 +160,10 @@
                     }
                 });
 
+            $(window).on('resize', function () {
+                self.delayed_render(false);
+            });
+
             this.svg.call(this.tip);
         },
 
@@ -169,7 +173,7 @@
             return views.CommonView.prototype.remove.apply(this, arguments);
         },
 
-        delayed_render: function () {
+        delayed_render: function (animate) {
 
             var size = {
                 width: this.$el.width(),
@@ -183,9 +187,9 @@
 
             this.resize_svg(size, inner_size);
             this.update_scales(inner_size);
-            this.update_axes(inner_size);
+            this.update_axes(inner_size, animate);
             this.update_baseline(inner_size);
-            this.update_feeling_groups();
+            this.update_feeling_groups(animate);
 
             if (!this.has_rendered_data && this.collection.size()) {
                 this.has_rendered_data = true;
@@ -226,7 +230,7 @@
             return 250;
         },
 
-        update_axes: function(inner_size) {
+        update_axes: function(inner_size, animate) {
 
             this.inner.select('g.y.axis')
                 .call(this.yAxis);
@@ -235,11 +239,13 @@
                 .attr('transform', 'translate(' + inner_size.width + ', 0)')
                 .call(this.yAxisRight);
 
-            this.inner.select('g.x.axis')
-                .attr("transform", "translate(0," + inner_size.height + ")")
-                .transition()
-                .duration(this.transition_duration())
-                .call(this.xAxis);
+            var xaxis = this.inner.select('g.x.axis')
+                .attr("transform", "translate(0," + inner_size.height + ")");
+            if (animate) {
+                xaxis = xaxis.transition()
+                    .duration(this.transition_duration());
+            }
+            xaxis.call(this.xAxis);
         },
 
         update_baseline: function(inner_size) {
@@ -311,7 +317,7 @@
             this.tip.hide();
         },
 
-        update_feeling_groups: function() {
+        update_feeling_groups: function(animate) {
 
             var group_bind = this.chart.selectAll("g.timeline-group")
                 .data(this.collection.models);
@@ -332,10 +338,12 @@
             var lines = group_bind.select('path.line')
                 .style("stroke", function(g) {
                     return self.color(g.get('word'));
-                })
-                .transition()
-                .duration(this.transition_duration())
-                .attr("d", function(g) {
+                });
+            if (animate) {
+                lines = lines.transition()
+                    .duration(this.transition_duration());
+            }
+            lines.attr("d", function(g) {
                     return self.line(g.get('recent_series').slice(skip_window_size));
                 })
                 .style('opacity', function(g) {
@@ -358,9 +366,12 @@
             example_bind.exit()
                 .remove();
 
+            if (animate) {
+                example_bind = example_bind
+                    .transition()
+                    .duration(this.transition_duration());
+            }
             example_bind
-                .transition()
-                .duration(this.transition_duration())
                 .attr('cx', function(d) {
                     return self.xScale(d.start_time);
                 })
