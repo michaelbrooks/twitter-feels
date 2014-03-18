@@ -129,6 +129,29 @@
          */
         get_selected_feelings: function() {
             return this.selected_feelings.pluck('feeling_id');
+        },
+
+        add_feeling: function(feeling_id) {
+            var feeling = this.feelings_list.get(feeling_id);
+            logger.debug('Adding feeling "' + feeling.get('word') + '"');
+
+            var selected_feeling_ids = this.get_selected_feelings();
+            selected_feeling_ids.push(feeling_id);
+
+            this.fetch(selected_feeling_ids);
+        },
+
+        remove_feeling: function(feeling_id) {
+            var feeling = this.feelings_list.get(feeling_id);
+
+            logger.debug('Removing feeling "' + feeling.get('word') + '"');
+
+            var selected_feeling_ids = this.get_selected_feelings();
+
+            var index = selected_feeling_ids.indexOf(feeling_id);
+            selected_feeling_ids.splice(index, 1);
+
+            this.fetch(selected_feeling_ids);
         }
 
     });

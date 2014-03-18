@@ -274,6 +274,37 @@
     box-shadow: 2px 3px 9px rgba(0, 0, 0, 0.5);
 }
 
+
+.glyph .minus {
+    font-size: 18px;
+
+    /*position: absolute;*/
+    text-align: center;
+
+    margin-top: 4px;
+    margin-left: 4px;
+
+    color: #FFF;
+    text-shadow: none;
+
+    -webkit-transition: opacity 250ms, text-shadow 250ms;
+    -moz-transition: opacity 250ms, text-shadow 250ms;
+    -ms-transition: opacity 250ms, text-shadow 250ms;
+    -o-transition: opacity 250ms, text-shadow 250ms;
+    transition: opacity 250ms, text-shadow 250ms;
+
+    opacity: 0;
+}
+
+.thermometer-view.selected .minus {
+    opacity: 1;
+}
+
+.thermometer-view.selected .minus:hover,
+.thermometer-view.selected .minus:active {
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.9);
+}
+
 .glyph .tube {
     position: absolute;
 

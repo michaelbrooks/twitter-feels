@@ -25,7 +25,8 @@
         },
 
         events: {
-            'click .adder .plus': 'adder_clicked'
+            'click .adder .plus': 'adder_clicked',
+            'click .thermometer-view .minus': 'minus_clicked'
         },
 
         initialize: function(options) {
@@ -55,6 +56,11 @@
 
         adder_clicked: function() {
             this.update.trigger('show-feeling-list');
+        },
+
+        minus_clicked: function(e) {
+            var feeling_id = $(e.target).data('id');
+            this.update.remove_feeling(feeling_id);
         },
 
         feeling_added: function(model) {

@@ -50,7 +50,8 @@
             feeling: '.label',
             normal: '.normal-indicator',
             historical: '.historical-indicator',
-            label_group: '.label-group'
+            label_group: '.label-group',
+            minus: '.minus'
         },
 
         events: {
@@ -93,6 +94,7 @@
             });
 
             return {
+                feeling_id: this.model.get('feeling_id'),
                 recent: recent_percent,
                 historical: historical,
                 normal: normal,
@@ -111,6 +113,10 @@
                 this.$el.html(this.template(data));
 
                 this.bindUIElements();
+
+                this.ui.minus.tooltip({
+                    placement: 'top'
+                });
 
                 this.has_rendered = true;
             }

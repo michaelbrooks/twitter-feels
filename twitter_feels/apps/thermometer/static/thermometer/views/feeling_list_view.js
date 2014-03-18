@@ -33,14 +33,7 @@
             this.$el.modal('hide');
 
             var feeling_id = $(e.target).data('id');
-
-            var feeling = this.collection.get(feeling_id);
-            logger.debug('Adding feeling "' + feeling.get('word') + '"');
-
-            var selected_feeling_ids = this.update.get_selected_feelings();
-            selected_feeling_ids.push(feeling_id);
-
-            this.update.fetch(selected_feeling_ids);
+            this.update.add_feeling(feeling_id);
         },
 
         render: function() {
