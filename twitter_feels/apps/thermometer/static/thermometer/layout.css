@@ -13,6 +13,7 @@
 .a-row.thermometer-panel {
     top: 0;
     height: 320px;
+    z-index: 0; /* since we are using z-index inside this, we need to set overall */
 }
 
 .a-row.timeline-panel {
