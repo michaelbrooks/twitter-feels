@@ -1,0 +1,24 @@
+
+iframe.external-vis {
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.map-app {
+    position: absolute;
+    top: 51px;
+    bottom: 60px;
+    width: 100%;
+    left: 0;
+    right: 0;
+}
+
+.fish-app {
+    position: absolute;
+    top: 51px;
+    bottom: 60px;
+    width: 100%;
+    left: 0;
+    right: 0;
+}

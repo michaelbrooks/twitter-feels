@@ -1,8 +1,15 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Visualize Feelings on Twitter{% endblock %}
+{% block header %}
+    <h1>Visualize Feelings on Twitter</h1>
+{% endblock %}
 
 {% block content %}
-
+    <ul>
+        <li><a href="{% url 'thermometer' %}">Thermometer</a></li>
+        <li><a href="{% url 'map' %}">Map</a></li>
+        <li><a href="{% url 'fish' %}">Aquarium</a></li>
+    </ul>
 {% endblock %}

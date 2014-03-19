@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load staticfiles humanize %}
 
-{% block title %}Map Visualization{% endblock %}
+{% block title %}Aquarium Visualization{% endblock %}
 {% block header %}
-    <h1>Map Visualization</h1>
+    <h1>Aquarium Visualization</h1>
 {% endblock %}
 
 {% block content %}
 
-    <div class="map-app">
-        <iframe class="external-vis" height="400px" width="600px" src="{{ external_urls.map }}"></iframe>
+    <div class="fish-app">
+        <iframe class="external-vis" height="400px" width="600px" src="{{ external_urls.fish }}"></iframe>
     </div>
 
 {% endblock %}

@@ -155,6 +155,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Adds a 'site' variable to every template
     'twitter_feels.context_processors.current_site',
     'twitter_feels.context_processors.debug_mode',
+    'twitter_feels.context_processors.external_urls',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
@@ -236,8 +237,11 @@ LOCAL_APPS = (
     # A thermometer visualization
     'twitter_feels.apps.thermometer',
 
-    # A thermometer visualization
+    # A map visualization
     'twitter_feels.apps.map',
+
+    # A fish visualization
+    'twitter_feels.apps.fish',
 
     # A status monitoring app
     'twitter_feels.apps.status',
@@ -395,3 +399,10 @@ TWITTER_STREAM_SETTINGS = {
     'DEFAULT_KEYS_NAME': environ.get('TWITTER_API_KEY', None) or None
 }
 ########## END TWITTER_STREAM SETTINGS
+
+########## EXTERNAL URLS
+EXTERNAL_URLS = {
+    'map': '/twitterfeels_map',
+    'fish': '/twitterfeels_fish'
+}
+########## END EXTERNAL URLS

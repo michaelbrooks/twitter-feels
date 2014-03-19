@@ -26,3 +26,11 @@ def debug_mode(request):
     return {
         'debug_mode': settings.DEBUG
     }
+
+def external_urls(request):
+    """
+    Adds an external_urls dict to the context.
+    """
+    return {
+        'external_urls': getattr(settings, 'EXTERNAL_URLS', {})
+    }

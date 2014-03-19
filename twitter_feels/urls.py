@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^status/', include('twitter_feels.apps.status.urls')),
     url(r'^thermometer/', include('twitter_feels.apps.thermometer.urls')),
     url(r'^map/', include('twitter_feels.apps.map.urls')),
+    url(r'^fish/', include('twitter_feels.apps.fish.urls')),
     url(r'^admin/rq/', include('django_rq.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )
