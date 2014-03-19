@@ -13,8 +13,14 @@ root_dir = os.path.dirname(os.path.realpath(__file__))
 
 def _supervisor(command, *args, **kwargs):
     capture = kwargs.get('capture', False)
+
     with lcd(root_dir):
         if args:
+            args = list(args)
+            # Allow "worker" as shorthand for "worker:*" (all workers)
+            if 'worker' in args:
+                args[args.index('worker')] = 'worker:*'
+
             local('supervisorctl %s %s' % (command, ' '.join(args)), capture=capture)
         elif command == 'status':
             local('supervisorctl %s' % command, capture=capture)
