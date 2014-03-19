@@ -51,7 +51,10 @@ MANAGERS = ADMINS
 DATABASES = {'default': dj_database_url.config(default='sqlite://default.db')}
 if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
     # enable utf8mb4 on mysql
-    DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
+    DATABASES['default']['OPTIONS'] = {
+        'charset': 'utf8mb4',
+        'init_command': 'SET storage_engine=INNODB',
+    }
 ########## END DATABASE CONFIGURATION
 
 
