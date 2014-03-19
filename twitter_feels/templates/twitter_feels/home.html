@@ -7,6 +7,10 @@
 {% endblock %}
 
 {% block content %}
+    <div class="page-header">
+        <h1>{{ site.name }}</h1>
+    </div>
+
     <ul>
         <li><a href="{% url 'thermometer' %}">Thermometer</a></li>
         <li><a href="{% url 'map' %}">Map</a></li>

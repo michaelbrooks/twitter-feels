@@ -19,5 +19,13 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('', url(r'^demo_vis/', include('twitter_feels.apps.demo_vis.urls')))
+
+    # Add the external urls
+    for name, external_url in getattr(settings, 'EXTERNAL_URLS', {}).iteritems():
+        if external_url.startswith('/'):
+            external_url = external_url[1:]
+        pattern = r'^%s/' % external_url
+        urlpatterns.append(url(pattern, 'twitter_feels.views.external'))
+
     import debug_toolbar
     urlpatterns += patterns('', url(r'^__debug__/', include(debug_toolbar.urls)))

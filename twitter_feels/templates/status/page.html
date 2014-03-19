@@ -2,16 +2,14 @@
 {% load staticfiles humanize %}
 
 {% block title %}Status{% endblock %}
-{% block header %}
+
+{% block content %}
     <h1>Status
         <button class="btn" title="Reload" id="refresh-status"
                 data-status-url="{% url 'get_status' %}">
             <span class="glyphicon glyphicon-refresh"></span>
         </button>
     </h1>
-{% endblock %}
-
-{% block content %}
 
     <div id="general-status">
         {% include 'status/general.html' %}
