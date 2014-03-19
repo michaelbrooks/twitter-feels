@@ -378,6 +378,10 @@ ANALYSIS_TIME_FRAME_TASKS = {
         "name": "Map Analysis",
         "frame_class_path": "twitter_feels.apps.map.models.MapTimeFrame",
     },
+    "fish": {
+        "name": "Fish Analysis",
+        "frame_class_path": "twitter_feels.apps.fish.models.TimeFrame",
+    },
 }
 ########## END SCHEDULED TASKS SETTINGS
 

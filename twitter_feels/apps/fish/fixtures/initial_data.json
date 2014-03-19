@@ -1,0 +1,26 @@
+[
+{
+   "pk": 1, 
+   "model": "fish.emotion", 
+   "fields": {
+      "name": "gratitude", 
+      "description": ""
+   }
+},
+{
+   "pk": 2, 
+   "model": "fish.emotion", 
+   "fields": {
+      "name": "industriousness", 
+      "description": ""
+   }
+},
+{
+   "pk": 3, 
+   "model": "fish.emotion", 
+   "fields": {
+      "name": "longing", 
+      "description": ""
+   }
+}
+]
