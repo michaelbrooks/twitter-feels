@@ -206,6 +206,31 @@ def requeue_failed():
 
     return requeued
 
+
+def clear_failed():
+    """Clear jobs in the failed queue."""
+    connection = django_rq.get_connection()
+    failed_queue = rq.queue.get_failed_queue(connection)
+    job_ids = failed_queue.job_ids
+
+    cleared = 0
+    for job_id in job_ids:
+
+        try:
+            job = rq.job.Job.fetch(job_id, connection=connection)
+        except rq.job.NoSuchJobError:
+            # Silently ignore/remove this job and return (i.e. do nothing)
+            failed_queue.remove(job_id)
+            continue
+
+        job.cancel()
+        cleared += 1
+
+    logger.info("Cleared %d failed jobs", cleared)
+
+    return cleared
+
+
 def clean_tweets():
     """Clean old tweets we don't need anymore."""
     cleanup.delay()

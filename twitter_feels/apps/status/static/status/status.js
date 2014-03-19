@@ -18,7 +18,8 @@
             queues_status: $('#queues-status'),
             general_status: $('#general-status'),
             _clean_tweets_button: function() { return $('.clean-tweets') },
-            _requeue_failed_button: function() { return $('.requeue-failed') }
+            _requeue_failed_button: function() { return $('.requeue-failed') },
+            _clear_failed_button: function() { return $('.clear-failed') }
         };
 
         if (this.ui.refresh_button) {
@@ -31,6 +32,10 @@
 
         if (this.ui._requeue_failed_button()) {
             this.init_requeue_failed();
+        }
+
+        if (this.ui._clear_failed_button()) {
+            this.init_clear_failed();
         }
 
         this.task_views = {};
@@ -113,6 +118,20 @@
         });
     };
 
+
+    /**
+     * Set up handler for clear failed jobs button.
+     */
+    StatusApp.prototype.init_clear_failed = function () {
+        var self = this;
+
+        this.ui.queues_status.on('click', '.clear-failed', function () {
+            if (self.updates_paused) return;
+
+            self.clear_failed();
+        });
+    };
+
     /**
      * Send a request to clean unneeded tweets.
      */
@@ -156,6 +175,32 @@
             })
             .fail(function (err) {
                 logger.error("Failed to requeue jobs.", err);
+                self.display_status_block(self.ui.queues_status, undefined);
+            })
+            .always(function () {
+                self.pause_updates(false);
+            });
+    };
+
+
+    /**
+     * Send a request to clear failed jobs.
+     */
+    StatusApp.prototype.clear_failed = function() {
+        var self = this;
+        logger.debug("Clearing failed jobs.");
+
+        var clear_url = this.ui._clear_failed_button().data('clear-url');
+
+        this.pause_updates(true);
+
+        $.post(clear_url)
+            .done(function (response) {
+                logger.debug("Failed jobs successfully cleared.");
+                self.display_status_block(self.ui.queues_status, response);
+            })
+            .fail(function (err) {
+                logger.error("Failed to clear jobs.", err);
                 self.display_status_block(self.ui.queues_status, undefined);
             })
             .always(function () {

@@ -19,6 +19,8 @@
                 {% if name == 'failed' and queue.count > 0 %}
                     &nbsp;
                     <button class="btn btn-xs requeue-failed" data-requeue-url="{% url 'status_requeue_failed' %}">Requeue</button>
+                    &nbsp;
+                    <button class="btn btn-xs clear-failed" data-clear-url="{% url 'status_clear_failed' %}">Clear</button>
                 {% endif %}
                 </td>
                 <td>{{ queue.count }}</td>

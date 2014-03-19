@@ -7,5 +7,6 @@ urlpatterns = patterns('twitter_feels.apps.status.views',
                        url(r'^start/(?P<task>[\w]+)', 'start_task', name='start_task'),
                        url(r'^stop/(?P<task>[\w]+)', 'stop_task', name='stop_task'),
                        url(r'^clean', 'clean_tweets', name='status_clean_tweets'),
-                       url(r'^requeue', 'requeue_failed', name='status_requeue_failed')
+                       url(r'^requeue', 'requeue_failed', name='status_requeue_failed'),
+                       url(r'^clear', 'clear_failed', name='status_clear_failed')
 )

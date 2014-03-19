@@ -150,3 +150,13 @@ def requeue_failed(request):
     queue_status = models.queues_status()
 
     return _process_queues_status(request, queue_status)
+
+@staff_member_required
+@json_view
+def clear_failed(request):
+    if request.method == 'POST':
+        models.clear_failed()
+
+    queue_status = models.queues_status()
+
+    return _process_queues_status(request, queue_status)
