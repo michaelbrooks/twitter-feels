@@ -79,7 +79,7 @@ class MapTimeFrame(TweetTimeFrame):
             for chunk in chunks:
                 if chunk == "":
                     continue
-                if depth > 30:
+                if depth > 10:
                     break
                 node, created = TreeNode.objects.get_or_create(parent=parent, word=chunk)
                 country = user_tz_map.get(tweet.user_time_zone, None)
