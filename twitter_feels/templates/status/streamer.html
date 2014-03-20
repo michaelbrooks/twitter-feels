@@ -30,6 +30,7 @@
             <th>Started</th>
             <th>Last Heartbeat</th>
             <th>Tweet Rate (t/s)</th>
+            <th>Memory</th>
             <th>Errors</th>
         </tr>
         </thead>
@@ -49,6 +50,7 @@
                 <td>{{ stream.created_at|naturaltime }}</td>
                 <td>{{ stream.last_heartbeat|naturaltime }}</td>
                 <td>{{ stream.tweet_rate|floatformat }}</td>
+                <td>{{ stream.memory_usage }}</td>
                 {% if stream.error_count > 0 %}
                     <td><b>{{ stream.error_count }}</b></td>
                 {% else %}
