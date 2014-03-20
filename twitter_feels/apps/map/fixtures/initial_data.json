@@ -1,0 +1,1570 @@
+[
+{
+   "pk": 1, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "", 
+      "parent": null
+   }
+},
+{
+   "pk": 2, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "I want", 
+      "parent": 1
+   }
+},
+{
+   "pk": 3, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "I need", 
+      "parent": 1
+   }
+},
+{
+   "pk": 4, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "I feel", 
+      "parent": 1
+   }
+},
+{
+   "pk": 5, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "We want", 
+      "parent": 1
+   }
+},
+{
+   "pk": 6, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "We need", 
+      "parent": 1
+   }
+},
+{
+   "pk": 7, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "We feel", 
+      "parent": 1
+   }
+},
+{
+   "pk": 8, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "They want", 
+      "parent": 1
+   }
+},
+{
+   "pk": 9, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "They need", 
+      "parent": 1
+   }
+},
+{
+   "pk": 10, 
+   "model": "map.treenode", 
+   "fields": {
+      "word": "They feel", 
+      "parent": 1
+   }
+},
+{
+   "pk": 1, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Eastern Time (US & Canada)"
+   }
+},
+{
+   "pk": 2, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Central Time (US & Canada)"
+   }
+},
+{
+   "pk": 3, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Pacific Time (US & Canada)"
+   }
+},
+{
+   "pk": 4, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Atlantic Time (Canada)"
+   }
+},
+{
+   "pk": 5, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United Kingdom", 
+      "user_time_zone": "London"
+   }
+},
+{
+   "pk": 6, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Ecuador", 
+      "user_time_zone": "Quito"
+   }
+},
+{
+   "pk": 7, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Netherlands", 
+      "user_time_zone": "Amsterdam"
+   }
+},
+{
+   "pk": 8, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Arizona"
+   }
+},
+{
+   "pk": 9, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Mountain Time (US & Canada)"
+   }
+},
+{
+   "pk": 10, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Morocco", 
+      "user_time_zone": "Casablanca"
+   }
+},
+{
+   "pk": 11, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Hawaii"
+   }
+},
+{
+   "pk": 12, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Greece", 
+      "user_time_zone": "Athens"
+   }
+},
+{
+   "pk": 13, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Alaska"
+   }
+},
+{
+   "pk": 14, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Brazil", 
+      "user_time_zone": "Brasilia"
+   }
+},
+{
+   "pk": 15, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Greenland", 
+      "user_time_zone": "Greenland"
+   }
+},
+{
+   "pk": 16, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "China", 
+      "user_time_zone": "Beijing"
+   }
+},
+{
+   "pk": 17, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Iraq", 
+      "user_time_zone": "Baghdad"
+   }
+},
+{
+   "pk": 18, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Thailand", 
+      "user_time_zone": "Bangkok"
+   }
+},
+{
+   "pk": 19, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Ireland", 
+      "user_time_zone": "Dublin"
+   }
+},
+{
+   "pk": 20, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "France", 
+      "user_time_zone": "Paris"
+   }
+},
+{
+   "pk": 21, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Scotland", 
+      "user_time_zone": "Edinburgh"
+   }
+},
+{
+   "pk": 22, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Argentina", 
+      "user_time_zone": "Buenos Aires"
+   }
+},
+{
+   "pk": 23, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Germany", 
+      "user_time_zone": "Berlin"
+   }
+},
+{
+   "pk": 24, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Chile", 
+      "user_time_zone": "Santiago"
+   }
+},
+{
+   "pk": 25, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Spain", 
+      "user_time_zone": "Madrid"
+   }
+},
+{
+   "pk": 26, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Singapore", 
+      "user_time_zone": "Singapore"
+   }
+},
+{
+   "pk": 27, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Mid-Atlantic"
+   }
+},
+{
+   "pk": 28, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Malaysia", 
+      "user_time_zone": "Kuala Lumpur"
+   }
+},
+{
+   "pk": 29, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Portugal", 
+      "user_time_zone": "Lisbon"
+   }
+},
+{
+   "pk": 30, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Indonesia", 
+      "user_time_zone": "Jakarta"
+   }
+},
+{
+   "pk": 31, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United Arab Emirates", 
+      "user_time_zone": "Abu Dhabi"
+   }
+},
+{
+   "pk": 32, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Italy", 
+      "user_time_zone": "Rome"
+   }
+},
+{
+   "pk": 33, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Venezuela", 
+      "user_time_zone": "Caracas"
+   }
+},
+{
+   "pk": 34, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "Indiana (East)"
+   }
+},
+{
+   "pk": 35, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Sweden", 
+      "user_time_zone": "Stockholm"
+   }
+},
+{
+   "pk": 36, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Belgium", 
+      "user_time_zone": "Brussels"
+   }
+},
+{
+   "pk": 37, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Sydney"
+   }
+},
+{
+   "pk": 38, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "South Africa", 
+      "user_time_zone": "Pretoria"
+   }
+},
+{
+   "pk": 39, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "Mexico City"
+   }
+},
+{
+   "pk": 40, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Brisbane"
+   }
+},
+{
+   "pk": 41, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "West Central Africa", 
+      "user_time_zone": "West Central Africa"
+   }
+},
+{
+   "pk": 42, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Egypt", 
+      "user_time_zone": "Cairo"
+   }
+},
+{
+   "pk": 43, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "India", 
+      "user_time_zone": "Chennai"
+   }
+},
+{
+   "pk": 44, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Central America", 
+      "user_time_zone": "Central America"
+   }
+},
+{
+   "pk": 45, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Melbourne"
+   }
+},
+{
+   "pk": 46, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Pakistan", 
+      "user_time_zone": "Islamabad"
+   }
+},
+{
+   "pk": 47, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "India", 
+      "user_time_zone": "New Delhi"
+   }
+},
+{
+   "pk": 48, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Poland", 
+      "user_time_zone": "Warsaw"
+   }
+},
+{
+   "pk": 49, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Saudi Arabia", 
+      "user_time_zone": "Riyadh"
+   }
+},
+{
+   "pk": 50, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Kuwait", 
+      "user_time_zone": "Kuwait"
+   }
+},
+{
+   "pk": 51, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "India", 
+      "user_time_zone": "Mumbai"
+   }
+},
+{
+   "pk": 52, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Colombia", 
+      "user_time_zone": "Bogota"
+   }
+},
+{
+   "pk": 53, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Denmark", 
+      "user_time_zone": "Copenhagen"
+   }
+},
+{
+   "pk": 54, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Finland", 
+      "user_time_zone": "Helsinki"
+   }
+},
+{
+   "pk": 55, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Turkey", 
+      "user_time_zone": "Istanbul"
+   }
+},
+{
+   "pk": 56, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "China", 
+      "user_time_zone": "Hong Kong"
+   }
+},
+{
+   "pk": 57, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Japan", 
+      "user_time_zone": "Tokyo"
+   }
+},
+{
+   "pk": 58, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "New Zealand", 
+      "user_time_zone": "Auckland"
+   }
+},
+{
+   "pk": 59, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Kenya", 
+      "user_time_zone": "Nairobi"
+   }
+},
+{
+   "pk": 60, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "International Date Line West", 
+      "user_time_zone": "International Date Line West"
+   }
+},
+{
+   "pk": 61, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/New_York"
+   }
+},
+{
+   "pk": 62, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Irkutsk"
+   }
+},
+{
+   "pk": 63, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "New Zealand", 
+      "user_time_zone": "Wellington"
+   }
+},
+{
+   "pk": 64, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "New Caledonia", 
+      "user_time_zone": "New Caledonia"
+   }
+},
+{
+   "pk": 65, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Peru", 
+      "user_time_zone": "Lima"
+   }
+},
+{
+   "pk": 66, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Austria", 
+      "user_time_zone": "Vienna"
+   }
+},
+{
+   "pk": 67, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Zimbabwe", 
+      "user_time_zone": "Harare"
+   }
+},
+{
+   "pk": 68, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Switzerland", 
+      "user_time_zone": "Bern"
+   }
+},
+{
+   "pk": 69, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "EST"
+   }
+},
+{
+   "pk": 70, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Moscow"
+   }
+},
+{
+   "pk": 71, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Chicago"
+   }
+},
+{
+   "pk": 72, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Kingdom of Tonga", 
+      "user_time_zone": "Nuku'alofa"
+   }
+},
+{
+   "pk": 73, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "Newfoundland"
+   }
+},
+{
+   "pk": 74, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Bolivia", 
+      "user_time_zone": "La Paz"
+   }
+},
+{
+   "pk": 75, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "South Korea", 
+      "user_time_zone": "Seoul"
+   }
+},
+{
+   "pk": 76, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Czech Republic", 
+      "user_time_zone": "Prague"
+   }
+},
+{
+   "pk": 77, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Japan", 
+      "user_time_zone": "Osaka"
+   }
+},
+{
+   "pk": 78, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Perth"
+   }
+},
+{
+   "pk": 79, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Israal", 
+      "user_time_zone": "Jerusalem"
+   }
+},
+{
+   "pk": 80, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "Guadalajara"
+   }
+},
+{
+   "pk": 81, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Hungary", 
+      "user_time_zone": "Budapest"
+   }
+},
+{
+   "pk": 82, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Romania", 
+      "user_time_zone": "Bucharest"
+   }
+},
+{
+   "pk": 83, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Adelaide"
+   }
+},
+{
+   "pk": 84, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Croatia", 
+      "user_time_zone": "Zagreb"
+   }
+},
+{
+   "pk": 85, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Serbia", 
+      "user_time_zone": "Belgrade"
+   }
+},
+{
+   "pk": 86, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "Monterrey"
+   }
+},
+{
+   "pk": 87, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Iran", 
+      "user_time_zone": "Tehran"
+   }
+},
+{
+   "pk": 88, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Pakistan", 
+      "user_time_zone": "Karachi"
+   }
+},
+{
+   "pk": 89, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Midway Island", 
+      "user_time_zone": "Midway Island"
+   }
+},
+{
+   "pk": 90, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United Kingdom", 
+      "user_time_zone": "GMT"
+   }
+},
+{
+   "pk": 91, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "Saskatchewan"
+   }
+},
+{
+   "pk": 92, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Canberra"
+   }
+},
+{
+   "pk": 93, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Afghanistan", 
+      "user_time_zone": "Kabul"
+   }
+},
+{
+   "pk": 94, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Ukraine", 
+      "user_time_zone": "Kyiv"
+   }
+},
+{
+   "pk": 95, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Taiwan", 
+      "user_time_zone": "Taipei"
+   }
+},
+{
+   "pk": 96, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "India", 
+      "user_time_zone": "Kolkata"
+   }
+},
+{
+   "pk": 97, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "Tijuana"
+   }
+},
+{
+   "pk": 98, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Latvia", 
+      "user_time_zone": "Riga"
+   }
+},
+{
+   "pk": 99, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Portugal", 
+      "user_time_zone": "Azores"
+   }
+},
+{
+   "pk": 100, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Guyana", 
+      "user_time_zone": "Georgetown"
+   }
+},
+{
+   "pk": 101, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Kazakhstan", 
+      "user_time_zone": "Almaty"
+   }
+},
+{
+   "pk": 102, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Bulgaria", 
+      "user_time_zone": "Sofia"
+   }
+},
+{
+   "pk": 103, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Slovenia", 
+      "user_time_zone": "Ljubljana"
+   }
+},
+{
+   "pk": 104, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "CST"
+   }
+},
+{
+   "pk": 105, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Los_Angeles"
+   }
+},
+{
+   "pk": 106, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Oman", 
+      "user_time_zone": "Muscat"
+   }
+},
+{
+   "pk": 107, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Macedonia", 
+      "user_time_zone": "Skopje"
+   }
+},
+{
+   "pk": 108, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Liberia", 
+      "user_time_zone": "Monrovia"
+   }
+},
+{
+   "pk": 109, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Estonia", 
+      "user_time_zone": "Tallinn"
+   }
+},
+{
+   "pk": 110, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Lithuania", 
+      "user_time_zone": "Vilnius"
+   }
+},
+{
+   "pk": 111, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "Chihuahua"
+   }
+},
+{
+   "pk": 112, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Bosnia and Herzegovina", 
+      "user_time_zone": "Sarajevo"
+   }
+},
+{
+   "pk": 113, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Fiji", 
+      "user_time_zone": "Fiji"
+   }
+},
+{
+   "pk": 114, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Guam", 
+      "user_time_zone": "Guam"
+   }
+},
+{
+   "pk": 115, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Slovakia", 
+      "user_time_zone": "Bratislava"
+   }
+},
+{
+   "pk": 116, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Hobart"
+   }
+},
+{
+   "pk": 117, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "Mazatlan"
+   }
+},
+{
+   "pk": 118, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "St. Petersburg"
+   }
+},
+{
+   "pk": 119, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Samoa", 
+      "user_time_zone": "Samoa"
+   }
+},
+{
+   "pk": 120, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Bangladesh", 
+      "user_time_zone": "Dhaka"
+   }
+},
+{
+   "pk": 121, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Cape Verde Is.", 
+      "user_time_zone": "Cape Verde Is."
+   }
+},
+{
+   "pk": 122, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Belarus", 
+      "user_time_zone": "Minsk"
+   }
+},
+{
+   "pk": 123, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United Kingdom", 
+      "user_time_zone": "Europe/London"
+   }
+},
+{
+   "pk": 124, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "PST"
+   }
+},
+{
+   "pk": 125, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "America/Atikokan"
+   }
+},
+{
+   "pk": 126, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Nepal", 
+      "user_time_zone": "Kathmandu"
+   }
+},
+{
+   "pk": 127, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Armenia", 
+      "user_time_zone": "Yerevan"
+   }
+},
+{
+   "pk": 128, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Ekaterinburg"
+   }
+},
+{
+   "pk": 129, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Vietnam", 
+      "user_time_zone": "Hanoi"
+   }
+},
+{
+   "pk": 130, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Burma", 
+      "user_time_zone": "Rangoon"
+   }
+},
+{
+   "pk": 131, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Yakutsk"
+   }
+},
+{
+   "pk": 132, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Boise"
+   }
+},
+{
+   "pk": 133, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "China", 
+      "user_time_zone": "Chongqing"
+   }
+},
+{
+   "pk": 134, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Azerbaijan", 
+      "user_time_zone": "Baku"
+   }
+},
+{
+   "pk": 135, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Georgia", 
+      "user_time_zone": "Tbilisi"
+   }
+},
+{
+   "pk": 136, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Denver"
+   }
+},
+{
+   "pk": 137, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Kamchatka"
+   }
+},
+{
+   "pk": 138, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Papua New Guinea", 
+      "user_time_zone": "Port Moresby"
+   }
+},
+{
+   "pk": 139, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Australia", 
+      "user_time_zone": "Darwin"
+   }
+},
+{
+   "pk": 140, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Central Europe", 
+      "user_time_zone": "CET"
+   }
+},
+{
+   "pk": 141, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Japan", 
+      "user_time_zone": "Sapporo"
+   }
+},
+{
+   "pk": 142, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Solomon Is.", 
+      "user_time_zone": "Solomon Is."
+   }
+},
+{
+   "pk": 143, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Magadan"
+   }
+},
+{
+   "pk": 144, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "America/Bahia_Banderas"
+   }
+},
+{
+   "pk": 145, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Uzbekistan", 
+      "user_time_zone": "Tashkent"
+   }
+},
+{
+   "pk": 146, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "India", 
+      "user_time_zone": "Asia/Calcutta"
+   }
+},
+{
+   "pk": 147, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Novosibirsk"
+   }
+},
+{
+   "pk": 148, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Nigeria", 
+      "user_time_zone": "Africa/Lagos"
+   }
+},
+{
+   "pk": 149, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Vladivostok"
+   }
+},
+{
+   "pk": 150, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "America/Toronto"
+   }
+},
+{
+   "pk": 151, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "America/Dawson"
+   }
+},
+{
+   "pk": 152, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "South Africa", 
+      "user_time_zone": "Africa/Johannesburg"
+   }
+},
+{
+   "pk": 153, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Detroit"
+   }
+},
+{
+   "pk": 154, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mongolia", 
+      "user_time_zone": "Ulaan Bataar"
+   }
+},
+{
+   "pk": 155, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Marshall Is.", 
+      "user_time_zone": "Marshall Is."
+   }
+},
+{
+   "pk": 156, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Sri Lanka", 
+      "user_time_zone": "Sri Jayawardenepura"
+   }
+},
+{
+   "pk": 157, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United Kingdom", 
+      "user_time_zone": "Europe/Belfast"
+   }
+},
+{
+   "pk": 158, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Kazakhstan", 
+      "user_time_zone": "Astana"
+   }
+},
+{
+   "pk": 159, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Argentina", 
+      "user_time_zone": "ART"
+   }
+},
+{
+   "pk": 160, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Volgograd"
+   }
+},
+{
+   "pk": 161, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Kuala Lumpus", 
+      "user_time_zone": "Asia/Kuala_Lumpur"
+   }
+},
+{
+   "pk": 162, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Ukraine", 
+      "user_time_zone": "Europe/Kiev"
+   }
+},
+{
+   "pk": 163, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "MST"
+   }
+},
+{
+   "pk": 164, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Russia", 
+      "user_time_zone": "Krasnoyarsk"
+   }
+},
+{
+   "pk": 165, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Japan", 
+      "user_time_zone": "JST"
+   }
+},
+{
+   "pk": 166, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "America/Tijuana"
+   }
+},
+{
+   "pk": 167, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "China", 
+      "user_time_zone": "Urumqi"
+   }
+},
+{
+   "pk": 168, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "New Zealand", 
+      "user_time_zone": "Pacific/Auckland"
+   }
+},
+{
+   "pk": 169, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Philippines", 
+      "user_time_zone": "Asia/Manila"
+   }
+},
+{
+   "pk": 170, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "America/Halifax"
+   }
+},
+{
+   "pk": 171, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Ireland", 
+      "user_time_zone": "Europe/Dublin"
+   }
+},
+{
+   "pk": 172, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Mexico", 
+      "user_time_zone": "America/Mexico_City"
+   }
+},
+{
+   "pk": 173, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "AST"
+   }
+},
+{
+   "pk": 174, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Puerto_Rico"
+   }
+},
+{
+   "pk": 175, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Indonesia", 
+      "user_time_zone": "Asia/Jakarta"
+   }
+},
+{
+   "pk": 176, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Sri Lanka", 
+      "user_time_zone": "Asia/Colombo"
+   }
+},
+{
+   "pk": 177, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Japan", 
+      "user_time_zone": "Asia/Tokyo"
+   }
+},
+{
+   "pk": 178, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "India", 
+      "user_time_zone": "Asia/Kolkata"
+   }
+},
+{
+   "pk": 179, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "United States", 
+      "user_time_zone": "America/Adak"
+   }
+},
+{
+   "pk": 180, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Brazil", 
+      "user_time_zone": "America/Sao_Paulo"
+   }
+},
+{
+   "pk": 181, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Barbados", 
+      "user_time_zone": "America/Barbados"
+   }
+},
+{
+   "pk": 182, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "NST"
+   }
+},
+{
+   "pk": 183, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "UTC", 
+      "user_time_zone": "UTC"
+   }
+},
+{
+   "pk": 184, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Canada", 
+      "user_time_zone": "America/Edmonton"
+   }
+},
+{
+   "pk": 185, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Costa Rica", 
+      "user_time_zone": "America/Costa_Rica"
+   }
+},
+{
+   "pk": 186, 
+   "model": "map.tz_country", 
+   "fields": {
+      "country": "Republic of Trinidad and Tobago", 
+      "user_time_zone": "America/Port_of_Spain"
+   }
+}
+]
