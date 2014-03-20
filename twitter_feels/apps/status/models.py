@@ -1,5 +1,5 @@
 import logging
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import redis
 from django.utils import timezone
@@ -44,19 +44,36 @@ def queues_status():
             if j.status != 'finished' and (not oldest or j.created_at < oldest):
                 oldest = j.created_at
 
-            func_count[j.func_name] += 1
+            job_type = j.func_name
+
+            if job_type.endswith('create_frames'):
+                if 'analysis.task.key' in j.meta:
+                    job_type = "create_frames[%s]" % j.meta.get('analysis.task.key', '?')
+                else:
+                    job_type = j.get_call_string().replace('stream_analysis.utils.', 'scheduler:')
+            elif job_type.endswith('analyze_frame'):
+                if 'analysis.task.key' in j.meta:
+                    job_type = "analyze_frame[%s]" % j.meta.get('analysis.task.key', '?')
+                else:
+                    job_type = j.get_call_string()
+            else:
+                job_type = j.get_call_string()
+
+            func_count[job_type] += 1
             state_count[j.status] += 1
 
         #TODO: Fix this nasty hack -- rq doesn't use UTC
         if oldest:
             oldest = timezone.make_aware(oldest, timezone.get_default_timezone())
 
+        func_count = sorted(func_count.items())
+
         result[q.name] = {
             'name': q.name,
             'count': q.count,
             'oldest': oldest,
             'state_count': dict(state_count),
-            'func_count': dict(func_count)
+            'func_count': func_count
         }
     return result
 
