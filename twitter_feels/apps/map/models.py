@@ -2,6 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from datetime import timedelta
+from django.db import connection
 import settings
 from twitter_feels.libs.twitter_analysis import TweetTimeFrame
 from twitter_stream.models import Tweet
@@ -73,19 +74,110 @@ class TreeNode(models.Model):
         query = query.filter(node__parent=self)
 
         # Order by count, desc
-        query = query.order_by('-tweet_count')
+        query = query.order_by('-count')
 
         # Aggregate fields
-        query = query.annotate(tweet_count=models.Count('tweet'))
+        query = query.annotate(count=models.Count('id'))
 
         print query.query
 
         # Limit
         try:
             result = query.first()
-            return result['node__word'], result['tweet_count']
+            return result['node__word'], result['count']
         except ObjectDoesNotExist:
             return None
+
+
+    def get_subquery(self):
+        """
+        Generates SQL like the following:
+
+        SELECT
+          `map_tweetchunk`.`tz_country`,
+          `map_treenode`.`word`,
+          COUNT(`map_tweetchunk`.`id`) AS `count`
+        FROM `map_tweetchunk`
+          INNER JOIN `map_treenode`
+            ON (`map_tweetchunk`.`node_id` = `map_treenode`.`id`)
+        WHERE (
+          AND `map_treenode`.`parent_id` = MY_ID_GOES HERE
+        )
+        GROUP BY `map_tweetchunk`.`tz_country`, `map_treenode`.`word`
+        """
+
+        # Group by country, chunk
+        query = TweetChunk.objects.values('tz_country', 'node__word')
+
+        # Only with the given country, non-empty words
+        # We'll do this later instead
+        # query = query.exclude(node__word='')
+        # query = query.exclude(tz_country='')
+
+        # Only chunks belonging to our children
+        query = query.filter(node__parent=self)
+
+        # Aggregate fields
+        query = query.annotate(count=models.Count('id'))
+
+        return query
+
+    def get_most_popular_child_chunk_by_country(self, country_limit=10):
+        """
+        Get tuples of country, word, count for the top 10 countries
+        following this node.
+
+        More specifically:
+            - Look at all the words that followed this one anywhere
+            - In every country, find the word following this one that was most commonly used
+            - For the top result from each country, return the top 10 country-word-counts.
+        """
+
+        # Make sure this is valid
+        country_limit = int(country_limit)
+
+        subquery = self.get_subquery()
+
+        # This query finds the maximum number of tweets
+        # with chunks following this node for every country
+        # up to the limit (plus 1 to allow for the empty country)
+        maxquery = """
+        SELECT
+            sub.tz_country,
+            MAX(sub.count) AS max_count
+        FROM ({subquery}) sub
+        GROUP BY tz_country
+        ORDER BY max_count DESC
+        LIMIT {limit}
+        """.format(subquery=subquery.query, limit=country_limit + 1)
+
+        # Template for the overall query
+        # It finds the actual chunk for each country
+        # that had the maximum count.
+        # Further, filters out empty words and countries.
+        superquery = """
+        SELECT
+            country_node_count.tz_country,
+            country_node_count.word,
+            country_node_count.count
+        FROM
+            ({subquery}) country_node_count
+        INNER JOIN ({maxquery}) countrymax
+            ON (countrymax.tz_country = country_node_count.tz_country)
+        WHERE (
+            country_node_count.count = countrymax.max_count
+            AND country_node_count.tz_country != ''
+            AND country_node_count.word != ''
+        );
+        ORDER BY country_node_count.count DESC
+        LIMIT {limit}
+        """.format(subquery=subquery.query, maxquery=maxquery, limit=country_limit)
+
+        print superquery
+        cursor = connection.cursor()
+        cursor.execute(superquery)
+
+        return cursor.fetchall()
 
 
     @classmethod
