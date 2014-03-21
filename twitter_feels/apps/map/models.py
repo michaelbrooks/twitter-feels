@@ -37,7 +37,8 @@ class TreeNode(models.Model):
         query = TweetChunk.objects.values('tz_country')
 
         # Only non-empty tz_countries, words
-        query = query.filter(~models.Q(tz_country=''), ~models.Q(node__word=''))
+        query = query.exclude(tz_country='')
+        query = query.exclude(node__word='')
 
         # Only chunks belonging to our children
         query = query.filter(node__parent=self)
@@ -51,6 +52,8 @@ class TreeNode(models.Model):
         # Limit
         query = query[:limit]
 
+        print query.query
+
         return [r['tz_country'] for r in query]
 
     def get_most_popular_child_chunk_in(self, country):
@@ -63,7 +66,8 @@ class TreeNode(models.Model):
         query = TweetChunk.objects.values('node', 'node__word')
 
         # Only with the given country, non-empty words
-        query = query.filter(~models.Q(node__word=''), tz_country=country)
+        query = query.exclude(node__word='')
+        query = query.filter(tz_country=country)
 
         # Only chunks belonging to our children
         query = query.filter(node__parent=self)
@@ -72,7 +76,9 @@ class TreeNode(models.Model):
         query = query.order_by('-tweet_count')
 
         # Aggregate fields
-        query = query.annotate(tweet_count=models.Count('tweet', distinct=True))
+        query = query.annotate(tweet_count=models.Count('tweet'))
+
+        print query.query
 
         # Limit
         try:
@@ -89,6 +95,7 @@ class TreeNode(models.Model):
         except ObjectDoesNotExist:
             return None
 
+
 class Tz_Country(models.Model):
     user_time_zone = models.CharField(max_length=32)
     country = models.CharField(max_length=32)
@@ -97,8 +104,8 @@ class Tz_Country(models.Model):
 class TweetChunk(models.Model):
     node = models.ForeignKey(TreeNode)
     tweet = models.ForeignKey(Tweet)
-    created_at = models.DateTimeField()
-    tz_country = models.CharField(max_length=32, null=True, blank=True)
+    created_at = models.DateTimeField(db_index=True)
+    tz_country = models.CharField(max_length=32, blank=True)
 
 
 class MapTimeFrame(TweetTimeFrame):

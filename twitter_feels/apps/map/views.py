@@ -34,9 +34,6 @@ def get_map_results(prefix, query_chunks):
         if not node:
             return None
 
-    print prefix_node.id, prefix_node.word, prefix_node.parent_id
-    print node.id, node.word, node.parent_id
-
     countries = node.get_top_chunk_countries_for_children()
 
     words = []
@@ -64,7 +61,7 @@ def map_results_json(request):
         raise BadRequest("Query did not include prefix")
 
     prefix = "%s %s" % (chunks[0], chunks[1])
-    data = get_map_results(prefix, chunks[2:])
+    return get_map_results(prefix, chunks[2:])
 
 
 def map_results_html(request):
