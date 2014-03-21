@@ -49,6 +49,10 @@ class MapTimeFrame(TweetTimeFrame):
 
     # Simply store the total tweet count in this time frame
     tweet_count = models.IntegerField(default=0)
+    nodes_added = models.IntegerField(default=0)
+    chunks_added = models.IntegerField(default=0)
+    node_cache_hits = models.IntegerField(default=0)
+    node_cache_size = models.IntegerField(default=0)
 
     def check_prefix(self, tweet, roots):
         """Returns a root in the tweet, if it exists"""
@@ -64,11 +68,17 @@ class MapTimeFrame(TweetTimeFrame):
         A dictionary can optionally be provided for caching values across calls.
         """
         if cache is not None and (parent, word) in cache:
+            self.node_cache_hits += 1
             return cache[(parent, word)], False
         else:
             node, created = TreeNode.objects.get_or_create(parent=parent, word=word)
+
             if cache is not None:
                 cache[(parent, word)] = node
+
+            if created:
+                self.nodes_added += 1
+
             return node, created
 
     def calculate(self, tweets):
@@ -113,6 +123,9 @@ class MapTimeFrame(TweetTimeFrame):
                 depth += 1
 
         TweetChunk.objects.bulk_create(new_tweet_chunks)
+
+        self.chunks_added += len(new_tweet_chunks)
+        self.node_cache_size = len(node_cache)
 
         return tweets
 
