@@ -197,7 +197,7 @@ def update_html(request):
     feelings = [int(f) for f in feelings if len(f)]
 
     data = get_thermometer_data(feelings)
-    return render(request, 'thermometer/data.html', {
+    return render(request, 'thermometer/../../templates/json.html', {
         'data_json': json.dumps(data, indent=3)
     })
 
@@ -209,6 +209,6 @@ def feelings_json(request):
 
 def feelings_html(request):
     data = get_all_feelings()
-    return render(request, 'thermometer/data.html', {
+    return render(request, 'json.html', {
         'data_json': json.dumps(data, indent=3)
     })

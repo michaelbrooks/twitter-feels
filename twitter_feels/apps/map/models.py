@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from datetime import timedelta
@@ -14,9 +15,79 @@ class TreeNode(models.Model):
             ['parent', 'word']
         ]
 
-    parent = models.ForeignKey('self', null=True, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
     word = models.CharField(max_length=150)
 
+    def get_child(self, word):
+        child = list(self.children.filter(word=word)[:1])
+        if child:
+            return child[0]
+        return None
+
+    def get_top_chunk_countries_for_children(self, limit=10):
+        """
+        Look at the children of this node. Look at
+        the chunks that refer to them.
+        Return the top countries for those chunks by frequency.
+
+        Returns a list.
+        """
+
+        # Group by tz_country
+        query = TweetChunk.objects.values('tz_country')
+
+        # Only non-empty tz_countries, words
+        query = query.filter(~models.Q(tz_country=''), ~models.Q(node__word=''))
+
+        # Only chunks belonging to our children
+        query = query.filter(node__parent=self)
+
+        # Order by count
+        query = query.order_by('-chunk_count')
+
+        # Aggregate fields
+        query = query.annotate(chunk_count=models.Count('id'))
+
+        # Limit
+        query = query[:limit]
+
+        return [r['tz_country'] for r in query]
+
+    def get_most_popular_child_chunk_in(self, country):
+        """
+        Get the chunk following this node with the most tweets
+        in the given country.
+        """
+
+        # Group by chunk
+        query = TweetChunk.objects.values('node', 'node__word')
+
+        # Only with the given country, non-empty words
+        query = query.filter(~models.Q(node__word=''), tz_country=country)
+
+        # Only chunks belonging to our children
+        query = query.filter(node__parent=self)
+
+        # Order by count, desc
+        query = query.order_by('-tweet_count')
+
+        # Aggregate fields
+        query = query.annotate(tweet_count=models.Count('tweet', distinct=True))
+
+        # Limit
+        try:
+            result = query.first()
+            return result['node__word'], result['tweet_count']
+        except ObjectDoesNotExist:
+            return None
+
+
+    @classmethod
+    def get_root(cls):
+        try:
+            return cls.objects.get(id=1)
+        except ObjectDoesNotExist:
+            return None
 
 class Tz_Country(models.Model):
     user_time_zone = models.CharField(max_length=32)
