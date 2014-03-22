@@ -199,6 +199,15 @@ class TweetChunk(models.Model):
     created_at = models.DateTimeField(db_index=True)
     tz_country = models.CharField(max_length=32, blank=True)
 
+    @classmethod
+    def delete_before(cls, oldest_date, batch_size=10000):
+        """Delete a batch of chunks before the given date"""
+
+        cursor = connection.cursor()
+
+        deleted = cursor.execute("DELETE FROM map_tweetchunk WHERE created_at <= %s ORDER BY created_at LIMIT %s", [oldest_date, batch_size])
+
+        return deleted
 
 class MapTimeFrame(TweetTimeFrame):
     """
