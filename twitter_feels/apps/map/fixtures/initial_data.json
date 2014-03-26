@@ -1,81 +1,91 @@
 [
 {
-   "pk": 1, 
-   "model": "map.treenode", 
+   "pk": 1,
+   "model": "map.treenode",
    "fields": {
-      "word": "", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "",
       "parent": null
    }
 },
 {
-   "pk": 2, 
-   "model": "map.treenode", 
+   "pk": 2,
+   "model": "map.treenode",
    "fields": {
-      "word": "I want", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "I want",
       "parent": 1
    }
 },
 {
-   "pk": 3, 
-   "model": "map.treenode", 
+   "pk": 3,
+   "model": "map.treenode",
    "fields": {
-      "word": "I need", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "I need",
       "parent": 1
    }
 },
 {
-   "pk": 4, 
-   "model": "map.treenode", 
+   "pk": 4,
+   "model": "map.treenode",
    "fields": {
-      "word": "I feel", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "I feel",
       "parent": 1
    }
 },
 {
-   "pk": 5, 
-   "model": "map.treenode", 
+   "pk": 5,
+   "model": "map.treenode",
    "fields": {
-      "word": "We want", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "We want",
       "parent": 1
    }
 },
 {
-   "pk": 6, 
-   "model": "map.treenode", 
+   "pk": 6,
+   "model": "map.treenode",
    "fields": {
-      "word": "We need", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "We need",
       "parent": 1
    }
 },
 {
-   "pk": 7, 
-   "model": "map.treenode", 
+   "pk": 7,
+   "model": "map.treenode",
    "fields": {
-      "word": "We feel", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "We feel",
       "parent": 1
    }
 },
 {
-   "pk": 8, 
-   "model": "map.treenode", 
+   "pk": 8,
+   "model": "map.treenode",
    "fields": {
-      "word": "They want", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "They want",
       "parent": 1
    }
 },
 {
-   "pk": 9, 
-   "model": "map.treenode", 
+   "pk": 9,
+   "model": "map.treenode",
    "fields": {
-      "word": "They need", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "They need",
       "parent": 1
    }
 },
 {
-   "pk": 10, 
-   "model": "map.treenode", 
+   "pk": 10,
+   "model": "map.treenode",
    "fields": {
-      "word": "They feel", 
+      "created_at": "2014-03-25T02:23:06Z",
+      "word": "They feel",
       "parent": 1
    }
 },

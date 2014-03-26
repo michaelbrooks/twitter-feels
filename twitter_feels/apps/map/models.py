@@ -1,14 +1,16 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
+from django.db import models, connection, transaction, IntegrityError
+from django.utils import timezone
 
 from datetime import timedelta
-from django.db import connection
 import settings
 from twitter_feels.libs.twitter_analysis import TweetTimeFrame
 from twitter_stream.models import Tweet
-
+import logging
 import re
+import time
 
+logger = logging.getLogger('map')
 
 class TreeNode(models.Model):
     class Meta:
@@ -16,14 +18,127 @@ class TreeNode(models.Model):
             ['parent', 'word']
         ]
 
+    ROOT_NODES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
     word = models.CharField(max_length=150)
+    created_at = models.DateTimeField(auto_now_add=True, default=None, null=True, blank=True)
 
     def get_child(self, word):
         child = list(self.children.filter(word=word)[:1])
         if child:
             return child[0]
         return None
+
+    @classmethod
+    def get_empty_nodes(cls):
+        """
+        Return a queryset for all the tree nodes that have no associated
+        TweetChunks
+        """
+        return cls.objects.filter(chunks=None).exclude(pk__in=cls.ROOT_NODES)
+
+    @classmethod
+    def orphan_empty_nodes(cls, batch_size=10000):
+
+        most_recent_time = cls.objects.aggregate(most_recent_time=models.Max('created_at'))
+        if most_recent_time['most_recent_time'] is None:
+            return 0
+
+        most_recent_time = most_recent_time['most_recent_time']
+        time_cutoff = most_recent_time - settings.NODE_FREEZE_INTERVAL
+
+        subset_query = """
+        SELECT map_treenode.id
+          FROM map_treenode
+          LEFT OUTER JOIN map_tweetchunk
+            ON ( map_treenode.id = map_tweetchunk.node_id )
+          WHERE (map_tweetchunk.id IS NULL)
+            AND (map_treenode.parent_id IS NOT NULL)
+            AND (map_treenode.created_at < %s)
+            AND NOT (map_treenode.id IN %s)
+          LIMIT %s
+        """
+
+        query = """
+        UPDATE map_treenode
+        JOIN (
+          {subset_query}
+        ) subset
+          ON map_treenode.id = subset.id
+        SET map_treenode.parent_id = NULL
+        """.format(subset_query=subset_query)
+
+        params = [time_cutoff, cls.ROOT_NODES, batch_size]
+
+        cursor = connection.cursor()
+        return cursor.execute(query, params)
+
+    @classmethod
+    def propagate_orphanage(cls):
+        """Makes sure that all children of current orphans are also orphaned."""
+        future_orphans = cls.objects.filter(parent__parent=None).exclude(parent=None)\
+            .exclude(pk__in=cls.ROOT_NODES)
+
+        return future_orphans.update(parent=None)
+
+    @classmethod
+    def delete_orphans(cls, batch_size=10000):
+        """Delete a batch of orphans"""
+
+        query = """
+        DELETE FROM map_treenode
+        WHERE (parent_id IS NULL)
+          AND NOT (id IN %s)
+        LIMIT %s
+        """
+        params = [cls.ROOT_NODES, batch_size]
+
+        cursor = connection.cursor()
+        return cursor.execute(query, params)
+
+    @classmethod
+    def cleanup(cls, batch_size=10000, reset=False):
+        # Disconnect TreeNodes without any chunks
+
+        logger.info("Orphaning empty tree nodes...")
+
+        batch_orphaned = cls.orphan_empty_nodes(batch_size=batch_size)
+        total_orphaned = batch_orphaned
+        while batch_orphaned == batch_size:
+            logger.info("  ... orphaned batch of %d", batch_orphaned)
+            batch_orphaned = cls.orphan_empty_nodes(batch_size=batch_size)
+            total_orphaned += batch_orphaned
+
+        if total_orphaned > 0:
+            logger.info("Orphaned %d empty nodes", total_orphaned)
+        else:
+            logger.info("No empty nodes to orphan")
+
+        logger.info("Orphaning children of orphans... (should not be needed)")
+        propagated = cls.propagate_orphanage()
+        while propagated > 0:
+            logger.info("  ...orphaned %d new nodes (should be 0!)", propagated)
+            propagated = cls.propagate_orphanage()
+
+        logger.info("Deleting orphans...")
+        batch_deleted = cls.delete_orphans(batch_size=batch_size)
+        total_deleted = batch_deleted
+        while batch_deleted == batch_size:
+            logger.info("  ... deleted batch of %d", batch_deleted)
+            batch_deleted = cls.delete_orphans(batch_size=batch_size)
+            total_deleted += batch_deleted
+
+            if reset and settings.DEBUG:
+                # Prevent apparent memory leaks
+                # https://docs.djangoproject.com/en/dev/faq/models/#why-is-django-leaking-memory
+                from django import db
+                db.reset_queries()
+
+        if total_deleted > 0:
+            logger.info("Deleted %d orphans", total_deleted)
+        else:
+            logger.info("No orphans to delete")
 
     def get_top_chunk_countries_for_children(self, limit=10):
         """
@@ -194,7 +309,7 @@ class Tz_Country(models.Model):
 
 
 class TweetChunk(models.Model):
-    node = models.ForeignKey(TreeNode)
+    node = models.ForeignKey(TreeNode, related_name='chunks')
     tweet = models.ForeignKey(Tweet)
     created_at = models.DateTimeField(db_index=True)
     tz_country = models.CharField(max_length=32, blank=True)
@@ -208,6 +323,48 @@ class TweetChunk(models.Model):
         deleted = cursor.execute("DELETE FROM map_tweetchunk WHERE created_at <= %s ORDER BY created_at LIMIT %s", [oldest_date, batch_size])
 
         return deleted
+
+    @classmethod
+    def get_earliest_created_at(cls):
+        """Get the earliest created_at in any tweet chunk."""
+        results = cls.objects.aggregate(earliest_created_at=models.Min('created_at'))
+        return results['earliest_created_at']
+
+    @classmethod
+    def cleanup(cls, batch_size=10000, reset=False):
+
+        # Get the most recently finished map time frame
+        now = MapTimeFrame.objects \
+            .filter(calculated=True) \
+            .aggregate(latest_start_time=models.Max('start_time'))
+
+        # maybe there aren't any?
+        if now['latest_start_time'] is None:
+            return
+
+        # Preserve some time prior to that time frame
+        trailing_edge_date = now['latest_start_time'] - settings.KEEP_DATA_FOR
+
+        logger.info("Cleaning chunks from before %s...", trailing_edge_date)
+
+        batch_deleted = TweetChunk.delete_before(trailing_edge_date, batch_size=batch_size)
+        total_deleted = batch_deleted
+        while batch_deleted == batch_size:
+            logger.info("  ... deleted batch of %d", batch_deleted)
+            batch_deleted = TweetChunk.delete_before(trailing_edge_date, batch_size=batch_size)
+            total_deleted += batch_deleted
+
+            if reset and settings.DEBUG:
+                # Prevent apparent memory leaks
+                # https://docs.djangoproject.com/en/dev/faq/models/#why-is-django-leaking-memory
+                from django import db
+                db.reset_queries()
+
+        if total_deleted > 0:
+            logger.info("Deleted %d tweet chunks", total_deleted)
+        else:
+            logger.info("No chunks to delete")
+
 
 class MapTimeFrame(TweetTimeFrame):
     """
@@ -250,15 +407,32 @@ class MapTimeFrame(TweetTimeFrame):
             self.node_cache_hits += 1
             return cache[(parent, word)], False
         else:
-            node, created = TreeNode.objects.get_or_create(parent=parent, word=word)
+            # We want to keep trying to grab this node until we get one
+            while True:
+                try:
+                    with transaction.atomic():
+                        # Get or create a node with parent and word
+                        node, created = TreeNode.objects.get_or_create(parent=parent, word=word)
 
-            if cache is not None:
-                cache[(parent, word)] = node
+                        if not created:
+                            # If it is an old node, there is a risk that the cleanup
+                            # procedure will delete it while we are working with it.
+                            # Setting created_at makes it impossible for it to be deleted for a brief period.
+                            node.created_at = timezone.now()
+                            node.save()
 
-            if created:
-                self.nodes_added += 1
+                except IntegrityError:
+                    # it was deleted while we were getting it
+                    continue
 
-            return node, created
+                # we got one
+                if cache is not None:
+                    cache[(parent, word)] = node
+
+                if created:
+                    self.nodes_added += 1
+
+                return node, created
 
     def calculate(self, tweets):
         self.tweet_count = len(tweets)
@@ -286,6 +460,8 @@ class MapTimeFrame(TweetTimeFrame):
                 if depth > settings.MAX_DEPTH:
                     break
 
+                # This node is guaranteed safe to work with for a few minutes
+                # It won't be deleted by cleanup before we create its TweetChunk.
                 node, created = self.get_tree_node(parent=parent, word=chunk, cache=node_cache)
 
                 country = user_tz_map.get(tweet.user_time_zone, None)
@@ -293,6 +469,7 @@ class MapTimeFrame(TweetTimeFrame):
                     country = ''
                 else:
                     country = country.country
+
                 new_tweet_chunks.append(TweetChunk(
                     node=node,
                     tweet=tweet,
@@ -307,6 +484,27 @@ class MapTimeFrame(TweetTimeFrame):
         self.node_cache_size = len(node_cache)
 
         return tweets
+
+    def cleanup(self):
+        # First delete old tweet chunks
+        TweetChunk.cleanup()
+
+        # Then remove obsolete tree nodes
+        TreeNode.cleanup()
+
+    @classmethod
+    def get_stream_memory_cutoff(cls):
+        """Need to override this because we have tons of data that depends on tweets."""
+
+        baseline_cutoff = super(TweetTimeFrame, cls).get_stream_memory_cutoff()
+
+        # Get the earliest tweet referenced in any Tweet Chunk
+        earliest_created_at = TweetChunk.get_earliest_created_at()
+
+        if earliest_created_at is not None:
+            return min(earliest_created_at, baseline_cutoff)
+        else:
+            return baseline_cutoff
 
     @classmethod
     def get_most_recent(cls, limit=20):

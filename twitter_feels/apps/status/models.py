@@ -1,12 +1,12 @@
 import logging
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 import redis
 from django.utils import timezone
 import django_rq
 import rq, rq.queue, rq.job, rq.exceptions
 
-from stream_analysis import AnalysisTask, cleanup
+from stream_analysis import AnalysisTask, cleanup, get_stream_cutoff_times
 from twitter_stream.models import Tweet, StreamProcess, FilterTerm
 from twitter_feels.libs.twitter_analysis.models import TweetStream
 
@@ -110,32 +110,47 @@ def stream_status():
             running = True
             break
 
-    tasks = AnalysisTask.get()
-    num_tweet_tasks = 0
-    for t in tasks:
-        if t.get_frame_class().STREAM_CLASS == TweetStream:
-            num_tweet_tasks += 1
+    stream_class_memory_cutoffs = get_stream_cutoff_times()
 
-    analyzed_count = TweetStream().count_analyzed(num_analyses=num_tweet_tasks)
+    tweet_count = Tweet.objects.count()
+    analyzed_count = None
+    for stream_class, cutoff_time in stream_class_memory_cutoffs.iteritems():
+        if stream_class == TweetStream:
+            analyzed_count = TweetStream().count_before(cutoff_time)
+
+    stream = TweetStream()
+    earliest_time = stream.get_earliest_stream_time()
+    latest_time = stream.get_latest_stream_time()
+
+    avg_rate = None
+    if earliest_time is not None and latest_time is not None:
+        avg_rate = float(tweet_count) / (latest_time - earliest_time).total_seconds()
 
     return {
         'running': running,
         'terms': [t.term for t in terms],
         'processes': processes,
-        'tweet_count': Tweet.objects.count(),
-        'analyzed_count': analyzed_count
+        'tweet_count': tweet_count,
+        'analyzed_count': analyzed_count,
+        'earliest': earliest_time,
+        'latest': latest_time,
+        'avg_rate': avg_rate
     }
 
 
 def _task_status(task):
     frame_class = task.get_frame_class()
+
+    stats = frame_class.get_performance_stats()
+
     result = {
         "key": task.key,
         "name": task.name,
         "time_frame_path": task.frame_class_path,
         "duration": frame_class.DURATION.total_seconds(),
         "frame_count": frame_class.count_completed(),
-        "avg_time": frame_class.get_average_analysis_time(),
+        "avg_analysis_time": stats['analysis_time'],
+        "avg_cleanup_time": stats['cleanup_time'],
         "running": False,
         "most_recent": frame_class.get_latest_end_time()
     }

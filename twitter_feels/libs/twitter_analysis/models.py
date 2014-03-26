@@ -1,7 +1,10 @@
-from django.db import models
+from django.db import models, connection
+import logging
 
 import stream_analysis
 from twitter_stream.models import Tweet
+
+logger = logging.getLogger('twitter_analysis')
 
 class TweetStream(stream_analysis.AbstractStream):
     """Stream interface for Tweets"""
@@ -19,19 +22,44 @@ class TweetStream(stream_analysis.AbstractStream):
         return Tweet.get_created_in_range(start, end) \
             .order_by('created_at')
 
-    def delete_analyzed(self, num_analyses=None):
-        analyzed = Tweet.objects.filter(analyzed_by__gte=num_analyses)
-        count = len(analyzed)
-        analyzed.delete()
-        return count
+    def delete_tweet_batch(self, cutoff_datetime, batch_size=10000):
+        query = """
+        DELETE FROM twitter_stream_tweet
+        WHERE created_at < %s
+        LIMIT %s
+        """
+        params = [cutoff_datetime, batch_size]
 
-    def count_analyzed(self, num_analyses=None):
-        analyzed = Tweet.objects.filter(analyzed_by__gte=num_analyses)
+        cursor = connection.cursor()
+        return cursor.execute(query, params)
+
+    def delete_before(self, cutoff_datetime):
+        if cutoff_datetime is None:
+            return 0
+
+        logger.info("Deleting tweets before %s", cutoff_datetime)
+
+        batch_size = 10000
+        batch_deleted = self.delete_tweet_batch(cutoff_datetime, batch_size)
+        total_deleted = batch_deleted
+        while batch_deleted == batch_size:
+            logger.info("  ... deleted %d tweets", batch_deleted)
+            batch_deleted = self.delete_tweet_batch(cutoff_datetime, batch_size)
+            total_deleted += batch_deleted
+
+        if total_deleted > 0:
+            logger.info("Deleted %d tweets", total_deleted)
+        else:
+            logger.info("No tweets to delete")
+
+        return total_deleted
+
+    def count_before(self, cutoff_datetime):
+        if cutoff_datetime is None:
+            return 0
+
+        analyzed = Tweet.objects.filter(created_at__lt=cutoff_datetime)
         return analyzed.count()
-
-    def mark_analyzed(self, stream_data, analysis_task):
-        # Increase the analyzed_by count on the tweets
-        stream_data.update(analyzed_by=models.F('analyzed_by') + 1)
 
 
 class TweetTimeFrame(stream_analysis.BaseTimeFrame):

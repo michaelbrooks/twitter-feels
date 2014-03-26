@@ -25,7 +25,8 @@
                 <th>Frequency (sec)</th>
                 <th>Completed</th>
                 <th>Up to...</th>
-                <th>Avg. Time (sec)</th>
+                <th>Analysis (sec)</th>
+                <th>Cleanup (sec)</th>
                 {% if request.user.is_staff %}
                     <th>Turn on or off</th>
                 {% endif %}
@@ -41,7 +42,8 @@
                     <td class="duration-cell">{{ task.duration|floatformat:0 }}</td>
                     <td class="frame-count-cell">{{ task.frame_count }}</td>
                     <td class="most-recent-cell">{{ task.most_recent|naturaltime }}</td>
-                    <td class="avg-time-cell">{{ task.avg_time|floatformat }}</td>
+                    <td class="avg-analysis-time-cell">{{ task.avg_analysis_time|floatformat }}</td>
+                    <td class="avg-cleanup-time-cell">{{ task.avg_cleanup_time|floatformat }}</td>
                     {% if request.user.is_staff %}
                         <td class="switch-cell invisible">{% include 'status/switch.html' with status=task %}</td>
                     {% endif %}

@@ -63,10 +63,10 @@ for logger in LOGGING['loggers']:
 
 
 ########## SCHEDULED TASKS SETTINGS
-ANALYSIS_TIME_FRAME_TASKS['demo_vis'] = {
-    "name": "Demo Vis Analysis",
-    "frame_class_path": "twitter_feels.apps.demo_vis.models.DemoTimeFrame",
-}
+# ANALYSIS_TIME_FRAME_TASKS['demo_vis'] = {
+#     "name": "Demo Vis Analysis",
+#     "frame_class_path": "twitter_feels.apps.demo_vis.models.DemoTimeFrame",
+# }
 ########## END SCHEDULED TASKS SETTINGS
 
 ########## DEMO VIS CONFIG

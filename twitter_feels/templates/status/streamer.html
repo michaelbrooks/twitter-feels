@@ -5,12 +5,23 @@
     <span class="label {% if streamer.running %}label-success{% else %}label-warning{% endif %}">
         {% if streamer.running %}Running{% else %}Stopped{% endif %}
     </span>
-    &nbsp;
-    You are hoarding <strong>{{ streamer.tweet_count }}</strong> tweets, <strong>{{ streamer.analyzed_count }}</strong> analyzed.
-    {% if request.user.is_staff and streamer.analyzed_count %}
-        <button class="clean-tweets btn btn-xs"
-                data-clean-url="{% url 'status_clean_tweets' %}">Discard analyzed tweets</button>
-    {% endif %}
+
+    <table class="table">
+        <tbody>
+        <tr><th>Tweets Stored:</th><td>{{ streamer.tweet_count }}</td></tr>
+        <tr><th>Tweets Analyzed:</th>
+            <td>{{ streamer.analyzed_count }}
+            {% if request.user.is_staff and streamer.analyzed_count %}
+                <button class="clean-tweets btn btn-xs"
+                        data-clean-url="{% url 'status_clean_tweets' %}">Discard analyzed tweets</button>
+            {% endif %}
+            </td>
+        </tr>
+        <tr><th>Earliest:</th><td>{{ streamer.earliest }}</td></tr>
+        <tr><th>Latest:</th><td>{{ streamer.latest }}</td></tr>
+        <tr><th>Average Rate:</th><td>{{ streamer.avg_rate|floatformat }} tweets / second</td></tr>
+        </tbody>
+    </table>
 </p>
 
 <p>Current filter terms:

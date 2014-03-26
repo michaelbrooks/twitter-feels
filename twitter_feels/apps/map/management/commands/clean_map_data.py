@@ -62,31 +62,6 @@ class Command(BaseCommand):
 
         batch_size = int(options.get('batch_size', 10000))
 
-        now = timezone.now()
-        trailing_edge_date = now - settings.KEEP_DATA_FOR
+        TweetChunk.cleanup(batch_size=batch_size, reset=True)
+        TreeNode.cleanup(batch_size=batch_size, reset=True)
 
-        print "Deleting data older than %s (< %s) in batches of %d" % (
-            naturaltime(settings.KEEP_DATA_FOR),
-            trailing_edge_date,
-            batch_size)
-
-        if not query_yes_no("Is this correct?", 'yes'):
-            print "Cancelled."
-            return
-
-        # Delete the old TweetChunks first
-        some_left = True
-        deleted = 0
-        while some_left:
-            this_batch_size = TweetChunk.delete_before(trailing_edge_date, batch_size)
-            some_left = this_batch_size > 0
-            deleted += this_batch_size
-            print "  ... %d deleted (total %d) ..." % (this_batch_size, deleted)
-
-            if settings.DEBUG:
-                # Prevent apparent memory leaks
-                # https://docs.djangoproject.com/en/dev/faq/models/#why-is-django-leaking-memory
-                from django import db
-                db.reset_queries()
-
-        print "Deleted %d tweet chunks" % deleted

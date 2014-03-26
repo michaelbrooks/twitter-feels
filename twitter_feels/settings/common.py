@@ -320,7 +320,15 @@ LOGGING = {
             "handlers": ["console", 'error_console'],
             "level": "ERROR"
         },
+        "map": {
+            "handlers": ["console", 'error_console'],
+            "level": "ERROR"
+        },
         "stream_analysis": {
+            "handlers": ["console", 'error_console'],
+            "level": "ERROR",
+        },
+        "twitter_analysis": {
             "handlers": ["console", 'error_console'],
             "level": "ERROR",
         },
@@ -396,10 +404,20 @@ THERMOMETER_SETTINGS = {
     'WINDOW_AFTER': 5,
     'WINDOW_BEFORE': 2,
     'EXAMPLE_INTERVAL': datetime.timedelta(minutes=7),
-    'HISTORICAL_INTERVAL': datetime.timedelta(hours=1),
-    'DISPLAY_INTERVAL': datetime.timedelta(minutes=60),
+    'HISTORICAL_INTERVAL': datetime.timedelta(minutes=24),
+    'DISPLAY_INTERVAL': datetime.timedelta(minutes=40),
 }
 ########## END THERMOMETER SETTINGS
+
+
+########## MAP SETTINGS
+MAP_SETTINGS = {
+    'MAX_DEPTH': 3,
+    'KEEP_DATA_FOR': datetime.timedelta(hours=24),
+    'NODE_FREEZE_INTERVAL': datetime.timedelta(minutes=3),
+}
+
+########## END MAP SETTINGS
 
 ########## TWITTER_STREAM SETTING
 TWITTER_STREAM_SETTINGS = {

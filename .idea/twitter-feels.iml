@@ -16,7 +16,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.vagrant" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 2.7.6(ssh://vagrant@127.0.0.1:2222/home/vagrant/.virtualenvs/twitter-feels/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="d3" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />

@@ -18,7 +18,8 @@
             name_cell: task_row.find('td.name-cell'),
             badge_cell: task_row.find('td.badge-cell'),
             most_recent_cell: task_row.find('td.most-recent-cell'),
-            avg_time_cell: task_row.find('td.avg-time-cell'),
+            avg_analysis_time_cell: task_row.find('td.avg-analysis-time-cell'),
+            avg_cleanup_time_cell: task_row.find('td.avg-cleanup-time-cell'),
             frame_count_cell: task_row.find('td.frame-count-cell'),
             switch_cell: task_row.find('td.switch-cell')
         };
@@ -94,15 +95,28 @@
     };
 
     /**
-     * Update the average time for this task.
+     * Update the average analysis time for this task.
      *
      * @param status
      */
-    TaskView.prototype.update_avg_time = function(status) {
-        if (status && status.avg_time) {
-            this.ui.avg_time_cell.text(status.avg_time.toFixed(2));
+    TaskView.prototype.update_avg_analysis_time = function(status) {
+        if (status && status.avg_analysis_time) {
+            this.ui.avg_analysis_time_cell.text(status.avg_analysis_time.toFixed(2));
         } else {
-            this.ui.avg_time_cell.text('?');
+            this.ui.avg_analysis_time_cell.text('?');
+        }
+    };
+
+    /**
+     * Update the average cleanup time for this task.
+     *
+     * @param status
+     */
+    TaskView.prototype.update_avg_cleanup_time = function(status) {
+        if (status && status.avg_cleanup_time) {
+            this.ui.avg_cleanup_time_cell.text(status.avg_cleanup_time.toFixed(2));
+        } else {
+            this.ui.avg_cleanup_time_cell.text('?');
         }
     };
 
@@ -125,7 +139,8 @@
 
             this.update_switch(status);
             this.update_most_recent(status);
-            this.update_avg_time(status);
+            this.update_avg_analysis_time(status);
+            this.update_avg_cleanup_time(status);
             this.update_frame_count(status);
         } else {
 
@@ -137,7 +152,8 @@
             this.ui.badge.addClass('label-danger');
             this.update_switch(undefined);
             this.update_most_recent(undefined);
-            this.update_avg_time(undefined);
+            this.update_avg_analysis_time(undefined);
+            this.update_avg_cleanup_time(undefined);
             this.update_frame_count(undefined);
         }
     };
