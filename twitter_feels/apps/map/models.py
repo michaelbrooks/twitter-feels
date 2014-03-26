@@ -16,7 +16,7 @@ class TreeNode(models.Model):
     class Meta:
         index_together = [
             ['parent', 'word'],
-            ['parent', 'created_at'],
+            ['created_at', 'parent'],
         ]
 
     ROOT_NODES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
