@@ -278,7 +278,8 @@ class TreeNode(models.Model):
               '-',
               map_treenode.word
            ) as combo
-        FROM map_tweetchunk USE INDEX ({index_name})
+        FROM map_tweetchunk
+        -- USE INDEX ({index_name})
         LEFT OUTER JOIN map_treenode
         ON ( map_tweetchunk.node_id = map_treenode.id )
         WHERE map_treenode.parent_id = %s
