@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, connection, transaction, IntegrityError
 from django.utils import timezone
+from south.db.generic import DatabaseOperations
 
 from datetime import timedelta
 import settings
@@ -262,6 +263,10 @@ class TreeNode(models.Model):
         # How much padding to add to counts for the concat/max/split trick
         count_padding = 10
 
+        # Get the name of the stupid index from South
+        db = DatabaseOperations(None)
+        index_name = db.create_index_name('map_tweetchunk', ['tz_country', 'node_id'])
+
         # Find the words following this node for every
         # country, and the number of tweets with that word.
 
@@ -273,14 +278,14 @@ class TreeNode(models.Model):
               '-',
               map_treenode.word
            ) as combo
-        FROM map_tweetchunk
+        FROM map_tweetchunk USE INDEX ({index_name})
         LEFT OUTER JOIN map_treenode
         ON ( map_tweetchunk.node_id = map_treenode.id )
         WHERE map_treenode.parent_id = %s
             AND map_tweetchunk.tz_country != ''
             AND map_treenode.word != ''
-        GROUP BY map_tweetchunk.tz_country, map_treenode.word
-        """.format(padding=count_padding)
+        GROUP BY map_tweetchunk.tz_country, map_tweetchunk.node_id
+        """.format(padding=count_padding, index_name=index_name)
 
         # Now select the max of the combo field for each country
         # Since we've padded with 0s, alphabetic max is the same as numeric max
@@ -383,6 +388,12 @@ class Tz_Country(models.Model):
 
 
 class TweetChunk(models.Model):
+
+    class Meta:
+        index_together = [
+            ['tz_country', 'node'],
+        ]
+
     node = models.ForeignKey(TreeNode, related_name='chunks')
     tweet = models.ForeignKey(Tweet)
     created_at = models.DateTimeField(db_index=True)
