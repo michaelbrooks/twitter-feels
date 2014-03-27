@@ -79,6 +79,36 @@ def get_map_results_fast(prefix, query_chunks):
         'words': results
     }
 
+def get_map_results_faster(prefix, query_chunks):
+
+    root = TreeNode.get_root()
+    if not root:
+        raise Exception("No root node in tweet tree")
+
+    prefix_node = root.get_child(prefix)
+    if prefix_node is None:
+        return None
+
+    node = prefix_node
+    for chunk in query_chunks:
+        node = node.get_child(chunk.lower())
+        if not node:
+            return None
+
+    query = node.get_most_popular_child_chunk_by_country2()
+
+    results = []
+    for country, text, count in query:
+        results.append({
+            'text': text,
+            'country': country,
+            'count': count
+        })
+
+    return {
+        'words': results
+    }
+
 @json_view
 def map_results_json(request):
     query = request.GET.get('q', '')
@@ -133,6 +163,23 @@ def fast_map_results_html(request):
 
     prefix = "%s %s" % (chunks[0], chunks[1])
     data = get_map_results_fast(prefix, chunks[2:])
+
+    return render(request, 'json.html', {
+        'data_json': json.dumps(data, indent=3)
+    })
+
+
+def faster_map_results_html(request):
+    query = request.GET.get('q', '')
+    query = query.strip()  # remove whitespace
+    chunks = query.split(' ')  # separate into words
+
+    # There should always be at least 2 chunks
+    if len(chunks) < 2:
+        return HttpResponseBadRequest("Query did not include prefix")
+
+    prefix = "%s %s" % (chunks[0], chunks[1])
+    data = get_map_results_faster(prefix, chunks[2:])
 
     return render(request, 'json.html', {
         'data_json': json.dumps(data, indent=3)
