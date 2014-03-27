@@ -3,6 +3,7 @@ from collections import defaultdict
 
 import redis
 from django.utils import timezone
+from django.db import models
 import django_rq
 import rq, rq.queue, rq.job, rq.exceptions
 
@@ -143,6 +144,11 @@ def _task_status(task):
 
     stats = frame_class.get_performance_stats()
 
+    most_recent = frame_class.objects\
+        .filter(calculated=True)\
+        .aggregate(latest_start_time=models.Max('start_time'))
+    most_recent = most_recent['latest_start_time']
+
     result = {
         "key": task.key,
         "name": task.name,
@@ -152,7 +158,7 @@ def _task_status(task):
         "avg_analysis_time": stats['analysis_time'],
         "avg_cleanup_time": stats['cleanup_time'],
         "running": False,
-        "most_recent": frame_class.get_latest_end_time()
+        "most_recent": most_recent,
     }
 
     job = task.get_rq_job()

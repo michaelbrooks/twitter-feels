@@ -16,7 +16,7 @@ class TreeNode(models.Model):
     class Meta:
         index_together = [
             ['parent', 'word'],
-            ['parent', 'created_at'],
+            ['created_at', 'parent'],
         ]
 
     ROOT_NODES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -100,6 +100,12 @@ class TreeNode(models.Model):
 
     @classmethod
     def cleanup(cls, batch_size=10000, reset=False):
+        cls.cleanup_empty(batch_size=batch_size, reset=reset)
+        cls.cleanup_orphans(batch_size=batch_size, reset=reset)
+        
+
+    @classmethod
+    def cleanup_empty(cls, batch_size=10000, reset=False):
         # Disconnect TreeNodes without any chunks
 
         logger.info("Orphaning empty tree nodes...")
@@ -122,6 +128,10 @@ class TreeNode(models.Model):
             logger.info("  ...orphaned %d new nodes (should be 0!)", propagated)
             propagated = cls.propagate_orphanage()
 
+
+    @classmethod
+    def cleanup_orphans(cls, batch_size=10000, reset=False):
+        
         logger.info("Deleting orphans...")
         batch_deleted = cls.delete_orphans(batch_size=batch_size)
         total_deleted = batch_deleted
@@ -347,7 +357,7 @@ class TreeNode(models.Model):
             country_node_count.count = countrymax.max_count
             AND country_node_count.tz_country != ''
             AND country_node_count.word != ''
-        );
+        )
         ORDER BY country_node_count.count DESC
         LIMIT {limit}
         """.format(subquery=subquery.query, maxquery=maxquery, limit=country_limit)
@@ -550,11 +560,17 @@ class MapTimeFrame(TweetTimeFrame):
         return tweets
 
     def cleanup(self):
-        # First delete old tweet chunks
-        TweetChunk.cleanup()
+        
+        if self.id % 3 == 0:
+            # Then remove obsolete tree nodes
+            TreeNode.cleanup_empty()
+        else:
+            logger.info("Skipping empty treenode cleanup on this frame")
 
-        # Then remove obsolete tree nodes
-        TreeNode.cleanup()
+            # First delete old tweet chunks
+            TweetChunk.cleanup()
+            TreeNode.cleanup_orphans()
+            
 
     @classmethod
     def get_stream_memory_cutoff(cls):

@@ -10,8 +10,13 @@ class Migration(DataMigration):
     def forwards(self, orm):
         "Write your forwards methods here."
         # One hour ago
-        now = timezone.now() - datetime.timedelta(hours=1)
-        orm.TreeNode.objects.filter(created_at=None).update(created_at=now)
+        most_recent_time = orm.TreeNode.objects.aggregate(most_recent_time=models.Max('created_at'))
+        if most_recent_time['most_recent_time'] is None:
+            most_recent_time = timezone.now() - datetime.timedelta(hours=1)
+        else:
+            most_recent_time = most_recent_time['most_recent_time']
+        
+        orm.TreeNode.objects.filter(created_at=None).update(created_at=most_recent_time)
 
     def backwards(self, orm):
         "Write your backwards methods here."

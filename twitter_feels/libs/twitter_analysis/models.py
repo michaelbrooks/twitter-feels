@@ -39,7 +39,7 @@ class TweetStream(stream_analysis.AbstractStream):
 
         logger.info("Deleting tweets before %s", cutoff_datetime)
 
-        batch_size = 10000
+        batch_size = 50000
         batch_deleted = self.delete_tweet_batch(cutoff_datetime, batch_size)
         total_deleted = batch_deleted
         while batch_deleted == batch_size:

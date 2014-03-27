@@ -8,13 +8,13 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding index on 'TreeNode', fields ['parent', 'created_at']
-        db.create_index(u'map_treenode', ['parent_id', 'created_at'])
+        # Adding index on 'TreeNode', fields ['created_at', 'parent']
+        db.create_index(u'map_treenode', ['created_at', 'parent_id'])
 
 
     def backwards(self, orm):
-        # Removing index on 'TreeNode', fields ['parent', 'created_at']
-        db.delete_index(u'map_treenode', ['parent_id', 'created_at'])
+        # Removing index on 'TreeNode', fields ['created_at', 'parent']
+        db.delete_index(u'map_treenode', ['created_at', 'parent_id'])
 
 
     models = {
@@ -33,7 +33,7 @@ class Migration(SchemaMigration):
             'tweet_count': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         u'map.treenode': {
-            'Meta': {'object_name': 'TreeNode', 'index_together': "[['parent', 'word'], ['parent', 'created_at']]"},
+            'Meta': {'object_name': 'TreeNode', 'index_together': "[['parent', 'word'], ['created_at', 'parent']]"},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'children'", 'null': 'True', 'to': u"orm['map.TreeNode']"}),
