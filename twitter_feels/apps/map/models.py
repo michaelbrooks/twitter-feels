@@ -294,7 +294,7 @@ class TreeNode(models.Model):
             country_node_count.count = countrymax.max_count
             AND country_node_count.tz_country != ''
             AND country_node_count.word != ''
-        );
+        )
         ORDER BY country_node_count.count DESC
         LIMIT {limit}
         """.format(subquery=subquery.query, maxquery=maxquery, limit=country_limit)
