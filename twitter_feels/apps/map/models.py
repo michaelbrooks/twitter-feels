@@ -238,6 +238,69 @@ class TreeNode(models.Model):
 
         return query
 
+    def get_most_popular_child_chunk_by_country2(self, country_limit=10):
+        """
+        Get tuples of country, word, count for the top 10 countries
+        following this node.
+
+        More specifically:
+            - Look at all the words that followed this one anywhere
+            - In every country, find the word following this one that was most commonly used
+            - For the top result from each country, return the top 10 country-word-counts.
+        """
+
+        # How much padding to add to counts for the concat/max/split trick
+        count_padding = 10
+
+        # Find the words following this node for every
+        # country, and the number of tweets with that word.
+
+        # Concatenate the tweet count to the word
+        subquery = """
+        SELECT map_tweetchunk.tz_country,
+           CONCAT(
+              LPAD(COUNT(DISTINCT map_tweetchunk.id), {padding}, '0'),
+              '-',
+              map_treenode.word
+           ) as combo
+        FROM map_tweetchunk
+        LEFT OUTER JOIN map_treenode
+        ON ( map_tweetchunk.node_id = map_treenode.id )
+        WHERE map_treenode.parent_id = %s
+            AND map_tweetchunk.tz_country != ''
+            AND map_treenode.word != ''
+        GROUP BY map_tweetchunk.tz_country, map_treenode.word
+        """.format(padding=count_padding)
+
+        # Now select the max of the combo field for each country
+        # Since we've padded with 0s, alphabetic max is the same as numeric max
+        maxquery = """
+        SELECT sub.tz_country,
+               MAX(sub.combo) as maxcombo
+        FROM ({subquery}) sub
+        GROUP BY sub.tz_country
+        ORDER BY maxcombo DESC
+        LIMIT %s
+        """.format(subquery=subquery)
+
+        # Now split up the max combo into the count and the word
+        # The word is substring(maxcombo, padding+2) because
+        # it is 1-indexed and we added a '-' character in the middle.
+        splitquery = """
+        SELECT sub2.tz_country,
+               SUBSTRING(sub2.maxcombo, {padding} + 2) AS word,
+               CAST(SUBSTRING(sub2.maxcombo, 1, {padding}) AS UNSIGNED) AS `count`
+        FROM ({maxquery}) sub2
+        """.format(maxquery=maxquery, padding=count_padding)
+
+        print splitquery
+
+        cursor = connection.cursor()
+        cursor.execute(splitquery, [self.id, country_limit])
+
+        return cursor.fetchall()
+
+
     def get_most_popular_child_chunk_by_country(self, country_limit=10):
         """
         Get tuples of country, word, count for the top 10 countries
