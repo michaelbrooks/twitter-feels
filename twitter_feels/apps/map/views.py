@@ -184,3 +184,17 @@ def faster_map_results_html(request):
     return render(request, 'json.html', {
         'data_json': json.dumps(data, indent=3)
     })
+
+
+@json_view
+def faster_map_results_json(request):
+    query = request.GET.get('q', '')
+    query = query.strip()  # remove whitespace
+    chunks = query.split(' ')  # separate into words
+
+    # There should always be at least 2 chunks
+    if len(chunks) < 2:
+        raise BadRequest("Query did not include prefix")
+
+    prefix = "%s %s" % (chunks[0], chunks[1])
+    return get_map_results_faster(prefix, chunks[2:])
