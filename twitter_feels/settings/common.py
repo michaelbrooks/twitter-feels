@@ -412,7 +412,7 @@ THERMOMETER_SETTINGS = {
 
 ########## MAP SETTINGS
 MAP_SETTINGS = {
-    'MAX_DEPTH': 3,
+    'MAX_DEPTH': 6,
     'KEEP_DATA_FOR': datetime.timedelta(hours=24),
     'NODE_FREEZE_INTERVAL': datetime.timedelta(minutes=3),
 }
