@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models, connection, transaction, IntegrityError
+from django.db import models, connection, transaction, IntegrityError, DatabaseError
 from django.utils import timezone
+import random
 from south.db.generic import DatabaseOperations
 
 from datetime import timedelta
@@ -39,6 +40,25 @@ class TreeNode(models.Model):
         TweetChunks
         """
         return cls.objects.filter(chunks=None).exclude(pk__in=cls.ROOT_NODES)
+
+    @classmethod
+    def follow_chunks(cls, prefix, query_chunks):
+        """Returns the node referenced by the given prefix and chunks."""
+        root = cls.get_root()
+        if not root:
+            raise Exception("No root node in tweet tree")
+
+        prefix_node = root.get_child(prefix)
+        if prefix_node is None:
+            return None
+
+        node = prefix_node
+        for chunk in query_chunks:
+            node = node.get_child(chunk.lower())
+            if not node:
+                return None
+
+        return node
 
     @classmethod
     def orphan_empty_nodes(cls, batch_size=10000):
@@ -399,6 +419,18 @@ class TweetChunk(models.Model):
     tweet = models.ForeignKey(Tweet)
     created_at = models.DateTimeField(db_index=True)
     tz_country = models.CharField(max_length=32, blank=True)
+
+    @classmethod
+    def get_example_tweet(cls, country_name, node):
+        """Returns a Tweet for the given country and node."""
+        try:
+            chunks = cls.objects.filter(tz_country=country_name, node=node)
+            count = chunks.count()
+            chunk = chunks[random.randint(0, count - 1)]
+            return chunk.tweet
+        except DatabaseError:
+            # things could potentially disappear while we're doing these operations
+            return None
 
     @classmethod
     def delete_before(cls, oldest_date, batch_size=10000):

@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseBadRequest
 from django.views import generic
 from django.shortcuts import render
@@ -7,7 +8,7 @@ import json
 from jsonview.decorators import json_view
 from jsonview.exceptions import BadRequest
 
-from models import TreeNode, TweetChunk
+from models import TreeNode, TweetChunk, Tz_Country
 
 
 
@@ -20,20 +21,7 @@ page_view = MapView.as_view()
 
 def get_map_results(prefix, query_chunks):
 
-    root = TreeNode.get_root()
-    if not root:
-        raise Exception("No root node in tweet tree")
-
-    prefix_node = root.get_child(prefix)
-    if prefix_node is None:
-        return None
-
-    node = prefix_node
-    for chunk in query_chunks:
-        node = node.get_child(chunk.lower())
-        if not node:
-            return None
-
+    node = TreeNode.follow_chunks(prefix, query_chunks)
     countries = node.get_top_chunk_countries_for_children()
 
     words = []
@@ -51,20 +39,7 @@ def get_map_results(prefix, query_chunks):
 
 def get_map_results_fast(prefix, query_chunks):
 
-    root = TreeNode.get_root()
-    if not root:
-        raise Exception("No root node in tweet tree")
-
-    prefix_node = root.get_child(prefix)
-    if prefix_node is None:
-        return None
-
-    node = prefix_node
-    for chunk in query_chunks:
-        node = node.get_child(chunk.lower())
-        if not node:
-            return None
-
+    node = TreeNode.follow_chunks(prefix, query_chunks)
     query = node.get_most_popular_child_chunk_by_country()
 
     results = []
@@ -81,20 +56,7 @@ def get_map_results_fast(prefix, query_chunks):
 
 def get_map_results_faster(prefix, query_chunks):
 
-    root = TreeNode.get_root()
-    if not root:
-        raise Exception("No root node in tweet tree")
-
-    prefix_node = root.get_child(prefix)
-    if prefix_node is None:
-        return None
-
-    node = prefix_node
-    for chunk in query_chunks:
-        node = node.get_child(chunk.lower())
-        if not node:
-            return None
-
+    node = TreeNode.follow_chunks(prefix, query_chunks)
     query = node.get_most_popular_child_chunk_by_country2()
 
     results = []
@@ -109,8 +71,14 @@ def get_map_results_faster(prefix, query_chunks):
         'words': results
     }
 
-@json_view
-def map_results_json(request):
+
+def get_example_tweet(prefix, query_chunks, country_name):
+    """Finds an example tweet for the given query"""
+    node = TreeNode.follow_chunks(prefix, query_chunks)
+    return TweetChunk.get_example_tweet(country_name, node).text
+
+
+def parse_chunks(request):
     query = request.GET.get('q', '')
     query = query.strip()  # remove whitespace
     chunks = query.split(' ')  # separate into words
@@ -120,20 +88,25 @@ def map_results_json(request):
         raise BadRequest("Query did not include prefix")
 
     prefix = "%s %s" % (chunks[0], chunks[1])
-    return get_map_results(prefix, chunks[2:])
+
+    return prefix, chunks[2:]
+
+
+###### VIEWS BELOW ##########
+
+@json_view
+def map_results_json(request):
+    prefix, chunks = parse_chunks(request)
+    return get_map_results(prefix, chunks)
 
 
 def map_results_html(request):
-    query = request.GET.get('q', '')
-    query = query.strip()  # remove whitespace
-    chunks = query.split(' ')  # separate into words
-
-    # There should always be at least 2 chunks
-    if len(chunks) < 2:
+    try:
+        prefix, chunks = parse_chunks(request)
+    except BadRequest:
         return HttpResponseBadRequest("Query did not include prefix")
 
-    prefix = "%s %s" % (chunks[0], chunks[1])
-    data = get_map_results(prefix, chunks[2:])
+    data = get_map_results(prefix, chunks)
 
     return render(request, 'json.html', {
         'data_json': json.dumps(data, indent=3)
@@ -141,28 +114,16 @@ def map_results_html(request):
 
 @json_view
 def fast_map_results_json(request):
-    query = request.GET.get('q', '')
-    query = query.strip()  # remove whitespace
-    chunks = query.split(' ')  # separate into words
-
-    # There should always be at least 2 chunks
-    if len(chunks) < 2:
-        raise BadRequest("Query did not include prefix")
-
-    prefix = "%s %s" % (chunks[0], chunks[1])
-    return get_map_results_fast(prefix, chunks[2:])
+    prefix, chunks = parse_chunks(request)
+    return get_map_results_fast(prefix, chunks)
 
 def fast_map_results_html(request):
-    query = request.GET.get('q', '')
-    query = query.strip()  # remove whitespace
-    chunks = query.split(' ')  # separate into words
-
-    # There should always be at least 2 chunks
-    if len(chunks) < 2:
+    try:
+        prefix, chunks = parse_chunks(request)
+    except BadRequest:
         return HttpResponseBadRequest("Query did not include prefix")
 
-    prefix = "%s %s" % (chunks[0], chunks[1])
-    data = get_map_results_fast(prefix, chunks[2:])
+    data = get_map_results_fast(prefix, chunks)
 
     return render(request, 'json.html', {
         'data_json': json.dumps(data, indent=3)
@@ -170,16 +131,12 @@ def fast_map_results_html(request):
 
 
 def faster_map_results_html(request):
-    query = request.GET.get('q', '')
-    query = query.strip()  # remove whitespace
-    chunks = query.split(' ')  # separate into words
-
-    # There should always be at least 2 chunks
-    if len(chunks) < 2:
+    try:
+        prefix, chunks = parse_chunks(request)
+    except BadRequest:
         return HttpResponseBadRequest("Query did not include prefix")
 
-    prefix = "%s %s" % (chunks[0], chunks[1])
-    data = get_map_results_faster(prefix, chunks[2:])
+    data = get_map_results_faster(prefix, chunks)
 
     return render(request, 'json.html', {
         'data_json': json.dumps(data, indent=3)
@@ -188,13 +145,25 @@ def faster_map_results_html(request):
 
 @json_view
 def faster_map_results_json(request):
-    query = request.GET.get('q', '')
-    query = query.strip()  # remove whitespace
-    chunks = query.split(' ')  # separate into words
+    prefix, chunks = parse_chunks(request)
+    return get_map_results_faster(prefix, chunks)
 
-    # There should always be at least 2 chunks
-    if len(chunks) < 2:
-        raise BadRequest("Query did not include prefix")
 
-    prefix = "%s %s" % (chunks[0], chunks[1])
-    return get_map_results_faster(prefix, chunks[2:])
+def example_tweet_html(request):
+    try:
+        prefix, chunks = parse_chunks(request)
+        country_name = request.GET.get('country', '').strip()
+        data = get_example_tweet(prefix, chunks, country_name)
+    except BadRequest, e:
+        return HttpResponseBadRequest(e.message)
+
+    return render(request, 'json.html', {
+        'data_json': json.dumps(data, indent=3)
+    })
+
+
+@json_view
+def example_tweet_json(request):
+    prefix, chunks = parse_chunks(request)
+    country_name = request.GET.get('country', '').strip()
+    return get_example_tweet(prefix, chunks, country_name)
