@@ -6,19 +6,60 @@
 {% block content %}
 
     <div class="map-app">
-        <iframe class="external-vis" height="400px" width="600px" src="{{ external_urls.map }}"></iframe>
+        <div id="mainContainer">
+            <div id="map-canvas"></div>
+            <div class="topLine">
+                <div class="topLineItem pronounDropdown">
+                    <div>
+                        <a href="#" id="selectedPronoun" class="topLineButton">I</a>
+                    </div>
+                    <div>
+                        <img class="expander" src="{% static 'map/expand.png' %}"/>
+                    </div>
+                </div>
+                <div class="topLineItem verbDropdown">
+                    <div>
+                        <a href="#" id="selectedVerb" class="topLineButton">want</a>
+                    </div>
+                    <div>
+                        <img class="expander" src="{% static 'map/expand.png' %}"/>
+                    </div>
+                </div>
+                <div class="info-button-box">
+                    <img src="{% static 'map/infoButton.png' %}"/>
+                </div>
+                <div id="searchContainer" class="topLineItem">
+                    <form id=form>
+                        <input type="text" name="nextWords" id="nextWords" class="textbox" value="to be a"/>
+                        <button type="submit" name="searchButton" id="searchButton">
+                            <img src="{% static 'map/Map_zoom.png' %}"/>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="pronouns"></div>
+            <div id="verbs"></div>
+            <div id="info"></div>
+        </div>
     </div>
 
 {% endblock %}
 
 {% block css %}
     {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'map/mapStyles.css' %}"/>
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
+    <script src="{% static 'map/markerwithlabel.js' %}" type="text/javascript"></script>
+    <script src="{% static 'map/mapScripts_v2.js' %}" type="text/javascript"></script>
+    <script src="{% static 'map/main.js' %}" type="text/javascript"></script>
 {% endblock %}
 
 {% block js_cdn %}
     {{ block.super }}
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmvk2JouqAjv2wcvE_FKnDr7UFiGSQk7A&sensor=false"></script>
 {% endblock %}

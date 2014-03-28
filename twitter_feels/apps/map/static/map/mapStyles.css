@@ -1,0 +1,247 @@
+html {
+    height: 100%
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#mainContainer {
+    /*width: 966px;*/
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+}
+
+#map-canvas {
+    position: absolute;
+    /*
+    top:80px;
+    left:50px;
+    width: 966px;
+    height: 580px;
+    */
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    /*
+    border-width:1px;
+    border-color:Gray;
+    border-style:solid;
+    */
+}
+
+.topLine {
+    position: absolute;
+
+    top: 100px;
+    left: 200px;
+
+    width: 520px;
+    height: 41px;
+    /*top: 40px;
+    left: 120px;*/
+    border: 1px solid #CCC;
+    background: #3E454D;
+    border-radius: 5px;
+    z-index: 99;
+
+    line-height: normal;
+}
+
+.topLineItem {
+    float: left;
+    background: transparent;
+    border-width: 0;
+    margin: 10px 25px 10px 10px;
+    font-size: 12pt;
+    width: 60px;
+}
+
+.topLineItem div {
+    float: left;
+}
+
+.topLineItem img.expander {
+    width: 10px;
+    margin-left: 5px;
+}
+
+.topLineButton {
+    background: transparent;
+    border-width: 0;
+    color: White;
+    text-decoration: none;
+    margin-top: 20px;
+    width: 500px;
+}
+
+.topLineButton:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.lower {
+    position: absolute;
+    top: 200px;
+    left: 300px;
+}
+
+#searchContainer {
+    border: 1px solid #F16567;
+    float: right;
+
+    margin-right: 3px;
+    margin-top: 3px;
+    border-radius: 5px;
+    width: auto;
+}
+
+.textbox {
+    background-color: transparent;
+    border-width: 0;
+    color: White;
+    margin: 2px 2px 2px 5px;
+    font-size: 12pt;
+}
+
+#searchButton {
+    background: #F16567;
+    border-width: 0;
+    margin: 2px;
+    border-radius: 2px;
+    height: 27px;
+    width: 27px;
+}
+
+#searchButton img {
+    height: 12px;
+    width: 12px;
+    vertical-align: baseline;
+}
+
+.dropdown {
+    background: url("Navigation_DropDown.png") no-repeat;
+    width: 100px;
+    height: 200px;
+}
+
+ul.dropDown {
+    list-style-type: none;
+    padding-top: 20px;
+    margin-left: -50px;
+    margin-top:12px;
+}
+
+li.dropDown {
+    margin-bottom: 25px;
+    font-family: Sans-Serif;
+    color: White;
+    text-align: center;
+}
+
+li.dropDown:hover {
+    color: #F16567;
+}
+
+.labels {
+    background: url("Map_location.png") no-repeat;
+    width: 90px;
+    height: 100px;
+    color: White;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    text-align: center;
+    white-space: normal;
+    margin-left: -30px;
+    margin-top: -30px;
+    padding-top: 10px;
+    background-position-y: calc(0%);
+}
+
+.labelsLong {
+    background: url("Map_location_Long.png") no-repeat;
+    width: 130px;
+    height: 100px;
+    color: White;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    text-align: center;
+    white-space: normal;
+    margin-left: -30px;
+    margin-top: -30px;
+    padding-top: 10px;
+    background-position-y: calc(0%);
+}
+
+.labels2 {
+    width: 275px;
+    background: url("tweet.png") no-repeat;
+    height: 100px;
+    color: White;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    text-align: center;
+    white-space: normal;
+    padding: 30px 10px 10px;
+    margin-left: -30px;
+    margin-top: -30px;
+    background-position-y: calc(0%);
+}
+
+.info-button-box {
+    float: right;
+    margin-left: 5px;
+    margin-top: 7px;
+    margin-right: 8px;
+}
+
+#infoContainer {
+    color: White;
+    border: 1px solid #CCC;
+    background: #3E454D;
+    border-radius: 5px;
+    width: 320px;
+    font-size: 10pt;
+    font-family: Sans-Serif;
+    padding: 12px;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
+#infoList {
+    padding-left: 20px;
+    margin-bottom: 0;
+}
+
+#infoList li {
+    padding-bottom: 10px;
+}
+
+#title {
+    color: #F16567;
+    font-family: Sans-Serif;
+    margin-left: 50px;
+    padding-bottom: 250px;
+    font-size: 22pt;
+}
+
+#pronouns {
+    position: absolute;
+    left: 200px;
+    top: 127px;
+}
+
+#verbs {
+    position: absolute;
+    left: 300px;
+    top: 127px;
+}
+
+#info {
+    position: absolute;
+    left: 640px;
+    top: 147px;
+}
