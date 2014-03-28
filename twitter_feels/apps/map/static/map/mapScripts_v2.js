@@ -164,7 +164,9 @@
 
     function gotTweet(marker) {
         marker.labelClass = "labels2";
-        marker.labelText = JSON.parse(req_fifo.responseText);
+        marker.labelText = "<span class='tweet-text'>" + JSON.parse(req_fifo.responseText) + "</span>" +
+            "<span class='twitter-icon'></span>" +
+            "<span class='glyphicon glyphicon-remove'></span>";
         marker.setMap(map);
     }
 

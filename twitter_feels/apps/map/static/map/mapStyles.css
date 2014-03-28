@@ -178,17 +178,33 @@ li.dropDown:hover {
 
 .labels2 {
     width: 275px;
-    background: url("tweet.png") no-repeat;
-    height: 100px;
     color: White;
     font-family: "Lucida Grande", "Arial", sans-serif;
     font-size: 12px;
     text-align: center;
     white-space: normal;
-    padding: 30px 10px 10px;
-    margin-left: -30px;
-    margin-top: -30px;
-    background-position-y: calc(0%);
+    margin-left: -120px;
+    margin-top: -20px;
+    background: #666;
+    border-radius: 4px;
+    border: 2px solid #444;
+    padding: 10px 20px;
+}
+
+.labels2 .twitter-icon {
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    background: url("Twitter_logo_white.png") no-repeat;
+    width: 24px;
+    height: 20px;
+}
+
+.labels2 .glyphicon {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    font-size: 18px;
 }
 
 .info-button-box {
