@@ -261,6 +261,19 @@ def clear_failed():
             failed_queue.remove(job_id)
             continue
 
+        # Delete jobs for this task
+        task_key = job.meta.get('analysis.task.key')
+        if task_key:
+            task = AnalysisTask.get(task_key)
+            frame_id = job.meta.get('analysis.frame.id')
+            if task and frame_id:
+                # Delete the corresponding frame
+                frame_class = task.get_frame_class()
+                try:
+                    frame_class.objects.filter(pk=frame_id, calculated=False).delete()
+                except Exception as e:
+                    logger.warn(e, exc_info=True)
+
         job.cancel()
         cleared += 1
 
