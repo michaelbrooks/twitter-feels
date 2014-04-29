@@ -1,7 +1,6 @@
 # requirements/common.txt
 
 # Management tools
-honcho==0.5.0
 supervisor==3.0
 Fabric==1.8.3
 

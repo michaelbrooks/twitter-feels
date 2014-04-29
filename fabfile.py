@@ -42,20 +42,10 @@ def _read_env():
     from twitter_feels import env_file
     return env_file.read()
 
-
-def run(process):
-    """Run a process from the Procfile directly (not through supervisor)."""
-
-    _supervisor('stop', process, capture=True)
-
-    with lcd(root_dir):
-        local('honcho start %s' % process)
-
-
 def manage(*args):
     """Run manage.py with the given arguments"""
     with lcd(root_dir):
-        local('honcho run ./manage.py %s' % (' '.join(args)))
+        local('python ./manage.py %s' % (' '.join(args)))
 
 
 def dev_web():
