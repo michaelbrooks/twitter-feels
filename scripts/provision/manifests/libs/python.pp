@@ -35,7 +35,8 @@ class python::build::libs {
   $libs = [
     "zlib-devel", "bzip2-devel", "openssl-devel", "ncurses-devel",
     "libxml2-devel", "libxslt-devel", "unixODBC-devel",
-    "sqlite", "sqlite-devel", 'mysql-community-devel'
+    "sqlite", "sqlite-devel", 'mysql-community-devel',
+    "readline-devel"
   ]
   package { $libs:
     ensure => "installed",

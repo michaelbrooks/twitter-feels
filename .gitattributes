@@ -2,6 +2,5 @@
 *.py text eol=lf
 *.sh text eol=lf
 /scripts/** text eol=lf
-/manifests/** test eol=lf
 
 *.png binary
