@@ -8,8 +8,10 @@ import django_rq
 import rq, rq.queue, rq.job, rq.exceptions
 
 from stream_analysis import AnalysisTask, cleanup, get_stream_cutoff_times
-from twitter_stream.models import Tweet, StreamProcess, FilterTerm
+from twitter_stream.models import StreamProcess, FilterTerm
 from twitter_feels.libs.twitter_analysis.models import TweetStream
+
+from swapper import load_model
 
 logger = logging.getLogger('status')
 scheduler = django_rq.get_scheduler()
@@ -113,6 +115,7 @@ def stream_status():
 
     stream_class_memory_cutoffs = get_stream_cutoff_times()
 
+    Tweet = load_model("twitter_stream", "Tweet")
     tweet_count = Tweet.objects.count()
     analyzed_count = None
     for stream_class, cutoff_time in stream_class_memory_cutoffs.iteritems():

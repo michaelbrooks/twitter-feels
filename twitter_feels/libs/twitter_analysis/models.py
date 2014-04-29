@@ -2,32 +2,35 @@ from django.db import models, connection
 import logging
 
 import stream_analysis
-from twitter_stream.models import Tweet
+from swapper import load_model
 
 logger = logging.getLogger('twitter_analysis')
 
 class TweetStream(stream_analysis.AbstractStream):
     """Stream interface for Tweets"""
 
+    def __init__(self):
+        self.Tweet = load_model('twitter_stream', 'Tweet')
+
     def is_stream_empty(self):
-        return Tweet.objects.count() == 0
+        return self.Tweet.objects.count() == 0
 
     def get_earliest_stream_time(self):
-        return Tweet.get_earliest_created_at()
+        return self.Tweet.get_earliest_created_at()
 
     def get_latest_stream_time(self):
-        return Tweet.get_latest_created_at()
+        return self.Tweet.get_latest_created_at()
 
     def get_stream_data(self, start, end):
-        return Tweet.get_created_in_range(start, end) \
+        return self.Tweet.get_created_in_range(start, end) \
             .order_by('created_at')
 
     def delete_tweet_batch(self, cutoff_datetime, batch_size=10000):
         query = """
-        DELETE FROM twitter_stream_tweet
+        DELETE FROM {table_name}
         WHERE created_at < %s
         LIMIT %s
-        """
+        """.format(table_name=self.Tweet._meta.db_table)
         params = [cutoff_datetime, batch_size]
 
         cursor = connection.cursor()
@@ -58,7 +61,7 @@ class TweetStream(stream_analysis.AbstractStream):
         if cutoff_datetime is None:
             return 0
 
-        analyzed = Tweet.objects.filter(created_at__lt=cutoff_datetime)
+        analyzed = self.Tweet.objects.filter(created_at__lt=cutoff_datetime)
         return analyzed.count()
 
 

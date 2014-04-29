@@ -4,13 +4,13 @@ from django.utils import timezone
 import random
 from south.db.generic import DatabaseOperations
 
+from swapper import get_model_name
 from datetime import timedelta
 import settings
 from twitter_feels.libs.twitter_analysis import TweetTimeFrame
-from twitter_stream.models import Tweet
+
 import logging
 import re
-import time
 
 logger = logging.getLogger('map')
 
@@ -416,7 +416,7 @@ class TweetChunk(models.Model):
         ]
 
     node = models.ForeignKey(TreeNode, related_name='chunks')
-    tweet = models.ForeignKey(Tweet)
+    tweet = models.ForeignKey(get_model_name('twitter_stream', 'Tweet'))
     created_at = models.DateTimeField(db_index=True)
     tz_country = models.CharField(max_length=32, blank=True)
 
