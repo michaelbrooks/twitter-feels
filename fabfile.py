@@ -1,7 +1,7 @@
 import os
 import sys
 
-from fabric.api import local, abort
+from fabric.api import local, abort, warn_only
 from fabric.context_managers import lcd, hide
 from fabric.state import env
 from fabric.contrib.console import confirm
@@ -27,6 +27,9 @@ def _supervisor(command, *args, **kwargs):
         else:
             local('supervisorctl %s all' % command, capture=capture)
 
+def _backup_file(file_path):
+    with warn_only():
+        local('cp %s %s~ 2> /dev/null || :' % (file_path, file_path))
 
 def _jinja_render(template_path, values):
     """Render a template. Expects path relative to root_dir."""
@@ -271,7 +274,7 @@ def generate_supervisor_conf(user=None, app=None, **kwargs):
         })
 
         # Back up first
-        local('mv supervisord.conf supervisord.conf~')
+        _backup_file('supervisord.conf')
 
         with open('supervisord.conf', 'w') as outfile:
             outfile.write(newconf)
