@@ -404,8 +404,8 @@ THERMOMETER_SETTINGS = {
     'WINDOW_AFTER': 5,
     'WINDOW_BEFORE': 2,
     'EXAMPLE_INTERVAL': datetime.timedelta(minutes=7),
-    'HISTORICAL_INTERVAL': datetime.timedelta(minutes=24),
-    'DISPLAY_INTERVAL': datetime.timedelta(minutes=40),
+    'HISTORICAL_INTERVAL': datetime.timedelta(hours=24),
+    'DISPLAY_INTERVAL': datetime.timedelta(minutes=60),
 }
 ########## END THERMOMETER SETTINGS
 
