@@ -88,10 +88,7 @@ class python::virtualenv {
   # Do not include this class unless you are class python!
 
   $virtualenv_exe = "${python::target_dir}/bin/virtualenv"
-  $virtualenvwrapper_missing_command = "! (
-    (${python::pip::pip_exe} freeze | grep -e '^virtualenvwrapper==' > /dev/null)
-    (command -v ${virtualenv_exe} > /dev/null)
-  )"
+  $virtualenvwrapper_missing_command = "! command -v ${virtualenv_exe} 2>&1 > /dev/null"
 
   exec { 'install virtualenvwrapper':
     command => "${python::pip::pip_exe} install virtualenvwrapper",

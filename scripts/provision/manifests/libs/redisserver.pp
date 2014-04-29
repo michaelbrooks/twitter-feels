@@ -10,7 +10,7 @@ class redisserver (
   }
   contain 'redis'
 
-  redis::instance { 'redis-${redis_port}':
+  redis::instance { "redis-${redis_port}":
     redis_port         => $redis_port,
     redis_bind_address => $redis_host,
     redis_password     => $redis_password,
