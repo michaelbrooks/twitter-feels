@@ -58,6 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision "puppet" do |puppet|
       puppet.options = ""
       puppet.manifest_file = "default.pp"
+      puppet.manifests_path = "scripts/provision/manifests"
       puppet.facter = {
           "user_name" => "vagrant",
           "user_home" => "/home/vagrant",
@@ -83,6 +84,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision "puppet" do |puppet|
       puppet.options = ""
       puppet.manifest_file = "base_box.pp"
+      puppet.manifests_path = "scripts/provision/manifests"
       puppet.facter = {
           "user_name" => "vagrant",
           "user_home" => "/home/vagrant",
@@ -93,12 +95,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       }
     end
   end
-
-
-  # Run the provisioning script
-  # config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels"]
-
-  # Use this to create a version suitable for packaging
-  # config.vm.provision "shell", path: "scripts/provision/install.sh", :args => ["twitter-feels", "base"]
 
 end
