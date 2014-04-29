@@ -32,6 +32,10 @@ class base {
     ensure  => present,
   }
 
+  package { "emacs-nox":
+    ensure => present,
+  }
+
   package { 'mysql-community-release':
     ensure => 'installed',
     source => 'http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm',

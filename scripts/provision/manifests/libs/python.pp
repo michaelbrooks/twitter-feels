@@ -1,3 +1,4 @@
+$pip_url = 'https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py'
 
 class python (
   # Which python to compile
@@ -76,7 +77,7 @@ class python::pip {
   $pip_missing_command = "! command -v ${pip_exe} 2>&1 > /dev/null"
 
   exec { "install pip":
-    command => "curl -L https://raw.github.com/pypa/pip/master/contrib/get-pip.py | ${python::build::python_exe}",
+    command => "curl -L ${pip_url} | ${python::build::python_exe}",
     onlyif => $pip_missing_command,
     provider => "shell",
   }
