@@ -8,7 +8,7 @@
 
     <table class="table">
         <tbody>
-        <tr><th>Tweets Stored:</th><td>{{ streamer.tweet_count }}</td></tr>
+        <tr><th>Tweets Stored:</th><td>~{{ streamer.tweet_count }}</td></tr>
         <tr><th>Tweets Analyzed:</th>
             <td>{{ streamer.analyzed_count }}
             {% if request.user.is_staff and streamer.analyzed_count %}

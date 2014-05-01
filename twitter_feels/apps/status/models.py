@@ -116,7 +116,7 @@ def stream_status():
     stream_class_memory_cutoffs = get_stream_cutoff_times()
 
     Tweet = load_model("twitter_stream", "Tweet")
-    tweet_count = Tweet.objects.count()
+    tweet_count = Tweet.count_approx()
     analyzed_count = None
     for stream_class, cutoff_time in stream_class_memory_cutoffs.iteritems():
         if stream_class == TweetStream:
