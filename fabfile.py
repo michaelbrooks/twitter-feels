@@ -204,8 +204,8 @@ def load_key(file='.twitter_api_key.json'):
             utils.abort('Cannot read file %s: %s' % (file, e))
 
         manage('loaddata', file)
-
-        restart('stream')
+        
+        print "You may need to restart your twitter stream now"
 
 
 def dev_data():
