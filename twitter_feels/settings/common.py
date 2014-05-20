@@ -301,16 +301,16 @@ LOGGING = {
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins', 'web_access_log'],
-            'level': 'ERROR',
+            'level': 'INFO',
             'propagate': True,
         },
         "rq.worker": {
             "handlers": ["console", 'error_console'],
-            "level": "ERROR"
+            "level": "WARN"
         },
         "twitter_stream": {
             "handlers": ["console", 'error_console'],
-            "level": "ERROR",
+            "level": "WARN",
         },
         "twitter_monitor": {
             "handlers": ["console", 'error_console'],
@@ -318,22 +318,22 @@ LOGGING = {
         },
         "thermometer": {
             "handlers": ["console", 'error_console'],
-            "level": "ERROR"
+            "level": "WARN"
         },
         "map": {
             "handlers": ["console", 'error_console'],
-            "level": "ERROR"
+            "level": "WARN"
         },
         "stream_analysis": {
             "handlers": ["console", 'error_console'],
-            "level": "ERROR",
+            "level": "WARN",
         },
         "twitter_analysis": {
             "handlers": ["console", 'error_console'],
-            "level": "ERROR",
+            "level": "WARN",
         },
         'gunicorn.error': {
-            'level': 'ERROR',
+            'level': 'WARN',
             'handlers': ['error_console'],
             'propagate': True,
         },
