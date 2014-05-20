@@ -16,9 +16,6 @@ django-lineage==0.2.0
 #dj-static==0.0.5
 -e git+https://github.com/kennethreitz/dj-static.git#egg=dj-static
 
-# Customized to not always print out the json module being used
--e git+https://github.com/michaelbrooks/django-jsonview.git@no-logging#egg=django-jsonview
-
 # Twitter streaming and stream analysis
 -e git+https://github.com/michaelbrooks/django-twitter-stream#egg=django-twitter-stream-0.1.1
 -e git+https://github.com/michaelbrooks/django-stream-analysis#egg=django-stream-analysis-0.1.0
@@ -27,3 +24,4 @@ nltk==2.0.4
 gunicorn==18.0
 mysql-python==1.2.5
 Jinja2==2.7.2
+django-jsonview==0.4.1
