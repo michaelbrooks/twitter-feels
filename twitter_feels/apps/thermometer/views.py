@@ -8,6 +8,7 @@ from itertools import groupby
 import settings
 import times
 from collections import defaultdict
+from datetime import timedelta
 
 def get_all_feelings():
     # Get all of the feelings
@@ -88,7 +89,9 @@ def get_thermometer_data(selected_feeling_ids=[]):
     }
 
     if not selected_feeling_ids:
-        selected_feeling_ids = FeelingPercent.get_top_feeling_ids(limit=settings.DEFAULT_FEELINGS)
+        top_start_time = normal_end - timedelta(days=4)
+        top_start_time = top_start_time.replace(hour=0, minute=0, second=0, microsecond=0)  # for caching
+        selected_feeling_ids = FeelingPercent.get_top_feeling_ids(start=top_start_time, limit=settings.DEFAULT_FEELINGS)
 
     # Get the data for each selected feeling
 

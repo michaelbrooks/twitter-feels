@@ -257,7 +257,6 @@ class FeelingPercent(TimedIntervalMixin, models.Model):
 
     class Meta:
         index_together = [
-            ["missing_data", "feeling"],
             # TODO: figure out if feeling -> start_time would be faster
             # since we order by feeling, start_time in one of the queries
             # are other queries using this?
@@ -321,7 +320,8 @@ class FeelingPercent(TimedIntervalMixin, models.Model):
 
         query = cls.get_in_range(start=start, end=end)
 
-        query = query.values('feeling') \
+        query = query.filter(missing_data=False) \
+            .values('feeling') \
             .annotate(models.Avg('percent')) \
             .order_by('-percent__avg') \
 
