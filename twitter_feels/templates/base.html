@@ -54,7 +54,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if request.user.is_staff %}
-                    <li class="{% ancestor 'twitter_stream:status' %}"><a href="{% url 'twitter_stream:status' %}">Status</a></li>
+                    <li class="{% ancestor 'twitter_stream:status' %}"><a href="{% url 'twitter_stream:status' %}">Stream</a></li>
                     <li class="{% ancestor 'status' %}"><a href="{% url 'status' %}">Status</a></li>
                 {% endif %}
             </ul>
