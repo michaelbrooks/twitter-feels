@@ -117,10 +117,12 @@ def stream_status():
 
     Tweet = load_model("twitter_stream", "Tweet")
     tweet_count = Tweet.count_approx()
-    analyzed_count = None
-    for stream_class, cutoff_time in stream_class_memory_cutoffs.iteritems():
-        if stream_class == TweetStream:
-            analyzed_count = TweetStream().count_before(cutoff_time)
+    analyzed_count = 'a lot'
+
+    if tweet_count < 10000000:
+        for stream_class, cutoff_time in stream_class_memory_cutoffs.iteritems():
+            if stream_class == TweetStream:
+                analyzed_count = TweetStream().count_before(cutoff_time)
 
     stream = TweetStream()
     earliest_time = stream.get_earliest_stream_time()
