@@ -6,6 +6,9 @@
     cursor: default;
 }
 
+.timeline-panel .timeline-view {
+    height: 100%;
+}
 
 .axis text {
     font-size: 11px;
