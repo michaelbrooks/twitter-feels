@@ -4,6 +4,8 @@ from django.utils import timezone
 import random
 from south.db.generic import DatabaseOperations
 
+from twitter_stream.fields import PositiveBigAutoField, PositiveBigAutoForeignKey
+
 from swapper import get_model_name
 from datetime import timedelta
 import settings
@@ -415,8 +417,10 @@ class TweetChunk(models.Model):
             ['tz_country', 'node'],
         ]
 
+    id = PositiveBigAutoField(primary_key=True)
+
     node = models.ForeignKey(TreeNode, related_name='chunks')
-    tweet = models.ForeignKey(get_model_name('twitter_stream', 'Tweet'))
+    tweet = PositiveBigAutoForeignKey(get_model_name('twitter_stream', 'Tweet'))
     created_at = models.DateTimeField(db_index=True)
     tz_country = models.CharField(max_length=32, blank=True)
 
