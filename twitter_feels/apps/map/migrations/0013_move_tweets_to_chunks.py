@@ -17,7 +17,7 @@ class Migration(DataMigration):
 
         query ="""UPDATE `{tweet_chunks}`
                   JOIN `{tweets}` ON `{tweets}`.`id` = `{tweet_chunks}`.`tweet_id`
-                  SET `{tweet_chunks}`.`twitter_id`=`{tweets}`.`id`,
+                  SET `{tweet_chunks}`.`twitter_id`=`{tweets}`.`tweet_id`,
                       `{tweet_chunks}`.`tweet_text`=`{tweets}`.`text`
                   WHERE `{tweet_chunks}`.`twitter_id` = 0"""
 

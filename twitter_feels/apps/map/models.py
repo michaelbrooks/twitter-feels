@@ -597,7 +597,7 @@ class MapTimeFrame(TweetTimeFrame):
 
                 new_tweet_chunks.append(TweetChunk(
                     node=node,
-                    twitter_id=tweet.id,
+                    twitter_id=tweet.tweet_id,
                     tweet_text=tweet.text,
                     created_at=tweet.created_at,
                     tz_country=country))
