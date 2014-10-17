@@ -114,6 +114,7 @@ class TreeNode(models.Model):
         DELETE FROM map_treenode
         WHERE (parent_id IS NULL)
           AND NOT (id IN %s)
+        ORDER BY id
         LIMIT %s
         """
         params = [cls.ROOT_NODES, batch_size]
@@ -445,7 +446,7 @@ class TweetChunk(models.Model):
 
         cursor = connection.cursor()
 
-        deleted = cursor.execute("DELETE FROM map_tweetchunk WHERE created_at <= %s ORDER BY created_at LIMIT %s", [oldest_date, batch_size])
+        deleted = cursor.execute("DELETE FROM map_tweetchunk WHERE created_at <= %s ORDER BY id LIMIT %s", [oldest_date, batch_size])
 
         return deleted
 

@@ -29,6 +29,7 @@ class TweetStream(stream_analysis.AbstractStream):
         query = """
         DELETE FROM {table_name}
         WHERE created_at < %s
+        ORDER BY id
         LIMIT %s
         """.format(table_name=self.Tweet._meta.db_table)
         params = [cutoff_datetime, batch_size]
