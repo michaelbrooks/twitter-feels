@@ -75,7 +75,7 @@ def get_map_results_faster(prefix, query_chunks):
 def get_example_tweet(prefix, query_chunks, country_name):
     """Finds an example tweet for the given query"""
     node = TreeNode.follow_chunks(prefix, query_chunks)
-    return TweetChunk.get_example_tweet(country_name, node).text
+    return TweetChunk.get_example_tweet(country_name, node)
 
 
 def parse_chunks(request):

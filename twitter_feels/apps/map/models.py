@@ -420,7 +420,10 @@ class TweetChunk(models.Model):
     id = PositiveBigAutoField(primary_key=True)
 
     node = models.ForeignKey(TreeNode, related_name='chunks')
-    tweet = PositiveBigAutoForeignKey(get_model_name('twitter_stream', 'Tweet'))
+
+    twitter_id = models.BigIntegerField(default=0)
+    tweet_text = models.CharField(max_length=250, default=None, null=True)
+
     created_at = models.DateTimeField(db_index=True)
     tz_country = models.CharField(max_length=32, blank=True)
 
@@ -431,7 +434,7 @@ class TweetChunk(models.Model):
             chunks = cls.objects.filter(tz_country=country_name, node=node)
             count = chunks.count()
             chunk = chunks[random.randint(0, count - 1)]
-            return chunk.tweet
+            return chunk.tweet_text
         except DatabaseError:
             # things could potentially disappear while we're doing these operations
             return None
@@ -594,7 +597,8 @@ class MapTimeFrame(TweetTimeFrame):
 
                 new_tweet_chunks.append(TweetChunk(
                     node=node,
-                    tweet=tweet,
+                    twitter_id=tweet.id,
+                    tweet_text=tweet.text,
                     created_at=tweet.created_at,
                     tz_country=country))
                 parent = node
