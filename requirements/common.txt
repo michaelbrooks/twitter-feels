@@ -25,3 +25,5 @@ gunicorn==18.0
 mysql-python==1.2.5
 Jinja2==2.7.2
 django-jsonview==0.4.1
+
+django-rq==0.7.0

@@ -63,6 +63,7 @@ RQ_QUEUES = {
     'default': {
         'URL': environ.get('REDIS_URL', 'redis://localhost:6379'),
         'DB': 0,
+        'DEFAULT_TIMEOUT': 500,
     },
 }
 # Warning: Overrides the admin template!
